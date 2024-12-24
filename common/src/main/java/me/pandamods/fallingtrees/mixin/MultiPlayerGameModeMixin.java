@@ -12,8 +12,8 @@
 
 package me.pandamods.fallingtrees.mixin;
 
-import me.pandamods.fallingtrees.api.TreeRegistry;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
+import me.pandamods.fallingtrees.registry.TreeRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.core.BlockPos;
@@ -56,7 +56,7 @@ public abstract class MultiPlayerGameModeMixin {
 			Level level = player.level();
 
 			BlockState blockState = level.getBlockState(this.destroyBlockPos);
-			if (TreeRegistry.getTree(blockState).isPresent()) {
+			if (TreeRegistry.getTree(blockState) != null) {
 				if (player.isCrouching() != fallingTrees$lastTickCrouchState) {
 					if (this.isDestroying() && minecraft.gameMode != null) {
 						MultiPlayerGameMode gameMode = minecraft.gameMode;

@@ -12,10 +12,11 @@
 
 package me.pandamods.fallingtrees.mixin;
 
+import me.pandamods.fallingtrees.api.Tree;
 import me.pandamods.fallingtrees.api.TreeData;
 import me.pandamods.fallingtrees.api.TreeDataBuilder;
-import me.pandamods.fallingtrees.api.TreeRegistry;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
+import me.pandamods.fallingtrees.registry.TreeRegistry;
 import me.pandamods.fallingtrees.utils.TreeCache;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
@@ -31,10 +32,10 @@ public class BlockStateMixin {
 	@Inject(method = "getDestroyProgress", at = @At("RETURN"), cancellable = true)
 	public void getDestroyProgress(Player player, BlockGetter level, BlockPos pos, CallbackInfoReturnable<Float> cir) {
 		if (FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.disable) return;
-		TreeRegistry.getTree(level.getBlockState(pos)).ifPresent(tree -> {
-			if (!tree.willTreeFall(pos, level, player)) return;
+		Tree<?> tree = TreeRegistry.getTree(level.getBlockState(pos));
+		if (tree != null && tree.willTreeFall(pos, level, player)) {
 			TreeData treeData = TreeCache.get(player, pos, () -> tree.getTreeData(new TreeDataBuilder(), pos, level));
 			cir.setReturnValue(cir.getReturnValueF() * treeData.miningSpeedMultiply());
-		});
+		}
 	}
 }

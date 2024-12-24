@@ -18,10 +18,10 @@ import dev.architectury.utils.value.IntValue;
 import me.pandamods.fallingtrees.api.Tree;
 import me.pandamods.fallingtrees.api.TreeData;
 import me.pandamods.fallingtrees.api.TreeDataBuilder;
-import me.pandamods.fallingtrees.api.TreeRegistry;
 import me.pandamods.fallingtrees.config.CommonConfig;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.entity.TreeEntity;
+import me.pandamods.fallingtrees.registry.TreeRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
@@ -32,7 +32,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.Optional;
 import java.util.Set;
 
 public class EventHandler {
@@ -49,8 +48,9 @@ public class EventHandler {
 
 	public static boolean makeTreeFall(BlockPos blockPos, LevelAccessor level, Player player) {
 		if (level.isClientSide()) return false;
-		Optional<Tree<?>> treeTypeOptional = TreeRegistry.getTree(level.getBlockState(blockPos));
-		return treeTypeOptional.filter(treeType -> makeTreeFall(treeType, blockPos, level, player)).isPresent();
+		Tree<?> tree = TreeRegistry.getTree(level.getBlockState(blockPos));
+		if (tree != null) return makeTreeFall(tree, blockPos, level, player);
+		return false;
 	}
 
 	public static boolean makeTreeFall(Tree<?> tree, BlockPos blockPos, LevelAccessor level, Player player) {

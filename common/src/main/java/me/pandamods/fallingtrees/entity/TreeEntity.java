@@ -13,9 +13,9 @@
 package me.pandamods.fallingtrees.entity;
 
 import me.pandamods.fallingtrees.api.Tree;
-import me.pandamods.fallingtrees.api.TreeRegistry;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.registry.EntityRegistry;
+import me.pandamods.fallingtrees.registry.TreeRegistry;
 import me.pandamods.fallingtrees.utils.BlockMapEntityData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -41,7 +41,6 @@ import org.joml.Math;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 public class TreeEntity extends Entity {
@@ -177,7 +176,6 @@ public class TreeEntity extends Entity {
 	}
 
 	public Tree<?> getTree() {
-		Optional<Tree<?>> treeTypeOptional = TreeRegistry.getTree(ResourceLocation.tryParse(this.getEntityData().get(TREE_TYPE_LOCATION)));
-		return treeTypeOptional.orElse(null);
+		return TreeRegistry.getTree(ResourceLocation.tryParse(this.getEntityData().get(TREE_TYPE_LOCATION)));
 	}
 }

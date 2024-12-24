@@ -17,7 +17,7 @@ import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.event.EventHandler;
 import me.pandamods.fallingtrees.registry.EntityRegistry;
 import me.pandamods.fallingtrees.registry.SoundRegistry;
-import me.pandamods.fallingtrees.registry.TreeTypeRegistry;
+import me.pandamods.fallingtrees.registry.TreeRegistry;
 import me.pandamods.fallingtrees.utils.BlockMapEntityData;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.resources.ResourceLocation;
@@ -28,7 +28,7 @@ public class FallingTrees {
 	public static final FallingTreesConfig CONFIG = new FallingTreesConfig();
 
     public static void init() {
-		TreeTypeRegistry.TREES.register();
+		TreeRegistry.TREES.register();
 		SoundRegistry.SOUNDS.register();
 		EntityRegistry.ENTITIES.register();
 		EventHandler.register();
