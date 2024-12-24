@@ -18,7 +18,7 @@ import me.pandamods.fallingtrees.api.TreeDataBuilder;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.config.common.tree.TreeConfig;
 import me.pandamods.fallingtrees.entity.TreeEntity;
-import me.pandamods.fallingtrees.utils.ListUtils;
+import me.pandamods.fallingtrees.utils.CollectionsUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
@@ -92,6 +92,6 @@ public class ChorusTree implements Tree<TreeConfig> {
 
 	@Override
 	public List<ItemStack> getDrops(TreeEntity entity, Map<BlockPos, BlockState> blocks) {
-		return Tree.super.getDrops(entity, ListUtils.mapRemoveIf(blocks, (blockPos, blockState) -> blockState.is(Blocks.CHORUS_FLOWER)));
+		return Tree.super.getDrops(entity, CollectionsUtils.mapRemoveIf(blocks, (blockPos, blockState) -> blockState.is(Blocks.CHORUS_FLOWER)));
 	}
 }

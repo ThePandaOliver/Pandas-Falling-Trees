@@ -30,7 +30,6 @@ public class BlockMapEntityData {
 		public @NotNull Map<BlockPos, BlockState> decode(ByteBuf byteBuf) {
 			int size = VarInt.read(byteBuf);
 			Map<BlockPos, BlockState> map = Maps.newHashMapWithExpectedSize(size);
-
 			for (int i = 0; i < size; i++) {
 				map.put(FriendlyByteBuf.readBlockPos(byteBuf), Block.stateById(VarInt.read(byteBuf)));
 			}

@@ -28,11 +28,12 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
 
+@SuppressWarnings("unused")
 public class TreeRegistry {
-	public static final ResourceKey<Registry<Tree>> TREE_REGISTRY_KEY = ResourceKey.createRegistryKey(FallingTrees.ID("tree_registry"));
-	public static final Registry<Tree> TREE_REGISTRY = RegistryRegister.register(new MappedRegistry<>(TREE_REGISTRY_KEY, Lifecycle.stable()));
+	public static final ResourceKey<Registry<Tree<?>>> TREE_REGISTRY_KEY = ResourceKey.createRegistryKey(FallingTrees.ID("tree_registry"));
+	public static final Registry<Tree<?>> TREE_REGISTRY = RegistryRegister.register(new MappedRegistry<>(TREE_REGISTRY_KEY, Lifecycle.stable()));
 	
-	public static final DeferredRegister<Tree> TREES = DeferredRegister.create(FallingTrees.MOD_ID, TREE_REGISTRY_KEY);
+	public static final DeferredRegister<Tree<?>> TREES = DeferredRegister.create(FallingTrees.MOD_ID, TREE_REGISTRY_KEY);
 	
 	public static final DeferredObject<StandardTree> GENERIC = TREES.register("generic", StandardTree::new);
 	public static final DeferredObject<VerticalTree> VERTICAL = TREES.register("vertical", VerticalTree::new);
