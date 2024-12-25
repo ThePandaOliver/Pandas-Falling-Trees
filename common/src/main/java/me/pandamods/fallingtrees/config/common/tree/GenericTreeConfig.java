@@ -19,8 +19,8 @@ import net.minecraft.world.level.block.Blocks;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StandardTreeConfig extends TreeConfig {
-	public StandardTreeConfig() {
+public class GenericTreeConfig extends TreeConfig {
+	public GenericTreeConfig() {
 		this.allowedToolFilter.whitelistedTags.add(ItemTags.AXES.location().toString());
 	}
 

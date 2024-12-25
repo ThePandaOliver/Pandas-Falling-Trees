@@ -18,7 +18,7 @@ import me.pandamods.fallingtrees.api.TreeData;
 import me.pandamods.fallingtrees.api.TreeDataBuilder;
 import me.pandamods.fallingtrees.config.ClientConfig;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
-import me.pandamods.fallingtrees.config.common.tree.StandardTreeConfig;
+import me.pandamods.fallingtrees.config.common.tree.GenericTreeConfig;
 import me.pandamods.fallingtrees.entity.TreeEntity;
 import me.pandamods.fallingtrees.registry.SoundRegistry;
 import net.fabricmc.api.EnvType;
@@ -35,17 +35,17 @@ import org.joml.Math;
 import java.util.HashSet;
 import java.util.Set;
 
-public class StandardTree implements Tree<StandardTreeConfig> {
+public class GenericTree implements Tree<GenericTreeConfig> {
 	@Override
 	public boolean mineableBlock(BlockState blockState) {
-		return FallingTreesConfig.getCommonConfig().trees.standardTree.logFilter.isValid(blockState);
+		return getConfig().logFilter.isValid(blockState);
 	}
 
 	public boolean extraRequiredBlockCheck(BlockState blockState) {
 		if (getConfig().algorithm.shouldIgnorePersistentLeaves &&
 				blockState.hasProperty(BlockStateProperties.PERSISTENT) && blockState.getValue(BlockStateProperties.PERSISTENT))
 			return false;
-		return FallingTreesConfig.getCommonConfig().trees.standardTree.leavesFilter.isValid(blockState);
+		return getConfig().leavesFilter.isValid(blockState);
 	}
 
 	@Override
@@ -166,8 +166,8 @@ public class StandardTree implements Tree<StandardTreeConfig> {
 	}
 
 	@Override
-	public StandardTreeConfig getConfig() {
-		return FallingTreesConfig.getCommonConfig().trees.standardTree;
+	public GenericTreeConfig getConfig() {
+		return FallingTreesConfig.getCommonConfig().trees.genericTree;
 	}
 
 	public boolean isMaxAmountReached(int amount) {
@@ -176,6 +176,6 @@ public class StandardTree implements Tree<StandardTreeConfig> {
 
 	@Override
 	public boolean enabled() {
-		return FallingTreesConfig.getCommonConfig().trees.standardTree.enabled;
+		return getConfig().enabled;
 	}
 }
