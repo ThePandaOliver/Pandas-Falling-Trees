@@ -34,7 +34,7 @@ import java.util.Set;
 
 public class ChorusTree implements Tree<TreeConfig> {
 	@Override
-	public boolean mineableBlock(BlockState blockState) {
+	public boolean isTreeStem(BlockState blockState) {
 		return blockState.is(Blocks.CHORUS_PLANT);
 	}
 
@@ -61,10 +61,10 @@ public class ChorusTree implements Tree<TreeConfig> {
 		loopedBlocks.add(originPos);
 
 		BlockState blockState = level.getBlockState(originPos);
-		if (this.mineableBlock(blockState) || this.extraRequiredBlockCheck(blockState)) {
+		if (this.isTreeStem(blockState) || this.extraRequiredBlockCheck(blockState)) {
 			builder.addBlock(originPos);
 
-			if (this.mineableBlock(blockState)) {
+			if (this.isTreeStem(blockState)) {
 				for (Direction direction : Direction.values()) {
 					if (blockState.getValue(ChorusPlantBlock.PROPERTY_BY_DIRECTION.get(direction))) {
 						BlockPos neighborPos = originPos.offset(direction.getUnitVec3i());

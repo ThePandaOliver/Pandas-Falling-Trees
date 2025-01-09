@@ -18,6 +18,7 @@ import dev.architectury.utils.value.IntValue;
 import me.pandamods.fallingtrees.api.Tree;
 import me.pandamods.fallingtrees.api.TreeData;
 import me.pandamods.fallingtrees.api.TreeDataBuilder;
+import me.pandamods.fallingtrees.api.TreeHandler;
 import me.pandamods.fallingtrees.config.CommonConfig;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.entity.TreeEntity;
@@ -40,39 +41,9 @@ public class EventHandler {
 	}
 
 	private static EventResult onBlockBreak(Level level, BlockPos blockPos, BlockState blockState, ServerPlayer serverPlayer, IntValue intValue) {
-		if (serverPlayer != null && makeTreeFall(blockPos, level, serverPlayer)) {
+		if (serverPlayer != null && TreeHandler.destroyTree(level, blockPos, serverPlayer)) {
 			return EventResult.interruptFalse();
 		}
 		return EventResult.pass();
-	}
-
-	public static boolean makeTreeFall(BlockPos blockPos, LevelAccessor level, Player player) {
-		if (level.isClientSide()) return false;
-		Tree<?> tree = TreeRegistry.getTree(level.getBlockState(blockPos));
-		if (tree != null) return makeTreeFall(tree, blockPos, level, player);
-		return false;
-	}
-
-	public static boolean makeTreeFall(Tree<?> tree, BlockPos blockPos, LevelAccessor level, Player player) {
-		if (level.isClientSide()) return false;
-		BlockState blockState = level.getBlockState(blockPos);
-		CommonConfig commonConfig = FallingTreesConfig.getCommonConfig();
-
-		if (!tree.willTreeFall(blockPos, level, player)) return false;
-		ItemStack mainItem = player.getItemBySlot(EquipmentSlot.MAINHAND);
-
-		TreeData treeData = tree.getTreeData(new TreeDataBuilder(), blockPos, level);
-		Set<BlockPos> treeBlockPos = treeData.blocks();
-		if (!treeData.shouldFall()) return false;
-
-		if (!mainItem.isEmpty()) {
-			mainItem.hurtAndBreak(commonConfig.disableExtraToolDamage ? 1 : treeData.toolDamage(), player, EquipmentSlot.MAINHAND);
-		}
-		float defaultExhaustion = 0.005f;
-		player.causeFoodExhaustion(commonConfig.disableExtraFoodExhaustion ? defaultExhaustion : defaultExhaustion * treeData.foodExhaustionMultiply());
-		player.awardStat(Stats.BLOCK_MINED.get(blockState.getBlock()), treeData.awardedBlocks());
-
-		TreeEntity.destroyTree(treeBlockPos, blockPos, level, tree, player);
-		return true;
 	}
 }

@@ -36,13 +36,13 @@ public class TreeRegistry {
 	public static final DeferredRegister<Tree<?>> TREES = DeferredRegister.create(FallingTrees.MOD_ID, TREE_REGISTRY_KEY);
 	
 	public static final DeferredObject<GenericTree> GENERIC = TREES.register("generic", GenericTree::new);
-	public static final DeferredObject<VerticalTree> VERTICAL = TREES.register("vertical", VerticalTree::new);
-	public static final DeferredObject<ChorusTree> CHORUS = TREES.register("chorus", ChorusTree::new);
-	public static final DeferredObject<MushroomTree> MUSHROOM = TREES.register("mushroom", MushroomTree::new);
+//	public static final DeferredObject<VerticalTree> VERTICAL = TREES.register("vertical", VerticalTree::new);
+//	public static final DeferredObject<ChorusTree> CHORUS = TREES.register("chorus", ChorusTree::new);
+//	public static final DeferredObject<MushroomTree> MUSHROOM = TREES.register("mushroom", MushroomTree::new);
 
 	public static Tree<?> getTree(BlockState blockState) {
 		for (Tree<?> tree : TREE_REGISTRY) {
-			if (tree.mineableBlock(blockState))
+			if (tree.isTreeStem(blockState))
 				return tree;
 		}
 		return null;

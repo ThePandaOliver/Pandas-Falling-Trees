@@ -40,6 +40,7 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Math;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,34 +59,7 @@ public class TreeEntity extends Entity {
 		super(entityType, level);
 	}
 
-	public static void destroyTree(Set<BlockPos> blockPosList, BlockPos blockPos, LevelAccessor levelAccessor, Tree<?> tree, Player player) {
-		if (levelAccessor instanceof ServerLevel level) {
-			TreeEntity treeEntity = new TreeEntity(EntityRegistry.TREE.get(), level);
-			treeEntity.setPos(blockPos.getCenter().add(0, -.5, 0));
-			treeEntity.setData(blockPosList, blockPos, tree, player, player.getItemBySlot(EquipmentSlot.MAINHAND));
-
-			BlockState air = Blocks.AIR.defaultBlockState();
-			for (BlockPos pos : blockPosList) {
-				BlockState oldState = level.getBlockState(pos);
-				level.setBlock(pos, air, 16);
-				level.setBlocksDirty(pos, oldState, level.getBlockState(pos));
-			}
-			for (Map.Entry<BlockPos, BlockState> entry : treeEntity.getBlocks().entrySet()) {
-				BlockPos pos = entry.getKey().offset(blockPos);
-				BlockState newState = level.getBlockState(pos);
-				level.sendBlockUpdated(pos, entry.getValue(), newState, 3);
-				level.blockUpdated(pos, newState.getBlock());
-				newState.updateIndirectNeighbourShapes(level, pos, 511);
-				entry.getValue().updateNeighbourShapes(level, pos, 511);
-				entry.getValue().updateIndirectNeighbourShapes(level, pos, 511);
-
-				level.onBlockStateChange(pos, entry.getValue(), newState);
-			}
-			level.addFreshEntity(treeEntity);
-		}
-	}
-
-	public void setData(Set<BlockPos> blockPosList, BlockPos originBlock, Tree<?> tree, Entity owner, ItemStack itemStack) {
+	public void setData(List<BlockPos> blockPosList, BlockPos originBlock, Tree<?> tree, Entity owner, ItemStack itemStack) {
 		this.owner = owner;
 		this.tree = tree;
 

@@ -15,11 +15,12 @@ package me.pandamods.fallingtrees.trees;
 import dev.architectury.platform.Platform;
 import me.pandamods.fallingtrees.api.Tree;
 import me.pandamods.fallingtrees.api.TreeData;
-import me.pandamods.fallingtrees.api.TreeDataBuilder;
 import me.pandamods.fallingtrees.config.ClientConfig;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.config.common.tree.GenericTreeConfig;
 import me.pandamods.fallingtrees.entity.TreeEntity;
+import me.pandamods.fallingtrees.exceptions.TreeException;
+import me.pandamods.fallingtrees.exceptions.TreeTooBigException;
 import me.pandamods.fallingtrees.registry.SoundRegistry;
 import net.fabricmc.api.EnvType;
 import net.minecraft.core.BlockPos;
@@ -30,14 +31,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import org.joml.Math;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class GenericTree implements Tree<GenericTreeConfig> {
 	@Override
-	public boolean mineableBlock(BlockState blockState) {
+	public boolean isTreeStem(BlockState blockState) {
 		return getConfig().logFilter.isValid(blockState);
 	}
 
@@ -72,9 +72,9 @@ public class GenericTree implements Tree<GenericTreeConfig> {
 	}
 
 	@Override
-	public TreeData getTreeData(TreeDataBuilder builder, BlockPos blockPos, BlockGetter level) {
-		if (!this.mineableBlock(level.getBlockState(blockPos.above()))) return builder.build(false);
-
+	public TreeData gatherTreeData(BlockPos blockPos, Level level) throws TreeException {
+		TreeData.Builder builder = TreeData.builder();
+		
 		Set<BlockPos> logBlocks = new HashSet<>();
 		Set<BlockPos> leavesBlocks = new HashSet<>();
 		Set<BlockPos> decorationBlocks = new HashSet<>();
@@ -82,11 +82,7 @@ public class GenericTree implements Tree<GenericTreeConfig> {
 		Set<BlockPos> loopedLogBlocks = new HashSet<>();
 		Set<BlockPos> loopedDecorationBlocks = new HashSet<>();
 
-		loopLogs(level, blockPos, logBlocks, loopedLogBlocks);
-		if (!getConfig().algorithm.shouldFallOnMaxLogAmount && isMaxAmountReached(logBlocks.size())) return builder.build(false);
-		float speedMultiplication = FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.speedMultiplication;
-		float multiplyAmount = Math.min(FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.maxSpeedMultiplication, ((float) logBlocks.size() - 1f));
-		builder.setMiningSpeed(1f / (multiplyAmount * speedMultiplication + 1f));
+		loopLogs(level, blockPos, logBlocks, loopedLogBlocks, blockPos);
 
 		logBlocks.forEach(logPos -> {
 			Set<BlockPos> loopedLeavesBlocks = new HashSet<>();
@@ -117,23 +113,24 @@ public class GenericTree implements Tree<GenericTreeConfig> {
 				.build(true);
 	}
 
-	public void loopLogs(BlockGetter level, BlockPos blockPos, Set<BlockPos> blocks, Set<BlockPos> loopedBlocks) {
+	private void loopLogs(Level level, BlockPos blockPos, Set<BlockPos> blocks, Set<BlockPos> loopedBlocks, BlockPos startPos) throws TreeTooBigException {
 		if (loopedBlocks.contains(blockPos)) return;
-		if (isMaxAmountReached(blocks.size())) return;
 		loopedBlocks.add(blockPos);
 
 		BlockState blockState = level.getBlockState(blockPos);
-		if (this.mineableBlock(blockState)) {
+		if (this.isTreeStem(blockState)) {
 			blocks.add(blockPos);
+			if (isMaxAmountReached(blocks.size()))
+				throw new TreeTooBigException(startPos, level);
 
 			for (BlockPos offset : BlockPos.betweenClosed(new BlockPos(-1, 0, -1), new BlockPos(1, 1, 1))) {
 				BlockPos neighborPos = blockPos.offset(offset);
-				loopLogs(level, neighborPos, blocks, loopedBlocks);
+				loopLogs(level, neighborPos, blocks, loopedBlocks, startPos);
 			}
 		}
 	}
 
-	public void loopLeaves(BlockGetter level, BlockPos blockPos, Set<BlockPos> blocks, Set<BlockPos> loopedBlocks, int recursionDistance) {
+	private void loopLeaves(BlockGetter level, BlockPos blockPos, Set<BlockPos> blocks, Set<BlockPos> loopedBlocks, int recursionDistance) {
 		if (recursionDistance > getConfig().algorithm.maxLeavesRadius) return;
 		BlockState blockState = level.getBlockState(blockPos);
 		if (loopedBlocks.contains(blockPos) ||
@@ -151,7 +148,7 @@ public class GenericTree implements Tree<GenericTreeConfig> {
 		}
 	}
 
-	public void loopExtraBlocks(BlockGetter level, BlockPos blockPos, Set<BlockPos> blocks, Set<BlockPos> loopedBlocks) {
+	private void loopExtraBlocks(BlockGetter level, BlockPos blockPos, Set<BlockPos> blocks, Set<BlockPos> loopedBlocks) {
 		BlockState blockState = level.getBlockState(blockPos);
 		if (loopedBlocks.contains(blockPos)) return;
 

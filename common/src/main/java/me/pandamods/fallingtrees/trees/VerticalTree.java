@@ -23,7 +23,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class VerticalTree implements Tree<VerticalTreeConfig> {
 	@Override
-	public boolean mineableBlock(BlockState blockState) {
+	public boolean isTreeStem(BlockState blockState) {
 		return getConfig().filter.isValid(blockState);
 	}
 

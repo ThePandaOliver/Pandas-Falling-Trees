@@ -4,6 +4,9 @@
 ### Dependency Updates
 * Updated pandalib 0.4.2 -> 0.5
 
+### Config Updates
+* Renamed `standardTree` config to `genericTree`
 
-## Developer Changelog
+
+## Developer Notes
 It seems like there is nothing new.

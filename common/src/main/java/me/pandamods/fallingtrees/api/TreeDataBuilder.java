@@ -15,6 +15,7 @@ package me.pandamods.fallingtrees.api;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import net.minecraft.core.BlockPos;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -69,7 +70,7 @@ public class TreeDataBuilder {
 
 	public TreeData build(boolean shouldFall) {
 		return new TreeData(
-				blocks,
+				new ArrayList<>(blocks),
 				useDefaultMiningSpeed ? getDefaultMiningSpeed() : miningSpeedMultiplication,
 				shouldFall,
 				toolDamage,

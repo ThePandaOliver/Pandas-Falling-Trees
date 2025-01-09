@@ -15,6 +15,8 @@ package me.pandamods.fallingtrees.api;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.config.common.tree.TreeConfig;
 import me.pandamods.fallingtrees.entity.TreeEntity;
+import me.pandamods.fallingtrees.exceptions.TreeException;
+import me.pandamods.fallingtrees.exceptions.TreeTooBigException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -32,9 +34,16 @@ import java.util.List;
 import java.util.Map;
 
 public interface Tree<T extends TreeConfig> {
-	boolean mineableBlock(BlockState blockState);
+	boolean isTreeStem(BlockState blockState);
 	
-	TreeData getTreeData(TreeDataBuilder builder, BlockPos blockPos, BlockGetter level);
+	@Deprecated
+	default TreeData getTreeData(TreeDataBuilder builder, BlockPos blockPos, BlockGetter level) {
+		return null;
+	}
+	
+	default TreeData gatherTreeData(BlockPos blockPos, Level level) throws TreeException {
+		return null;
+	}
 
 	default void entityTick(TreeEntity entity) {
 		Level level = entity.level();

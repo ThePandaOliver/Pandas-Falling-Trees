@@ -22,13 +22,10 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Math;
@@ -114,7 +111,7 @@ public class TreeRenderer extends EntityRenderer<TreeEntity, TreeRenderState> {
 
 	private int getDistance(Tree tree, Map<BlockPos, BlockState> blocks, int distance, Direction direction) {
 		BlockPos nextBlockPos = new BlockPos(direction.getUnitVec3i().multiply(distance + 1));
-		if (blocks.containsKey(nextBlockPos) && tree.mineableBlock(blocks.get(nextBlockPos)))
+		if (blocks.containsKey(nextBlockPos) && tree.isTreeStem(blocks.get(nextBlockPos)))
 			return getDistance(tree, blocks, distance + 1, direction);
 		return distance;
 	}

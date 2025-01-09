@@ -27,13 +27,13 @@ import java.util.Set;
 
 public class MushroomTree implements Tree<MushroomTreeConfig> {
 	@Override
-	public boolean mineableBlock(BlockState blockState) {
+	public boolean isTreeStem(BlockState blockState) {
 		return getConfig().stemFilter.isValid(blockState);
 	}
 
 	@Override
 	public TreeData getTreeData(TreeDataBuilder builder, BlockPos blockPos, BlockGetter level) {
-		if (!this.mineableBlock(level.getBlockState(blockPos.above()))) return builder.build(false);
+		if (!this.isTreeStem(level.getBlockState(blockPos.above()))) return builder.build(false);
 
 		Set<BlockPos> stemBlocks = new HashSet<>();
 		Set<BlockPos> capBlocks = new HashSet<>();
@@ -70,7 +70,7 @@ public class MushroomTree implements Tree<MushroomTreeConfig> {
 		loopedBlocks.add(blockPos);
 
 		BlockState blockState = level.getBlockState(blockPos);
-		if (this.mineableBlock(blockState)) {
+		if (this.isTreeStem(blockState)) {
 			blocks.add(blockPos);
 
 			for (BlockPos offset : BlockPos.betweenClosed(new BlockPos(-1, 0, -1), new BlockPos(1, 1, 1))) {
