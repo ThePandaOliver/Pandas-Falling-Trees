@@ -20,7 +20,6 @@ import java.util.*;
 public record TreeData(
 		List<BlockPos> blocks,
 		float miningSpeedMultiply,
-		boolean shouldFall,
 		int toolDamage,
 		float foodExhaustionMultiply,
 		int awardedBlocks
@@ -71,11 +70,10 @@ public record TreeData(
 			return this;
 		}
 
-		public TreeData build(boolean shouldFall) {
+		public TreeData build() {
 			return new TreeData(
 					viewBlocks,
 					useDefaultMiningSpeed ? getDefaultMiningSpeed() : miningSpeedMultiplication,
-					shouldFall,
 					toolDamage,
 					foodExhaustionMultiplication,
 					awardedBlocks

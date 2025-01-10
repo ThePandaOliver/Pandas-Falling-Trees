@@ -15,25 +15,12 @@ package me.pandamods.fallingtrees.event;
 import dev.architectury.event.EventResult;
 import dev.architectury.event.events.common.BlockEvent;
 import dev.architectury.utils.value.IntValue;
-import me.pandamods.fallingtrees.api.Tree;
-import me.pandamods.fallingtrees.api.TreeData;
-import me.pandamods.fallingtrees.api.TreeDataBuilder;
 import me.pandamods.fallingtrees.api.TreeHandler;
-import me.pandamods.fallingtrees.config.CommonConfig;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
-import me.pandamods.fallingtrees.entity.TreeEntity;
-import me.pandamods.fallingtrees.registry.TreeRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.stats.Stats;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
-
-import java.util.Set;
 
 public class EventHandler {
 	public static void register() {
@@ -41,9 +28,15 @@ public class EventHandler {
 	}
 
 	private static EventResult onBlockBreak(Level level, BlockPos blockPos, BlockState blockState, ServerPlayer serverPlayer, IntValue intValue) {
-		if (serverPlayer != null && TreeHandler.destroyTree(level, blockPos, serverPlayer)) {
+		if (serverPlayer == null)
+			return EventResult.pass();
+		
+		if (!FallingTreesConfig.getCommonConfig().disableCrouchMining && serverPlayer.isCrouching())
+			return EventResult.pass();
+		
+		if (TreeHandler.destroyTree(level, blockPos, serverPlayer))
 			return EventResult.interruptFalse();
-		}
+		
 		return EventResult.pass();
 	}
 }

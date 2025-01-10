@@ -14,11 +14,10 @@ package me.pandamods.fallingtrees.registry;
 
 import com.mojang.serialization.Lifecycle;
 import me.pandamods.fallingtrees.FallingTrees;
-import me.pandamods.fallingtrees.api.Tree;
-import me.pandamods.fallingtrees.trees.ChorusTree;
-import me.pandamods.fallingtrees.trees.MushroomTree;
+import me.pandamods.fallingtrees.api.TreeType;
+import me.pandamods.fallingtrees.config.FallingTreesConfig;
+import me.pandamods.fallingtrees.config.common.TreeConfigs;
 import me.pandamods.fallingtrees.trees.GenericTree;
-import me.pandamods.fallingtrees.trees.VerticalTree;
 import me.pandamods.pandalib.registry.DeferredObject;
 import me.pandamods.pandalib.registry.DeferredRegister;
 import me.pandamods.pandalib.registry.RegistryRegister;
@@ -30,29 +29,36 @@ import net.minecraft.world.level.block.state.BlockState;
 
 @SuppressWarnings("unused")
 public class TreeRegistry {
-	public static final ResourceKey<Registry<Tree<?>>> TREE_REGISTRY_KEY = ResourceKey.createRegistryKey(FallingTrees.ID("tree_registry"));
-	public static final Registry<Tree<?>> TREE_REGISTRY = RegistryRegister.register(new MappedRegistry<>(TREE_REGISTRY_KEY, Lifecycle.stable()));
+	public static final ResourceKey<Registry<TreeType>> TREE_REGISTRY_KEY = ResourceKey.createRegistryKey(FallingTrees.ID("tree_registry"));
+	public static final Registry<TreeType> TREE_REGISTRY = RegistryRegister.register(new MappedRegistry<>(TREE_REGISTRY_KEY, Lifecycle.stable()));
 	
-	public static final DeferredRegister<Tree<?>> TREES = DeferredRegister.create(FallingTrees.MOD_ID, TREE_REGISTRY_KEY);
+	public static final DeferredRegister<TreeType> TREES = DeferredRegister.create(FallingTrees.MOD_ID, TREE_REGISTRY_KEY);
 	
-	public static final DeferredObject<GenericTree> GENERIC = TREES.register("generic", GenericTree::new);
-//	public static final DeferredObject<VerticalTree> VERTICAL = TREES.register("vertical", VerticalTree::new);
-//	public static final DeferredObject<ChorusTree> CHORUS = TREES.register("chorus", ChorusTree::new);
-//	public static final DeferredObject<MushroomTree> MUSHROOM = TREES.register("mushroom", MushroomTree::new);
-
-	public static Tree<?> getTree(BlockState blockState) {
-		for (Tree<?> tree : TREE_REGISTRY) {
+	public static DeferredObject<GenericTree> GENERIC;
+//	public static DeferredObject<VerticalTree> VERTICAL = TREES.register("vertical", VerticalTree::new);
+//	public static DeferredObject<ChorusTree> CHORUS = TREES.register("chorus", ChorusTree::new);
+//	public static DeferredObject<MushroomTree> MUSHROOM = TREES.register("mushroom", MushroomTree::new);
+	
+	static {
+		TreeConfigs treeConfigs = FallingTreesConfig.getCommonConfig().trees;
+		
+		if (treeConfigs.genericTree.enabled)
+			GENERIC = TREES.register("generic", GenericTree::new);
+	}
+	
+	public static TreeType getTree(BlockState blockState) {
+		for (TreeType tree : TREE_REGISTRY) {
 			if (tree.isTreeStem(blockState))
 				return tree;
 		}
 		return null;
 	}
 	
-	public static Tree<?> getTree(ResourceLocation resourceLocation) {
+	public static TreeType getTree(ResourceLocation resourceLocation) {
 		return TREE_REGISTRY.getValue(resourceLocation);
 	}
 	
-	public static ResourceLocation getTreeLocation(Tree<?> tree) {
+	public static ResourceLocation getTreeLocation(TreeType tree) {
 		return TREE_REGISTRY.getKey(tree);
 	}
 }

@@ -13,7 +13,7 @@
 package me.pandamods.fallingtrees.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import me.pandamods.fallingtrees.api.Tree;
+import me.pandamods.fallingtrees.api.TreeType;
 import me.pandamods.fallingtrees.config.ClientConfig;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.entity.TreeEntity;
@@ -28,6 +28,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Math;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -46,7 +47,7 @@ public class TreeRenderer extends EntityRenderer<TreeEntity, TreeRenderState> {
 
 	@Override
 	public void render(TreeRenderState renderState, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
-		Tree<?> tree = renderState.tree;
+		TreeType tree = renderState.treeType;
 		if (tree == null) return;
 
 		poseStack.pushPose();
@@ -67,7 +68,7 @@ public class TreeRenderer extends EntityRenderer<TreeEntity, TreeRenderState> {
 		Direction direction = renderState.direction.getOpposite();
 		int distance = getDistance(tree, blocks, 0, direction.getOpposite());
 
-		Vector3f pivot =  new Vector3f(0, 0, (.5f + distance) * tree.fallAnimationEdgeDistance());
+		Vector3f pivot =  new Vector3f(0, 0, (.5f + distance) * 1);
 		pivot.rotateY(Math.toRadians(-direction.toYRot()));
 		poseStack.translate(-pivot.x, 0, -pivot.z);
 
@@ -94,13 +95,14 @@ public class TreeRenderer extends EntityRenderer<TreeEntity, TreeRenderState> {
 	}
 
 	@Override
+	@NotNull
 	public TreeRenderState createRenderState() {
 		return new TreeRenderState();
 	}
 
 	@Override
 	public void extractRenderState(TreeEntity entity, TreeRenderState renderState, float f) {
-		renderState.tree = entity.getTree();
+		renderState.treeType = entity.getTreeType();
 		renderState.blocks = entity.getBlocks();
 		renderState.lifeTime = entity.getLifetime(f);
 		renderState.direction = entity.getDirection();
@@ -109,7 +111,7 @@ public class TreeRenderer extends EntityRenderer<TreeEntity, TreeRenderState> {
 		super.extractRenderState(entity, renderState, f);
 	}
 
-	private int getDistance(Tree tree, Map<BlockPos, BlockState> blocks, int distance, Direction direction) {
+	private int getDistance(TreeType tree, Map<BlockPos, BlockState> blocks, int distance, Direction direction) {
 		BlockPos nextBlockPos = new BlockPos(direction.getUnitVec3i().multiply(distance + 1));
 		if (blocks.containsKey(nextBlockPos) && tree.isTreeStem(blocks.get(nextBlockPos)))
 			return getDistance(tree, blocks, distance + 1, direction);

@@ -1,6 +1,6 @@
 package me.pandamods.fallingtrees.client.render;
 
-import me.pandamods.fallingtrees.api.Tree;
+import me.pandamods.fallingtrees.api.TreeType;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.Map;
 
 public class TreeRenderState extends EntityRenderState {
-	public Tree<?> tree;
+	public TreeType treeType;
 	public Map<BlockPos, BlockState> blocks;
 	public double lifeTime;
 	public Direction direction;

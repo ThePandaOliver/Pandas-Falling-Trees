@@ -36,7 +36,7 @@ public class GenericTreeConfig extends TreeConfig {
 			new ArrayList<>(),
 			new ArrayList<>()
 	);
-	public Filter extraBlockFilter = new Filter(
+	public Filter adjacentBlockFilter = new Filter(
 			new ArrayList<>(),
 			List.of(
 					Blocks.VINE.arch$registryName().toString(),
@@ -47,7 +47,7 @@ public class GenericTreeConfig extends TreeConfig {
 	);
 
 	public static class Algorithm {
-		public int maxLeavesRadius = 10;
+		public int maxLeavesRadius = 7;
 		public int maxLogAmount = 256;
 		public boolean shouldFallOnMaxLogAmount = false;
 		public boolean shouldIgnorePersistentLeaves = true;
