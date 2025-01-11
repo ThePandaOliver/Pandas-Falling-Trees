@@ -19,6 +19,7 @@ import me.pandamods.fallingtrees.config.common.tree.GenericTreeConfig;
 import me.pandamods.fallingtrees.exceptions.TreeTooBigException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LeavesBlock;
@@ -78,10 +79,9 @@ public class GenericTree implements TreeType {
 				.addBlocks(logBlocks)
 				.addBlocks(leavesBlocks)
 				.addBlocks(adjacentBlocks)
-				.setAwardedBlocks(logBlocks.size())
-				.setFoodExhaustion(logBlocks.size())
 				.setToolDamage(logBlocks.size())
-				.setMiningSpeedModifier((blockState, originalMiningSpeed) -> {
+				.setFoodExhaustionModifier(originalExhaustion -> originalExhaustion * logBlocks.size())
+				.setMiningSpeedModifier(originalMiningSpeed -> {
 					float speedMultiplication = FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.speedMultiplication;
 					float multiplyAmount = Math.min(FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.maxSpeedMultiplication, ((float) logBlocks.size() - 1f));
 					return originalMiningSpeed / (multiplyAmount * speedMultiplication + 1f);

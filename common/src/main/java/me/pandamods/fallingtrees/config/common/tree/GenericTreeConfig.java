@@ -49,7 +49,6 @@ public class GenericTreeConfig extends TreeConfig {
 	public static class Algorithm {
 		public int maxLeavesRadius = 7;
 		public int maxLogAmount = 256;
-		public boolean shouldFallOnMaxLogAmount = false;
 		public boolean shouldIgnorePersistentLeaves = true;
 	}
 }

@@ -16,6 +16,7 @@ import me.pandamods.fallingtrees.api.TreeType;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.registry.TreeRegistry;
 import me.pandamods.fallingtrees.utils.BlockMapEntityData;
+import me.pandamods.fallingtrees.utils.ItemListEntityData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -28,18 +29,18 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Math;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TreeEntity extends Entity {
 	public static final EntityDataAccessor<Map<BlockPos, BlockState>> BLOCKS = SynchedEntityData.defineId(TreeEntity.class, BlockMapEntityData.BLOCK_MAP);
+	public static final EntityDataAccessor<List<ItemStack>> DROPS = SynchedEntityData.defineId(TreeEntity.class, ItemListEntityData.ITEM_LIST);
 	public static final EntityDataAccessor<BlockPos> ORIGIN_POS = SynchedEntityData.defineId(TreeEntity.class, EntityDataSerializers.BLOCK_POS);
 	public static final EntityDataAccessor<Direction> FALL_DIRECTION = SynchedEntityData.defineId(TreeEntity.class, EntityDataSerializers.DIRECTION);
 	public static final EntityDataAccessor<String> TREE_TYPE_LOCATION = SynchedEntityData.defineId(TreeEntity.class, EntityDataSerializers.STRING);
@@ -51,7 +52,7 @@ public class TreeEntity extends Entity {
 		super(entityType, level);
 	}
 
-	public void setData(Entity owner, TreeType tree, List<BlockPos> blockPosList, BlockPos originBlock) {
+	public void setData(Entity owner, TreeType tree, BlockPos originBlock, List<BlockPos> blockPosList) {
 		this.owner = owner;
 		this.treeType = tree;
 
@@ -74,7 +75,8 @@ public class TreeEntity extends Entity {
 
 	@Override
 	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		builder.define(BLOCKS, new HashMap<>());
+		builder.define(BLOCKS, Collections.emptyMap());
+		builder.define(DROPS, Collections.emptyList());
 		builder.define(ORIGIN_POS, new BlockPos(0, 0, 0));
 		builder.define(FALL_DIRECTION, Direction.NORTH);
 		builder.define(TREE_TYPE_LOCATION, "");

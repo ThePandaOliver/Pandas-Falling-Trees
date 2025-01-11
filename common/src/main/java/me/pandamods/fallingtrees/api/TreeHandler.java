@@ -1,13 +1,14 @@
 package me.pandamods.fallingtrees.api;
 
 import com.mojang.logging.LogUtils;
-import dev.architectury.event.EventResult;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.entity.TreeEntity;
 import me.pandamods.fallingtrees.exceptions.TreeException;
 import me.pandamods.fallingtrees.registry.EntityRegistry;
 import me.pandamods.fallingtrees.registry.TreeRegistry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.stats.Stats;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -35,7 +36,21 @@ public class TreeHandler {
 
 			TreeEntity entity = new TreeEntity(EntityRegistry.TREE.get(), level);
 			entity.setPos(blockPos.getX() + 0.5, blockPos.getY(), blockPos.getZ() + 0.5);
-			entity.setData(player, tree, blocks, blockPos);
+			entity.setData(player, tree, blockPos, blocks);
+			
+			player.causeFoodExhaustion(
+					FallingTreesConfig.getCommonConfig().disableExtraFoodExhaustion ? 1 : 
+							data.foodExhaustionModifier().getExhaustion(0.005F)
+			);
+			
+			if (player.getMainHandItem().isDamageableItem())
+				player.getMainHandItem().hurtAndBreak(
+						FallingTreesConfig.getCommonConfig().disableExtraToolDamage ? 1 : data.toolDamage(),
+						player, EquipmentSlot.MAINHAND
+				);
+			
+			player.awardStat(Stats.ITEM_USED.get(player.getMainHandItem().getItem()));
+			data.awardedStats().forEach(awardedStat -> player.awardStat(awardedStat.stat(), awardedStat.amount()));
 
 //			for (BlockPos block : blocks) {
 //				level.removeBlock(block, false);
@@ -60,7 +75,7 @@ public class TreeHandler {
 				if (tree == null) return null;
 				TreeData data = tree.gatherTreeData(blockPos, player.level());
 				if (data == null) return null;
-				return new TreeSpeed(data.miningSpeedModifier().getMiningSpeed(blockState, baseSpeed), blockPos.immutable());
+				return new TreeSpeed(data.miningSpeedModifier().getMiningSpeed(baseSpeed), blockPos.immutable());
 			}
 			return speed;
 		});

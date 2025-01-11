@@ -13,16 +13,18 @@
 package me.pandamods.fallingtrees.api;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.stats.Stat;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.*;
 
 public record TreeData(
 		List<BlockPos> blocks,
-		MiningSpeedModifier miningSpeedModifier,
+		List<ItemStack> drops,
+		List<AwardedStat> awardedStats,
 		int toolDamage,
-		float foodExhaustionMultiply,
-		int awardedBlocks
+		MiningSpeedModifier miningSpeedModifier,
+		FoodExhaustionModifier foodExhaustionModifier
 ) {
 	public static Builder builder() {
 		return new Builder();
@@ -31,25 +33,53 @@ public record TreeData(
 	public static class Builder {
 		private final List<BlockPos> blocks = new ArrayList<>();
 		private final List<BlockPos> viewBlocks = Collections.unmodifiableList(blocks);
+		private final List<ItemStack> drops = new ArrayList<>();
+		private final List<ItemStack> viewDrops = Collections.unmodifiableList(drops);
+		private final Map<Stat<?>, Integer> awardedStats = new HashMap<>();
 		private int toolDamage = 0;
-		private float foodExhaustionMultiplication = 1;
-		private int awardedBlocks = 0;
-		private MiningSpeedModifier miningSpeedModifier = (blockState, originalMiningSpeed) -> originalMiningSpeed;
+		private MiningSpeedModifier miningSpeedModifier = originalMiningSpeed -> originalMiningSpeed;
+		private FoodExhaustionModifier foodExhaustionModifier = originalExhaustion -> originalExhaustion;
 
 		private Builder() {}
 
-		public Builder setMiningSpeedModifier(MiningSpeedModifier miningSpeedModifier) {
-			this.miningSpeedModifier = miningSpeedModifier;
+		public Builder addBlock(BlockPos blockPos) {
+			this.blocks.add(blockPos);
 			return this;
 		}
 
+		public Builder addBlocks(BlockPos blockPos, BlockPos... otherBlocks) {
+			this.blocks.add(blockPos);
+			this.blocks.addAll(Arrays.asList(otherBlocks));
+			return this;
+		}
+		
 		public Builder addBlocks(Collection<BlockPos> blocks) {
 			this.blocks.addAll(blocks);
 			return this;
 		}
+		
+		public Builder addDrop(ItemStack drop) {
+			this.drops.add(drop);
+			return this;
+		}
 
-		public Builder addBlock(BlockPos blockPos) {
-			this.blocks.add(blockPos);
+		public Builder addDrops(ItemStack drop, ItemStack... otherDrops) {
+			this.drops.add(drop);
+			this.drops.addAll(Arrays.asList(otherDrops));
+			return this;
+		}
+		
+		public Builder addDrops(Collection<ItemStack> drops) {
+			this.drops.addAll(drops);
+			return this;
+		}
+
+		public Builder addAwardedStat(Stat<?> stat) {
+			return this.addAwardedStat(stat, 1);
+		}
+		
+		public Builder addAwardedStat(Stat<?> stat, int amount) {
+			this.awardedStats.compute(stat, (stat1, oldAmount) -> oldAmount == null ? amount : oldAmount + amount);
 			return this;
 		}
 
@@ -58,28 +88,35 @@ public record TreeData(
 			return this;
 		}
 
-		public Builder setFoodExhaustion(float multiply) {
-			this.foodExhaustionMultiplication = multiply;
+		public Builder setMiningSpeedModifier(MiningSpeedModifier miningSpeedModifier) {
+			this.miningSpeedModifier = miningSpeedModifier;
 			return this;
 		}
 
-		public Builder setAwardedBlocks(int awardedBlocks) {
-			this.awardedBlocks = awardedBlocks;
+		public Builder setFoodExhaustionModifier(FoodExhaustionModifier foodExhaustionModifier) {
+			this.foodExhaustionModifier = foodExhaustionModifier;
 			return this;
 		}
 
 		public TreeData build() {
 			return new TreeData(
 					viewBlocks,
-					miningSpeedModifier,
+					viewDrops,
+					awardedStats.entrySet().stream().map(entry -> new AwardedStat(entry.getKey(), entry.getValue())).toList(),
 					toolDamage,
-					foodExhaustionMultiplication,
-					awardedBlocks
+					miningSpeedModifier,
+					foodExhaustionModifier
 			);
 		}
 	}
 
 	public interface MiningSpeedModifier {
-		float getMiningSpeed(BlockState blockState, float originalMiningSpeed);
+		float getMiningSpeed(float originalMiningSpeed);
 	}
+
+	public interface FoodExhaustionModifier {
+		float getExhaustion(float originalExhaustion);
+	}
+	
+	public record AwardedStat(Stat<?> stat, int amount) {}
 }

@@ -19,6 +19,7 @@ import me.pandamods.fallingtrees.registry.EntityRegistry;
 import me.pandamods.fallingtrees.registry.SoundRegistry;
 import me.pandamods.fallingtrees.registry.TreeRegistry;
 import me.pandamods.fallingtrees.utils.BlockMapEntityData;
+import me.pandamods.fallingtrees.utils.ItemListEntityData;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.resources.ResourceLocation;
 
@@ -33,8 +34,10 @@ public class FallingTrees {
 		EntityRegistry.ENTITIES.register();
 		EventHandler.register();
 
-		if (!Platform.isNeoForge())
+		if (!Platform.isNeoForge()) {
 			EntityDataSerializers.registerSerializer(BlockMapEntityData.BLOCK_MAP);
+			EntityDataSerializers.registerSerializer(ItemListEntityData.ITEM_LIST);
+		}
     }
 
 	public static ResourceLocation ID(String path) {
