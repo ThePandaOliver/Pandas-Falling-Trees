@@ -19,6 +19,7 @@ import me.pandamods.fallingtrees.api.TreeHandler;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -31,7 +32,7 @@ public class EventHandler {
 		if (serverPlayer == null)
 			return EventResult.pass();
 		
-		if (!FallingTreesConfig.getCommonConfig().disableCrouchMining && serverPlayer.isCrouching())
+		if (!TreeHandler.canPlayerChopTree(serverPlayer))
 			return EventResult.pass();
 		
 		if (TreeHandler.destroyTree(level, blockPos, serverPlayer))

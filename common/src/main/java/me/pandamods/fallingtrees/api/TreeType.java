@@ -18,6 +18,5 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public interface TreeType {
 	boolean isTreeStem(BlockState blockState);
-	
 	TreeData gatherTreeData(BlockPos blockPos, Level level);
 }

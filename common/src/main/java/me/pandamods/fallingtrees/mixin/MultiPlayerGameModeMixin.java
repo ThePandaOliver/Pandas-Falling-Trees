@@ -32,40 +32,40 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MultiPlayerGameMode.class)
 public abstract class MultiPlayerGameModeMixin {
-//	@Shadow private BlockPos destroyBlockPos;
-//
-//	@Shadow public abstract boolean isDestroying();
-//
-//	@Shadow @Final private Minecraft minecraft;
-//	@Unique
-//	private boolean fallingTrees$lastTickCrouchState = false;
-//	@Unique
-//	private Direction fallingTrees$blockDestroyDirection = Direction.UP;
-//
-//	@Inject(method = "startDestroyBlock", at = @At("RETURN"))
-//	public void startDestroyBlock(BlockPos loc, Direction face, CallbackInfoReturnable<Boolean> cir) {
-//		fallingTrees$blockDestroyDirection = face;
-//	}
-//
-//	@Inject(method = "tick", at = @At("RETURN"))
-//	public void tick(CallbackInfo ci) {
-//		if (FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.disable) return;
-//		Player player = minecraft.player;
-//
-//		if (player != null) {
-//			Level level = player.level();
-//
-//			BlockState blockState = level.getBlockState(this.destroyBlockPos);
-//			if (TreeRegistry.getTree(blockState) != null) {
-//				if (player.isCrouching() != fallingTrees$lastTickCrouchState) {
-//					if (this.isDestroying() && minecraft.gameMode != null) {
-//						MultiPlayerGameMode gameMode = minecraft.gameMode;
-//						gameMode.stopDestroyBlock();
-//						gameMode.startDestroyBlock(this.destroyBlockPos, fallingTrees$blockDestroyDirection);
-//					}
-//				}
-//				this.fallingTrees$lastTickCrouchState = player.isCrouching();
-//			}
-//		}
-//	}
+	@Shadow private BlockPos destroyBlockPos;
+
+	@Shadow public abstract boolean isDestroying();
+
+	@Shadow @Final private Minecraft minecraft;
+	@Unique
+	private boolean fallingTrees$lastTickCrouchState = false;
+	@Unique
+	private Direction fallingTrees$blockDestroyDirection = Direction.UP;
+
+	@Inject(method = "startDestroyBlock", at = @At("RETURN"))
+	public void startDestroyBlock(BlockPos loc, Direction face, CallbackInfoReturnable<Boolean> cir) {
+		fallingTrees$blockDestroyDirection = face;
+	}
+
+	@Inject(method = "tick", at = @At("RETURN"))
+	public void tick(CallbackInfo ci) {
+		if (FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.disable) return;
+		Player player = minecraft.player;
+
+		if (player != null) {
+			Level level = player.level();
+
+			BlockState blockState = level.getBlockState(this.destroyBlockPos);
+			if (TreeRegistry.getTree(blockState) != null) {
+				if (player.isCrouching() != fallingTrees$lastTickCrouchState) {
+					if (this.isDestroying() && minecraft.gameMode != null) {
+						MultiPlayerGameMode gameMode = minecraft.gameMode;
+						gameMode.stopDestroyBlock();
+						gameMode.startDestroyBlock(this.destroyBlockPos, fallingTrees$blockDestroyDirection);
+					}
+				}
+				this.fallingTrees$lastTickCrouchState = player.isCrouching();
+			}
+		}
+	}
 }

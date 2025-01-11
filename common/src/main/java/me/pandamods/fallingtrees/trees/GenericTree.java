@@ -81,6 +81,11 @@ public class GenericTree implements TreeType {
 				.setAwardedBlocks(logBlocks.size())
 				.setFoodExhaustion(logBlocks.size())
 				.setToolDamage(logBlocks.size())
+				.setMiningSpeedModifier((blockState, originalMiningSpeed) -> {
+					float speedMultiplication = FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.speedMultiplication;
+					float multiplyAmount = Math.min(FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.maxSpeedMultiplication, ((float) logBlocks.size() - 1f));
+					return originalMiningSpeed / (multiplyAmount * speedMultiplication + 1f);
+				})
 				.build();
 	}
 

@@ -9,4 +9,5 @@
 
 
 ## Developer Notes
-It seems like there is nothing new.
+* Renamed `standardTree.class` to `genericTree.class`
+* Renamed `Tree.class` to `TreeType.class`

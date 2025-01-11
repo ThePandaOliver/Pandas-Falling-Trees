@@ -12,14 +12,14 @@
 
 package me.pandamods.fallingtrees.api;
 
-import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.*;
 
 public record TreeData(
 		List<BlockPos> blocks,
-		float miningSpeedMultiply,
+		MiningSpeedModifier miningSpeedModifier,
 		int toolDamage,
 		float foodExhaustionMultiply,
 		int awardedBlocks
@@ -31,17 +31,15 @@ public record TreeData(
 	public static class Builder {
 		private final List<BlockPos> blocks = new ArrayList<>();
 		private final List<BlockPos> viewBlocks = Collections.unmodifiableList(blocks);
-		private boolean useDefaultMiningSpeed = true;
-		private float miningSpeedMultiplication = 1;
 		private int toolDamage = 0;
 		private float foodExhaustionMultiplication = 1;
 		private int awardedBlocks = 0;
+		private MiningSpeedModifier miningSpeedModifier = (blockState, originalMiningSpeed) -> originalMiningSpeed;
 
 		private Builder() {}
 
-		public Builder setMiningSpeed(float multiply) {
-			this.useDefaultMiningSpeed = false;
-			this.miningSpeedMultiplication = multiply;
+		public Builder setMiningSpeedModifier(MiningSpeedModifier miningSpeedModifier) {
+			this.miningSpeedModifier = miningSpeedModifier;
 			return this;
 		}
 
@@ -73,17 +71,15 @@ public record TreeData(
 		public TreeData build() {
 			return new TreeData(
 					viewBlocks,
-					useDefaultMiningSpeed ? getDefaultMiningSpeed() : miningSpeedMultiplication,
+					miningSpeedModifier,
 					toolDamage,
 					foodExhaustionMultiplication,
 					awardedBlocks
 			);
 		}
+	}
 
-		protected float getDefaultMiningSpeed() {
-			float speedMultiplication = FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.speedMultiplication;
-			float multiplyAmount = Math.min(FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.maxSpeedMultiplication, ((float) blocks.size() - 1f));
-			return 1f / (multiplyAmount * speedMultiplication + 1f);
-		}
+	public interface MiningSpeedModifier {
+		float getMiningSpeed(BlockState blockState, float originalMiningSpeed);
 	}
 }

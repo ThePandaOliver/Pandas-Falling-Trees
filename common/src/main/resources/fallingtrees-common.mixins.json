@@ -7,8 +7,7 @@
 		"MultiPlayerGameModeMixin"
 	],
 	"mixins": [
-		"BlockBehaviourMixin",
-		"BlockStateMixin"
+		"BlockBehaviourMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
