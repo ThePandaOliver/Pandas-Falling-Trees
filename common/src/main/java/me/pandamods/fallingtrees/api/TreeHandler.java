@@ -7,6 +7,8 @@ import me.pandamods.fallingtrees.exceptions.TreeException;
 import me.pandamods.fallingtrees.registry.EntityRegistry;
 import me.pandamods.fallingtrees.registry.TreeRegistry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
@@ -14,7 +16,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.slf4j.Logger;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TreeHandler {
@@ -30,25 +34,25 @@ public class TreeHandler {
 		if (tree == null) return false;
 		
 		try {
-			TreeData data = tree.gatherTreeData(blockPos, level);
+			TreeData data = tree.gatherTreeData(blockPos, level, player);
 			if (data == null) return false;
 			List<BlockPos> blocks = data.blocks();
 
 			TreeEntity entity = new TreeEntity(EntityRegistry.TREE.get(), level);
 			entity.setPos(blockPos.getX() + 0.5, blockPos.getY(), blockPos.getZ() + 0.5);
 			entity.setData(player, tree, blockPos, blocks);
-			
+
 			player.causeFoodExhaustion(
-					FallingTreesConfig.getCommonConfig().disableExtraFoodExhaustion ? 1 : 
+					FallingTreesConfig.getCommonConfig().disableExtraFoodExhaustion ? 1 :
 							data.foodExhaustionModifier().getExhaustion(0.005F)
 			);
-			
+
 			if (player.getMainHandItem().isDamageableItem())
 				player.getMainHandItem().hurtAndBreak(
 						FallingTreesConfig.getCommonConfig().disableExtraToolDamage ? 1 : data.toolDamage(),
 						player, EquipmentSlot.MAINHAND
 				);
-			
+
 			player.awardStat(Stats.ITEM_USED.get(player.getMainHandItem().getItem()));
 			data.awardedStats().forEach(awardedStat -> player.awardStat(awardedStat.stat(), awardedStat.amount()));
 
@@ -59,6 +63,12 @@ public class TreeHandler {
 			return true;
 		} catch (TreeException e) {
 			LOGGER.warn(e.getMessage());
+		} catch (Exception e) {
+			LOGGER.error("An error occurred when trying to destroy tree", e);
+			player.displayClientMessage(Component.literal("Error: " + e).withStyle(Style.EMPTY.withColor(Color.red.getRGB())), false);
+			player.displayClientMessage(Component.translatable("text.fallingtrees.tree_handler.exception.1").withStyle(Style.EMPTY.withColor(Color.red.getRGB())), false);
+			player.displayClientMessage(Component.translatable("text.fallingtrees.tree_handler.exception.2").withStyle(Style.EMPTY.withColor(Color.red.getRGB())), false);
+			return false;
 		}
 		return false;
 	}

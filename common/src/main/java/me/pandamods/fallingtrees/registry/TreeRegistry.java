@@ -17,7 +17,9 @@ import me.pandamods.fallingtrees.FallingTrees;
 import me.pandamods.fallingtrees.api.TreeType;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.config.common.TreeConfigs;
+import me.pandamods.fallingtrees.trees.ChorusTree;
 import me.pandamods.fallingtrees.trees.GenericTree;
+import me.pandamods.fallingtrees.trees.VerticalTree;
 import me.pandamods.pandalib.registry.DeferredObject;
 import me.pandamods.pandalib.registry.DeferredRegister;
 import me.pandamods.pandalib.registry.RegistryRegister;
@@ -27,7 +29,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
 
-@SuppressWarnings("unused")
 public class TreeRegistry {
 	public static final ResourceKey<Registry<TreeType>> TREE_REGISTRY_KEY = ResourceKey.createRegistryKey(FallingTrees.ID("tree_registry"));
 	public static final Registry<TreeType> TREE_REGISTRY = RegistryRegister.register(new MappedRegistry<>(TREE_REGISTRY_KEY, Lifecycle.stable()));
@@ -35,8 +36,8 @@ public class TreeRegistry {
 	public static final DeferredRegister<TreeType> TREES = DeferredRegister.create(FallingTrees.MOD_ID, TREE_REGISTRY_KEY);
 	
 	public static DeferredObject<GenericTree> GENERIC;
-//	public static DeferredObject<VerticalTree> VERTICAL = TREES.register("vertical", VerticalTree::new);
-//	public static DeferredObject<ChorusTree> CHORUS = TREES.register("chorus", ChorusTree::new);
+	public static DeferredObject<VerticalTree> VERTICAL;
+	public static DeferredObject<ChorusTree> CHORUS;
 //	public static DeferredObject<MushroomTree> MUSHROOM = TREES.register("mushroom", MushroomTree::new);
 	
 	static {
@@ -44,6 +45,12 @@ public class TreeRegistry {
 		
 		if (treeConfigs.genericTree.enabled)
 			GENERIC = TREES.register("generic", GenericTree::new);
+
+		if (treeConfigs.verticalTree.enabled)
+			VERTICAL = TREES.register("vertical", VerticalTree::new);
+
+		if (treeConfigs.chorusTree.enabled)
+			CHORUS = TREES.register("chorus", ChorusTree::new);
 	}
 	
 	public static TreeType getTree(BlockState blockState) {

@@ -1,15 +1,21 @@
 # Version 0.12.8 Beta
 
 ## User Changelog
+* Added error handling when destroying tree.
+
 ### Dependency Updates
 * Updated pandalib 0.4.2 -> 0.5
 
-### Config Updates
+### Config Update
 * Renamed `standardTree` config to `genericTree`
 * Renamed `extraBlockFilter` config to `adjacentBlockFilter`
 * Changed `maxLeavesRadius` default value 10 -> 7
 * Removed `shouldFallOnMaxLogAmount` as it became redundant with the new algorithm changes to Generic Tree
 
+### Algorithm Update
+#### Chorus Plant
+* Minor improvements
+* Chorus Plants will now only fall from the mined block and above, leaving the blocks under the mined block.
 
 ## Developer Notes
 * Changed `TreeRegistry` to use deferred registration
