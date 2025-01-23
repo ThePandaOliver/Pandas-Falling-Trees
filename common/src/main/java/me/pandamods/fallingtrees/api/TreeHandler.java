@@ -79,18 +79,38 @@ public class TreeHandler {
 	
 	public static Optional<Float> getMiningSpeed(Player player, BlockPos blockPos, float baseSpeed) {
 		TreeSpeed treeSpeed = TREE_SPEED_CACHES.compute(player.getUUID(), (uuid, speed) -> {
-			if (speed == null || !speed.blockPos.equals(blockPos)) {
+			if (speed == null || !speed.isValid(blockPos, baseSpeed)) {
 				BlockState blockState = player.level().getBlockState(blockPos);
 				TreeType tree = TreeRegistry.getTree(blockState);
 				if (tree == null) return null;
 				TreeData data = tree.gatherTreeData(blockPos, player.level(), player);
 				if (data == null) return null;
-				return new TreeSpeed(data.miningSpeedModifier().getMiningSpeed(baseSpeed), blockPos.immutable());
+				return new TreeSpeed(baseSpeed, data.miningSpeedModifier().getMiningSpeed(baseSpeed), blockPos.immutable());
 			}
 			return speed;
 		});
-		return Optional.ofNullable(treeSpeed).map(TreeSpeed::miningSpeed);
+		return Optional.ofNullable(treeSpeed).map(TreeSpeed::getMiningSpeed);
 	}
 
-	public record TreeSpeed(float miningSpeed, BlockPos blockPos) {}
+	public static final class TreeSpeed {
+		private final float baseMiningSpeed;
+		private final float miningSpeed;
+		private final BlockPos blockPos;
+
+		public TreeSpeed(float baseMiningSpeed, float miningSpeed, BlockPos blockPos) {
+			this.baseMiningSpeed = baseMiningSpeed;
+			this.miningSpeed = miningSpeed;
+			this.blockPos = blockPos;
+			System.out.println("test");
+		}
+
+
+		public float getMiningSpeed() {
+			return miningSpeed;
+		}
+
+		public boolean isValid(BlockPos blockPos, float baseSpeed) {
+			return Objects.equals(this.blockPos, blockPos) && this.baseMiningSpeed == baseSpeed;
+		}
+	}
 }
