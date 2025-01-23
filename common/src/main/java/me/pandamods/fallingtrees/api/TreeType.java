@@ -19,10 +19,5 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public interface TreeType {
 	boolean isTreeStem(BlockState blockState);
-	default TreeData gatherTreeData(BlockPos blockPos, Level level) {
-		return null;
-	}
-	default TreeData gatherTreeData(BlockPos blockPos, Level level, Player player) {
-		return gatherTreeData(blockPos, level);
-	}
+	TreeData gatherTreeData(BlockPos blockPos, Level level, Player player);
 }

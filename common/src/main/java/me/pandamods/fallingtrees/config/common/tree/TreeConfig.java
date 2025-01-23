@@ -25,7 +25,7 @@ import java.util.List;
 public class TreeConfig {
 	public boolean enabled = true;
 
-	public boolean onlyFallWithRequiredTool = false;
+	public boolean requireTool = false;
 	public Filter allowedToolFilter = new Filter(
 			new ArrayList<>(),
 			new ArrayList<>(),

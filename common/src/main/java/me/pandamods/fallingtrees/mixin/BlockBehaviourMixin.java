@@ -18,6 +18,7 @@ import java.util.Optional;
 public class BlockBehaviourMixin {
 	@Inject(method = "getDestroyProgress", at = @At("TAIL"), cancellable = true)
 	private void getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos, CallbackInfoReturnable<Float> cir) {
+		// Todo: Fix tools not mining faster
 		if (FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.disable) return;
 		if (player == null || !TreeHandler.canPlayerChopTree(player)) return;
 		Optional<Float> miningSpeedOpt = TreeHandler.getMiningSpeed(player, pos, cir.getReturnValue());

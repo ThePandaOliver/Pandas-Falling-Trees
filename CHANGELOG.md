@@ -11,6 +11,7 @@
 * Renamed `extraBlockFilter` config to `adjacentBlockFilter`
 * Changed `maxLeavesRadius` default value 10 -> 7
 * Removed `shouldFallOnMaxLogAmount` as it became redundant with the new algorithm changes to Generic Tree
+* Renamed `onlyFallWithRequiredTool` to `requireTool`
 
 ### Algorithm Update
 #### Chorus Plant

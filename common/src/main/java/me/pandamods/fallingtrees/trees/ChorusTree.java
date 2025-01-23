@@ -47,6 +47,8 @@ public class ChorusTree implements TreeType {
 
 	@Override
 	public TreeData gatherTreeData(BlockPos blockPos, Level level, Player player) {
+		if (getConfig().requireTool && !getConfig().allowedToolFilter.isValid(player.getMainHandItem())) return null;
+
 		blockPos = blockPos.immutable();
 		TreeData.Builder builder = TreeData.builder();
 
