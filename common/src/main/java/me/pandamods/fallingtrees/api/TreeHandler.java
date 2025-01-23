@@ -101,7 +101,6 @@ public class TreeHandler {
 			this.baseMiningSpeed = baseMiningSpeed;
 			this.miningSpeed = miningSpeed;
 			this.blockPos = blockPos;
-			System.out.println("test");
 		}
 
 
