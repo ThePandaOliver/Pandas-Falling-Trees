@@ -22,8 +22,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class RedMushroomTree implements TreeType {
 	private static final BlockPos[] CAP_SCAN_OFFSET = new BlockPos[] {
@@ -45,14 +44,10 @@ public class RedMushroomTree implements TreeType {
 		blockPos = blockPos.immutable();
 		TreeData.Builder builder = TreeData.builder();
 
-		List<BlockPos> stemBlocks = new ArrayList<>();
-		List<BlockPos> capBlocks = new ArrayList<>();
+		Set<BlockPos> stemBlocks = gatherStemBlocks(level, blockPos);
+		Set<BlockPos> capBlocks = new HashSet<>();
 
-		List<BlockPos> checkedStemBlocks = new ArrayList<>();
-		List<BlockPos> checkedCapBlocks = new ArrayList<>();
-
-		gatherStemBlocks(level, blockPos, stemBlocks, checkedStemBlocks);
-		stemBlocks.forEach(stemPos -> gatherCapBlocks(level, stemPos.above(), capBlocks, checkedCapBlocks, 0));
+		stemBlocks.forEach(stemPos -> capBlocks.addAll(gatherCapBlocks(level, stemPos.above())));
 		if (capBlocks.isEmpty()) return null;
 
 		List<BlockPos> blocks = new ArrayList<>();
@@ -71,33 +66,63 @@ public class RedMushroomTree implements TreeType {
 				.build();
 	}
 
-	private void gatherStemBlocks(Level level, BlockPos blockPos, List<BlockPos> blocks, List<BlockPos> checkedBlocks) {
-		if (checkedBlocks.contains(blockPos)) return;
-		checkedBlocks.add(blockPos);
+	private Set<BlockPos> gatherStemBlocks(Level level, BlockPos startPos) {
+		Set<BlockPos> blocks = new HashSet<>();
+		Stack<BlockPos> toVisit = new Stack<>();
+		Set<BlockPos> visited = new HashSet<>();
 
-		BlockState blockState = level.getBlockState(blockPos);
-		if (this.isTreeStem(blockState)) {
-			blocks.add(blockPos);
+		toVisit.add(startPos);
+		while (!toVisit.isEmpty()) {
+			BlockPos current = toVisit.pop();
+			if (visited.contains(current)) {
+				continue;
+			}
+			visited.add(current);
 
-			BlockPos neighborPos = blockPos.above();
-			gatherStemBlocks(level, neighborPos, blocks, checkedBlocks);
-		}
-	}
+			BlockState currentState = level.getBlockState(current);
+			if (isTreeStem(currentState)) {
+				blocks.add(current);
 
-	private void gatherCapBlocks(Level level, BlockPos blockPos, List<BlockPos> blocks, List<BlockPos> checkedBlocks, int scanRadius) {
-		if (scanRadius >= 6 || checkedBlocks.contains(blockPos)) return;
-		checkedBlocks.add(blockPos);
-
-		BlockState blockState = level.getBlockState(blockPos);
-		if (blockState.is(Blocks.RED_MUSHROOM_BLOCK)) {
-			blocks.add(blockPos);
-
-			for (BlockPos offset : CAP_SCAN_OFFSET) {
-				BlockPos neighborPos = blockPos.offset(offset);
-				gatherCapBlocks(level, neighborPos, blocks, checkedBlocks, scanRadius + 1);
+				BlockPos neighbor = current.above();
+				if (!visited.contains(neighbor)) {
+					toVisit.add(neighbor);
+				}
 			}
 		}
+		return blocks;
 	}
+
+	private Set<BlockPos> gatherCapBlocks(Level level, BlockPos startPos) {
+		Set<BlockPos> blocks = new HashSet<>();
+		Queue<BlockSearchNode> toVisit = new LinkedList<>();
+		Set<BlockPos> visited = new HashSet<>();
+
+		toVisit.add(new BlockSearchNode(startPos, 1));
+		while (!toVisit.isEmpty()) {
+			BlockSearchNode node = toVisit.poll();
+			BlockPos current = node.position();
+
+			if (visited.contains(current) || node.distance() > 6) {
+				continue;
+			}
+			visited.add(current);
+
+			BlockState currentState = level.getBlockState(current);
+			if (currentState.is(Blocks.RED_MUSHROOM_BLOCK)) {
+				blocks.add(current);
+
+				for (BlockPos offset : CAP_SCAN_OFFSET) {
+					BlockPos neighbor = current.offset(offset);
+					if (!visited.contains(neighbor)) {
+						toVisit.add(new BlockSearchNode(neighbor, node.distance() + 1));
+					}
+				}
+			}
+		}
+		return blocks;
+	}
+
+	private record BlockSearchNode(BlockPos position, int distance) { }
 
 	public TreeConfig getConfig() {
 		return FallingTreesConfig.getCommonConfig().trees.mushroomTree;

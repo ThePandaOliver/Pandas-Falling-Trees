@@ -16,6 +16,7 @@ import me.pandamods.fallingtrees.api.TreeData;
 import me.pandamods.fallingtrees.api.TreeType;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.config.common.tree.TreeConfig;
+import me.pandamods.fallingtrees.exceptions.TreeTooBigException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -26,8 +27,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class ChorusTree implements TreeType {
 	private static final Direction[] HORIZONTAL_DIRECTIONS = new Direction[] { Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST };
@@ -52,42 +52,53 @@ public class ChorusTree implements TreeType {
 		blockPos = blockPos.immutable();
 		TreeData.Builder builder = TreeData.builder();
 
-		List<BlockPos> blocks = new ArrayList<>();
-		List<BlockPos> checkedBlocks = new ArrayList<>();
-		gatherBlocks(level, blockPos, blocks, checkedBlocks, builder, player);
-
+		Set<BlockPos> blockPosSet = gatherBlocks(level, blockPos, builder, player);
 		return builder
-				.addBlocks(blocks)
-				.setToolDamage(blocks.size())
-				.setFoodExhaustionModifier(originalExhaustion -> originalExhaustion * blocks.size())
+				.addBlocks(blockPosSet)
+				.setToolDamage(blockPosSet.size())
+				.setFoodExhaustionModifier(originalExhaustion -> originalExhaustion * blockPosSet.size())
 				.setMiningSpeedModifier(originalMiningSpeed -> {
 					float speedMultiplication = FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.speedMultiplication;
-					float multiplyAmount = Math.min(FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.maxSpeedMultiplication, ((float) blocks.size() - 1f));
+					float multiplyAmount = Math.min(FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.maxSpeedMultiplication, ((float) blockPosSet.size() - 1f));
 					return originalMiningSpeed / (multiplyAmount * speedMultiplication + 1f);
 				})
 				.build();
 	}
 
-	private void gatherBlocks(Level level, BlockPos blockPos, List<BlockPos> blocks, List<BlockPos> checkedBlocks, TreeData.Builder builder, Player player) {
-		if (checkedBlocks.contains(blockPos)) return;
-		checkedBlocks.add(blockPos);
+	private Set<BlockPos> gatherBlocks(Level level, BlockPos startPos, TreeData.Builder builder, Player player) {
+		Set<BlockPos> blocks = new HashSet<>();
+		Queue<BlockPos> toVisit = new LinkedList<>();
+		Set<BlockPos> visited = new HashSet<>();
 
-		BlockState blockState = level.getBlockState(blockPos);
-		if (isFlower(blockState)) {
-			blocks.add(blockPos);
-			return;
-		}
+		toVisit.add(startPos);
+		while (!toVisit.isEmpty()) {
+			BlockPos current = toVisit.poll();
+			if (visited.contains(current)) {
+				continue;
+			}
+			visited.add(current);
 
-		if (isPlant(blockState)) {
-			blocks.add(blockPos);
-			builder.addAwardedStat(Stats.BLOCK_MINED.get(blockState.getBlock()));
-			if (level instanceof ServerLevel serverLevel)
-				builder.addDrops(Block.getDrops(blockState, serverLevel, blockPos, null, player, player.getMainHandItem()));
+			BlockState currentState = level.getBlockState(current);
+			if (isFlower(currentState)) {
+				blocks.add(current);
+				continue;
+			}
 
-			for (BlockPos neighborPos : gatherValidBlocksAround(level, blockPos)) {
-				gatherBlocks(level, neighborPos, blocks, checkedBlocks, builder, player);
+			if (isPlant(currentState)) {
+				blocks.add(current);
+				builder.addAwardedStat(Stats.BLOCK_MINED.get(currentState.getBlock()));
+
+				if (level instanceof ServerLevel serverLevel)
+					builder.addDrops(Block.getDrops(currentState, serverLevel, current, null, player, player.getMainHandItem()));
+
+				for (BlockPos neighbor : gatherValidBlocksAround(level, current)) {
+					if (!visited.contains(neighbor)) {
+						toVisit.add(neighbor);
+					}
+				}
 			}
 		}
+		return blocks;
 	}
 
 	private static List<BlockPos> gatherValidBlocksAround(Level level, BlockPos blockPos) {
