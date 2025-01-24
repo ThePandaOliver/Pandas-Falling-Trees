@@ -19,6 +19,7 @@ import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.config.common.TreeConfigs;
 import me.pandamods.fallingtrees.trees.ChorusTree;
 import me.pandamods.fallingtrees.trees.GenericTree;
+import me.pandamods.fallingtrees.trees.mushroom.MushroomTree;
 import me.pandamods.fallingtrees.trees.VerticalTree;
 import me.pandamods.pandalib.registry.DeferredObject;
 import me.pandamods.pandalib.registry.DeferredRegister;
@@ -38,7 +39,7 @@ public class TreeRegistry {
 	public static DeferredObject<GenericTree> GENERIC;
 	public static DeferredObject<VerticalTree> VERTICAL;
 	public static DeferredObject<ChorusTree> CHORUS;
-//	public static DeferredObject<MushroomTree> MUSHROOM = TREES.register("mushroom", MushroomTree::new);
+	public static DeferredObject<MushroomTree> MUSHROOM;
 	
 	static {
 		TreeConfigs treeConfigs = FallingTreesConfig.getCommonConfig().trees;
@@ -51,6 +52,9 @@ public class TreeRegistry {
 
 		if (treeConfigs.chorusTree.enabled)
 			CHORUS = TREES.register("chorus", ChorusTree::new);
+
+		if (treeConfigs.mushroomTree.enabled)
+			MUSHROOM = TREES.register("mushroom", MushroomTree::new);
 	}
 	
 	public static TreeType getTree(BlockState blockState) {

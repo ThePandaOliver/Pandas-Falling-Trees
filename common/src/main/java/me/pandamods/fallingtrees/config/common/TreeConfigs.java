@@ -12,7 +12,6 @@
 
 package me.pandamods.fallingtrees.config.common;
 
-import me.pandamods.fallingtrees.config.common.tree.MushroomTreeConfig;
 import me.pandamods.fallingtrees.config.common.tree.VerticalTreeConfig;
 import me.pandamods.fallingtrees.config.common.tree.GenericTreeConfig;
 import me.pandamods.fallingtrees.config.common.tree.TreeConfig;
@@ -21,5 +20,5 @@ public class TreeConfigs {
 	public GenericTreeConfig genericTree = new GenericTreeConfig();
 	public VerticalTreeConfig verticalTree = new VerticalTreeConfig();
 	public TreeConfig chorusTree = new TreeConfig();
-	public MushroomTreeConfig mushroomTree = new MushroomTreeConfig();
+	public TreeConfig mushroomTree = new TreeConfig();
 }
