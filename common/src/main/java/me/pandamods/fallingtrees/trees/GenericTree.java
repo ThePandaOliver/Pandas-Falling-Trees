@@ -12,6 +12,7 @@
 
 package me.pandamods.fallingtrees.trees;
 
+import me.pandamods.fallingtrees.FallingTrees;
 import me.pandamods.fallingtrees.api.TreeData;
 import me.pandamods.fallingtrees.api.TreeType;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
@@ -21,6 +22,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
@@ -119,12 +121,16 @@ public class GenericTree implements TreeType {
 			BlockSearchNode node = toVisit.poll();
 			BlockPos current = node.position;
 
-			if (visited.contains(current) || node.distance > 7) {
+			BlockState currentState = level.getBlockState(current);
+			OptionalInt optionalDistanceAt = LeavesBlock.getOptionalDistanceAt(currentState);
+			if (node.distance != optionalDistanceAt.orElse(0)) {
+				continue;
+			}
+			if (visited.contains(current) || node.distance > getConfig().algorithm.maxLeavesRadius) {
 				continue;
 			}
 			visited.add(current);
 
-			BlockState currentState = level.getBlockState(current);
 			if (isLeafBlock(currentState)) {
 				leaves.add(current);
 
