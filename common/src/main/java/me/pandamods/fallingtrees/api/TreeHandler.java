@@ -40,7 +40,7 @@ public class TreeHandler {
 
 			TreeEntity entity = new TreeEntity(EntityRegistry.TREE.get(), level);
 			entity.setPos(blockPos.getX() + 0.5, blockPos.getY(), blockPos.getZ() + 0.5);
-			entity.setData(player, tree, blockPos, blocks);
+			entity.setData(player, tree, blockPos, blocks, data.drops());
 
 			player.causeFoodExhaustion(
 					FallingTreesConfig.getCommonConfig().disableExtraFoodExhaustion ? 1 :
@@ -74,7 +74,8 @@ public class TreeHandler {
 	}
 	
 	public static boolean canPlayerChopTree(Player player) {
-		return FallingTreesConfig.getCommonConfig().disableCrouchMining || !player.isCrouching();
+		boolean invertCrouchMining = FallingTreesConfig.getClientConfig(player).invertCrouchMining;
+		return FallingTreesConfig.getCommonConfig().disableCrouchMining || player.isCrouching() == invertCrouchMining;
 	}
 	
 	public static Optional<Float> getMiningSpeed(Player player, BlockPos blockPos, float baseSpeed) {

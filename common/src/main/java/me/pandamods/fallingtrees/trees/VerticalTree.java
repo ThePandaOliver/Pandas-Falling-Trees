@@ -17,8 +17,11 @@ import me.pandamods.fallingtrees.api.TreeType;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.config.common.tree.VerticalTreeConfig;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.ArrayList;
@@ -40,10 +43,20 @@ public class VerticalTree implements TreeType {
 		List<BlockPos> blocks = new ArrayList<>();
 		gatherBlocks(level, blockPos, blocks);
 
+		List<ItemStack> drops = new ArrayList<>();
+		if (level instanceof ServerLevel serverLevel) {
+			for (BlockPos block : blocks) {
+				BlockState blockState = level.getBlockState(block);
+				List<ItemStack> items = Block.getDrops(blockState, serverLevel, block, null, player, player.getMainHandItem());
+				drops.addAll(items);
+			}
+		}
+
 		return builder
 				.addBlocks(blocks)
 				.setToolDamage(blocks.size())
 				.setFoodExhaustionModifier(originalExhaustion -> originalExhaustion * blocks.size())
+				.addDrops(drops)
 				.setMiningSpeedModifier(originalMiningSpeed -> {
 					float speedMultiplication = FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.speedMultiplication;
 					float multiplyAmount = Math.min(FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.maxSpeedMultiplication, ((float) blocks.size() - 1f));

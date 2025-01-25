@@ -20,12 +20,16 @@ import me.pandamods.fallingtrees.config.common.tree.GenericTreeConfig;
 import me.pandamods.fallingtrees.exceptions.TreeTooBigException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.loot.LootTable;
 
 import java.util.*;
 
@@ -61,12 +65,24 @@ public class GenericTree implements TreeType {
 
 		Set<BlockPos> adjacent = gatherAdjacentBlocks(level, logs, leaves);
 
+		Set<BlockPos> allBlocks = new HashSet<>(logs);
+		allBlocks.addAll(leaves);
+		allBlocks.addAll(adjacent);
+
+		List<ItemStack> drops = new ArrayList<>();
+		if (level instanceof ServerLevel serverLevel) {
+			for (BlockPos block : allBlocks) {
+				BlockState blockState = level.getBlockState(block);
+				List<ItemStack> items = Block.getDrops(blockState, serverLevel, block, null, player, player.getMainHandItem());
+				drops.addAll(items);
+			}
+		}
+
 		return builder
-				.addBlocks(logs)
-				.addBlocks(leaves)
-				.addBlocks(adjacent)
+				.addBlocks(allBlocks)
 				.setToolDamage(logs.size())
 				.setFoodExhaustionModifier(originalExhaustion -> originalExhaustion * logs.size())
+				.addDrops(drops)
 				.setMiningSpeedModifier(originalMiningSpeed -> {
 					float speedMultiplication = FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.speedMultiplication;
 					float multiplyAmount = Math.min(FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.maxSpeedMultiplication, ((float) logs.size() - 1f));
