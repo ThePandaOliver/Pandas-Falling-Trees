@@ -28,6 +28,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Math;
 import org.joml.Quaternionf;
@@ -66,9 +69,9 @@ public class TreeRenderer extends EntityRenderer<TreeEntity, TreeRenderState> {
 		float animation = (fallAnim + bounceAnim) - 90;
 
 		Direction direction = renderState.direction.getOpposite();
-		int distance = getDistance(tree, blocks, 0, direction.getOpposite());
+		float distance = getDistance(blocks, direction.getOpposite());
 
-		Vector3f pivot =  new Vector3f(0, 0, (.5f + distance) * 1);
+		Vector3f pivot =  new Vector3f(0, 0, .5f + distance);
 		pivot.rotateY(Math.toRadians(-direction.toYRot()));
 		poseStack.translate(-pivot.x, 0, -pivot.z);
 
@@ -80,7 +83,6 @@ public class TreeRenderer extends EntityRenderer<TreeEntity, TreeRenderState> {
 		Level level = renderState.level;
 
 		poseStack.translate(pivot.x, 0, pivot.z);
-
 		poseStack.translate(-.5, 0, -.5);
 		blocks.forEach((blockPos, blockState) -> {
 			poseStack.pushPose();
@@ -111,10 +113,26 @@ public class TreeRenderer extends EntityRenderer<TreeEntity, TreeRenderState> {
 		super.extractRenderState(entity, renderState, f);
 	}
 
-	private int getDistance(TreeType tree, Map<BlockPos, BlockState> blocks, int distance, Direction direction) {
-		BlockPos nextBlockPos = new BlockPos(direction.getUnitVec3i().multiply(distance + 1));
-		if (blocks.containsKey(nextBlockPos) && tree.isTreeStem(blocks.get(nextBlockPos)))
-			return getDistance(tree, blocks, distance + 1, direction);
+	private float getDistance(Map<BlockPos, BlockState> blocks, Direction direction) {
+		float distance = 0;
+		BlockPos currentPos = new BlockPos(0, 0, 0);
+		BlockPos next = currentPos.relative(direction);
+
+		while (blocks.containsKey(next)) {
+			currentPos = next;
+			next = currentPos.relative(direction);
+			distance++;
+		}
+		BlockState blockState = blocks.get(currentPos);
+		if (blockState.hasOffsetFunction())
+			return distance - .5f;
+		AABB bounds = blockState.getCollisionShape(Minecraft.getInstance().level, currentPos).bounds();
+		switch (direction) {
+			case WEST -> distance -= (float) (bounds.minX);
+			case EAST -> distance -= (float) (1f - bounds.maxX);
+			case SOUTH -> distance -= (float) (bounds.minZ);
+			case NORTH -> distance -= (float) (1f - bounds.maxZ);
+		}
 		return distance;
 	}
 
