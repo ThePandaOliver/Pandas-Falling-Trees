@@ -22,6 +22,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -37,7 +38,7 @@ public class GenericTree implements TreeType {
 	@Override
 	public TreeData gatherTreeData(BlockPos blockPos, Level level, Player player) {
 		if (getConfig().requireTool && !getConfig().allowedToolFilter.isValid(player.getMainHandItem())) return null;
-		
+
 		blockPos = blockPos.immutable();
 		TreeData.Builder builder = TreeData.builder();
 
@@ -154,12 +155,43 @@ public class GenericTree implements TreeType {
 		for (BlockPos blockPos : allTreeBlocks) {
 			for (Direction dir : Direction.values()) {
 				BlockPos neighbor = blockPos.relative(dir);
-				if (isValidAdjacent(level.getBlockState(neighbor))) {
+				BlockState neighborState = level.getBlockState(neighbor);
+				if (neighborState.is(Blocks.VINE)) {
+					adjacentBlocks.addAll(gatherVines(level, neighbor));
+				} else if (neighborState.is(Blocks.BEE_NEST)) {
+					adjacentBlocks.add(neighbor);
+				} else if (neighborState.is(Blocks.COCOA)) {
 					adjacentBlocks.add(neighbor);
 				}
 			}
 		}
 		return adjacentBlocks;
+	}
+
+	private Set<BlockPos> gatherVines(Level level, BlockPos startPos) {
+		Set<BlockPos> vines = new HashSet<>();
+		Stack<BlockPos> toVisit = new Stack<>();
+		Set<BlockPos> visited = new HashSet<>();
+
+		toVisit.push(startPos);
+		while (!toVisit.isEmpty()) {
+			BlockPos current = toVisit.pop();
+			if (visited.contains(current)) {
+				continue;
+			}
+			visited.add(current);
+
+			BlockState currentState = level.getBlockState(current);
+			if (currentState.is(Blocks.VINE)) {
+				vines.add(current);
+
+				BlockPos neighbor = current.below();
+				if (!visited.contains(neighbor)) {
+					toVisit.push(neighbor);
+				}
+			}
+		}
+		return vines;
 	}
 
 	private boolean isLogBlock(BlockState blockState) {
@@ -171,10 +203,6 @@ public class GenericTree implements TreeType {
 				blockState.hasProperty(BlockStateProperties.PERSISTENT) && blockState.getValue(BlockStateProperties.PERSISTENT))
 			return false;
 		return getConfig().leavesFilter.isValid(blockState);
-	}
-
-	private boolean isValidAdjacent(BlockState blockState) {
-		return getConfig().adjacentBlockFilter.isValid(blockState);
 	}
 
 	private record BlockSearchNode(BlockPos position, int distance) { }

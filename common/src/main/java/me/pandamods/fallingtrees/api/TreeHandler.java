@@ -56,9 +56,9 @@ public class TreeHandler {
 			player.awardStat(Stats.ITEM_USED.get(player.getMainHandItem().getItem()));
 			data.awardedStats().forEach(awardedStat -> player.awardStat(awardedStat.stat(), awardedStat.amount()));
 
-//			for (BlockPos block : blocks) {
-//				level.removeBlock(block, false);
-//			}
+			for (BlockPos block : blocks) {
+				level.removeBlock(block, false);
+			}
 			level.addFreshEntity(entity);
 			return true;
 		} catch (TreeException e) {
@@ -102,7 +102,6 @@ public class TreeHandler {
 			this.miningSpeed = miningSpeed;
 			this.blockPos = blockPos;
 		}
-
 
 		public float getMiningSpeed() {
 			return miningSpeed;

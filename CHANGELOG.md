@@ -13,6 +13,7 @@
 * Removed `shouldFallOnMaxLogAmount` as it became redundant with the new algorithm changes to Generic Tree
 * Renamed `onlyFallWithRequiredTool` to `requireTool`
 * Removed `mushroomTree` filters, this is now handled internally
+* Removed `adjacentBlockFilter` from the Generic Tree config, this will be handled internally temporarily.
 
 ### Algorithm Update
 * Highly improved the Generic Tree's tree detection algorithm by using the Breadth-first search (BFS) method.

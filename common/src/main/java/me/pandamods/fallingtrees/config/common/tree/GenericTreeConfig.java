@@ -36,15 +36,15 @@ public class GenericTreeConfig extends TreeConfig {
 			new ArrayList<>(),
 			new ArrayList<>()
 	);
-	public Filter adjacentBlockFilter = new Filter(
-			new ArrayList<>(),
-			List.of(
-					Blocks.VINE.arch$registryName().toString(),
-					Blocks.BEE_NEST.arch$registryName().toString(),
-					Blocks.COCOA.arch$registryName().toString()
-			),
-			new ArrayList<>()
-	);
+//	public Filter adjacentBlockFilter = new Filter(
+//			new ArrayList<>(),
+//			List.of(
+//					Blocks.VINE.arch$registryName().toString(),
+//					Blocks.BEE_NEST.arch$registryName().toString(),
+//					Blocks.COCOA.arch$registryName().toString()
+//			),
+//			new ArrayList<>()
+//	);
 
 	public static class Algorithm {
 		public int maxLeavesRadius = 7;
