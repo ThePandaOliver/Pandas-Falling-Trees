@@ -1,4 +1,4 @@
-# Version 0.12.8 Beta
+# Version 0.13 Beta
 
 ## User Changelog
 * Added error handling when destroying tree.
