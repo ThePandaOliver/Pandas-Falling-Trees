@@ -83,6 +83,16 @@ public record TreeData(
 			return this;
 		}
 
+		public <T> Builder addAwardedStats(Collection<Stat<T>> stats) {
+			stats.forEach(this::addAwardedStat);
+			return this;
+		}
+
+		public Builder addAwardedStatsMap(Map<Stat<?>, Integer> stats) {
+			this.awardedStats.putAll(stats);
+			return this;
+		}
+
 		public Builder setToolDamage(int toolDamage) {
 			this.toolDamage = toolDamage;
 			return this;

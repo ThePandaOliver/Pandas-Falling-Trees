@@ -76,6 +76,10 @@ public class BrownMushroomTree implements TreeType {
 					float multiplyAmount = Math.min(FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.maxSpeedMultiplication, ((float) blocks.size() - 1f));
 					return originalMiningSpeed / (multiplyAmount * speedMultiplication + 1f);
 				})
+				.addAwardedStats(blocks.stream().map(logPos -> {
+					BlockState blockState = level.getBlockState(logPos);
+					return Stats.BLOCK_MINED.get(blockState.getBlock());
+				}).toList())
 				.build();
 	}
 

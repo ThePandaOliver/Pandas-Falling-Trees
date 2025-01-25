@@ -21,6 +21,7 @@ import me.pandamods.fallingtrees.exceptions.TreeTooBigException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -70,9 +71,9 @@ public class GenericTree implements TreeType {
 		allBlocks.addAll(adjacent);
 
 		List<ItemStack> drops = new ArrayList<>();
-		if (level instanceof ServerLevel serverLevel) {
-			for (BlockPos block : allBlocks) {
-				BlockState blockState = level.getBlockState(block);
+		for (BlockPos block : allBlocks) {
+			BlockState blockState = level.getBlockState(block);
+			if (level instanceof ServerLevel serverLevel) {
 				List<ItemStack> items = Block.getDrops(blockState, serverLevel, block, null, player, player.getMainHandItem());
 				drops.addAll(items);
 			}
@@ -88,6 +89,10 @@ public class GenericTree implements TreeType {
 					float multiplyAmount = Math.min(FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.maxSpeedMultiplication, ((float) logs.size() - 1f));
 					return originalMiningSpeed / (multiplyAmount * speedMultiplication + 1f);
 				})
+				.addAwardedStats(logs.stream().map(logPos -> {
+					BlockState blockState = level.getBlockState(logPos);
+					return Stats.BLOCK_MINED.get(blockState.getBlock());
+				}).toList())
 				.build();
 	}
 
