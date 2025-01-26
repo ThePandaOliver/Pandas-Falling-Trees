@@ -110,7 +110,7 @@ public class TreeRenderer extends EntityRenderer<TreeEntity> {
 			distance++;
 		}
 		BlockState blockState = blocks.get(currentPos);
-		if (blockState.hasOffsetFunction())
+		if (blockState.getOffset(Minecraft.getInstance().level, currentPos).equals(Vec3.ZERO))
 			return distance - .5f;
 		AABB bounds = blockState.getCollisionShape(Minecraft.getInstance().level, currentPos).bounds();
 		switch (direction) {

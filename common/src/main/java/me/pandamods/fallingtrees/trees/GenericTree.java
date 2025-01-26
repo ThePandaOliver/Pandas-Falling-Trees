@@ -144,7 +144,7 @@ public class GenericTree implements TreeType {
 			BlockPos current = node.position;
 
 			BlockState currentState = level.getBlockState(current);
-			OptionalInt optionalDistanceAt = LeavesBlock.getOptionalDistanceAt(currentState);
+			OptionalInt optionalDistanceAt = currentState.hasProperty(LeavesBlock.DISTANCE) ? OptionalInt.of(currentState.getValue(LeavesBlock.DISTANCE)) : OptionalInt.empty();
 			if (node.distance != optionalDistanceAt.orElse(0)) {
 				continue;
 			}

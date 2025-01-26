@@ -22,6 +22,8 @@ import me.pandamods.pandalib.utils.EnvRunner;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -38,7 +40,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Math;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -67,7 +68,7 @@ public class TreeEntity extends Entity {
 
 		Map<BlockPos, BlockState> blockPosMap = new HashMap<>();
 		for (BlockPos pos : blockPosList) {
-			blockPosMap.put(pos.immutable().subtract(originBlock), level().getBlockState(pos));
+			blockPosMap.put(pos.immutable().subtract(originBlock), level.getBlockState(pos));
 		}
 
 		this.getEntityData().set(ORIGIN_POS, originBlock);
@@ -115,7 +116,7 @@ public class TreeEntity extends Entity {
 		}
 
 		if (tickCount >= getMaxLifeTimeTick()) {
-			if (!level().isClientSide())
+			if (!level.isClientSide())
 				this.dropItems();
 			remove(RemovalReason.DISCARDED);
 		}
@@ -123,13 +124,13 @@ public class TreeEntity extends Entity {
 
 	private void dropItems() {
 		for (ItemStack stack : this.getEntityData().get(DROPS)) {
-			double deltaX = Mth.nextDouble(level().random, -0.1, 0.1);
+			double deltaX = Mth.nextDouble(level.random, -0.1, 0.1);
 			double deltaY = 0.25;
-			double deltaZ = Mth.nextDouble(level().random, -0.1, 0.1);
+			double deltaZ = Mth.nextDouble(level.random, -0.1, 0.1);
 
-			ItemEntity entity = new ItemEntity(level(), getX(), getY() + EntityType.ITEM.getHeight() / 2, getZ(), stack, deltaX, deltaY, deltaZ);
+			ItemEntity entity = new ItemEntity(level, getX(), getY() + EntityType.ITEM.getHeight() / 2, getZ(), stack, deltaX, deltaY, deltaZ);
 			entity.setDefaultPickUpDelay();
-			level().addFreshEntity(entity);
+			level.addFreshEntity(entity);
 		}
 	}
 

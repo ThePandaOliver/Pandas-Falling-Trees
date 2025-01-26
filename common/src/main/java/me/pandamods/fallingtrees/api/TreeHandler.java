@@ -81,10 +81,10 @@ public class TreeHandler {
 	public static Optional<Float> getMiningSpeed(Player player, BlockPos blockPos, float baseSpeed) {
 		TreeSpeed treeSpeed = TREE_SPEED_CACHES.compute(player.getUUID(), (uuid, speed) -> {
 			if (speed == null || !speed.isValid(blockPos, baseSpeed)) {
-				BlockState blockState = player.level().getBlockState(blockPos);
+				BlockState blockState = player.level.getBlockState(blockPos);
 				TreeType tree = TreeRegistry.getTree(blockState);
 				if (tree == null) return null;
-				TreeData data = tree.gatherTreeData(blockPos, player.level(), player);
+				TreeData data = tree.gatherTreeData(blockPos, player.level, player);
 				if (data == null) return null;
 				return new TreeSpeed(baseSpeed, data.miningSpeedModifier().getMiningSpeed(baseSpeed), blockPos.immutable());
 			}
