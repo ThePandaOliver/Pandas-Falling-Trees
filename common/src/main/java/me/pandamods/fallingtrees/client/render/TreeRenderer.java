@@ -26,6 +26,7 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -39,7 +40,7 @@ import org.joml.Vector3f;
 import java.util.Map;
 
 @Environment(EnvType.CLIENT)
-public class TreeRenderer extends EntityRenderer<TreeEntity, TreeRenderState> {
+public class TreeRenderer extends EntityRenderer<TreeEntity> {
 	public TreeRenderer(EntityRendererProvider.Context context) {
 		super(context);
 	}
@@ -49,26 +50,26 @@ public class TreeRenderer extends EntityRenderer<TreeEntity, TreeRenderState> {
 	}
 
 	@Override
-	public void render(TreeRenderState renderState, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
-		TreeType tree = renderState.treeType;
+	public void render(TreeEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+		TreeType tree = entity.treeType;
 		if (tree == null) return;
 
 		poseStack.pushPose();
 
-		Map<BlockPos, BlockState> blocks = renderState.blocks;
+		Map<BlockPos, BlockState> blocks = entity.getBlocks();
 		float fallAnimLength = getConfig().animation.fallAnimLength;
 
 		float bounceHeight = getConfig().animation.bounceAngleHeight;
 		float bounceAnimLength = getConfig().animation.bounceAnimLength;
 
-		float time = (float) (renderState.lifeTime * (Math.PI / 2) / fallAnimLength);
+		float time = (float) (entity.getLifetime(partialTick) * (Math.PI / 2) / fallAnimLength);
 
 		float fallAnim = bumpCos(time) * 90;
 		float bounceAnim = bumpSin((float) ((time - Math.PI / 2) / (bounceAnimLength / (fallAnimLength * 2)))) * bounceHeight;
 
 		float animation = (fallAnim + bounceAnim) - 90;
 
-		Direction direction = renderState.direction.getOpposite();
+		Direction direction = entity.getDirection().getOpposite();
 		float distance = getDistance(blocks, direction.getOpposite());
 
 		Vector3f pivot =  new Vector3f(0, 0, .5f + distance);
@@ -80,7 +81,7 @@ public class TreeRenderer extends EntityRenderer<TreeEntity, TreeRenderState> {
 		Quaternionf quaternion = new Quaternionf().identity().rotateX(vector.x).rotateZ(vector.z);
 		poseStack.mulPose(quaternion);
 
-		Level level = renderState.level;
+		Level level = entity.level();
 
 		poseStack.translate(pivot.x, 0, pivot.z);
 		poseStack.translate(-.5, 0, -.5);
@@ -88,29 +89,12 @@ public class TreeRenderer extends EntityRenderer<TreeEntity, TreeRenderState> {
 			poseStack.pushPose();
 			poseStack.translate(blockPos.getX(), blockPos.getY(), blockPos.getZ());
 
-			blockPos = blockPos.offset(renderState.originPos);
-			RenderUtils.renderSingleBlock(poseStack, blockState, blockPos, level, buffer, packedLight);
+			blockPos = blockPos.offset(entity.getOriginPos());
+			RenderUtils.renderSingleBlock(poseStack, blockState, blockPos, level, bufferSource, packedLight);
 
 			poseStack.popPose();
 		});
 		poseStack.popPose();
-	}
-
-	@Override
-	@NotNull
-	public TreeRenderState createRenderState() {
-		return new TreeRenderState();
-	}
-
-	@Override
-	public void extractRenderState(TreeEntity entity, TreeRenderState renderState, float f) {
-		renderState.treeType = entity.getTreeType();
-		renderState.blocks = entity.getBlocks();
-		renderState.lifeTime = entity.getLifetime(f);
-		renderState.direction = entity.getDirection();
-		renderState.originPos = entity.getOriginPos();
-		renderState.level = entity.level();
-		super.extractRenderState(entity, renderState, f);
 	}
 
 	private float getDistance(Map<BlockPos, BlockState> blocks, Direction direction) {
@@ -145,7 +129,7 @@ public class TreeRenderer extends EntityRenderer<TreeEntity, TreeRenderState> {
 	}
 
 	@Override
-	protected boolean affectedByCulling(TreeEntity entity) {
-		return false;
+	public ResourceLocation getTextureLocation(TreeEntity entity) {
+		return null;
 	}
 }

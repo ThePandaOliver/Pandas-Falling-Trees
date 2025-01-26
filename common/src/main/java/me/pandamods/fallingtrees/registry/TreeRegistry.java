@@ -66,7 +66,7 @@ public class TreeRegistry {
 	}
 	
 	public static TreeType getTree(ResourceLocation resourceLocation) {
-		return TREE_REGISTRY.getValue(resourceLocation);
+		return TREE_REGISTRY.get(resourceLocation);
 	}
 	
 	public static ResourceLocation getTreeLocation(TreeType tree) {

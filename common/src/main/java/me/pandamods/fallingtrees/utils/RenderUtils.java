@@ -42,7 +42,7 @@ public class RenderUtils {
 					float green = (float)(color >> 8 & 0xFF) / 255.0f;
 					float blue = (float)(color & 0xFF) / 255.0f;
 					blockRenderDispatcher.getModelRenderer().renderModel(poseStack.last(),
-							bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(blockState)), blockState,
+							bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(blockState, false)), blockState,
 							bakedModel, red, green, blue, packedLight, OverlayTexture.NO_OVERLAY);
 					break;
 				case ENTITYBLOCK_ANIMATED:

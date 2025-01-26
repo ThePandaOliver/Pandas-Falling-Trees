@@ -133,11 +133,6 @@ public class TreeEntity extends Entity {
 		}
 	}
 
-	@Override
-	public boolean hurtServer(ServerLevel serverLevel, DamageSource damageSource, float f) {
-		return false;
-	}
-
 	public int getMaxLifeTimeTick() {
 		return (int) (FallingTreesConfig.getCommonConfig().treeLifetimeLength * 20);
 	}
