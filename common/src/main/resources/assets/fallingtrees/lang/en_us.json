@@ -51,5 +51,8 @@
 	"text.autoconfig.fallingtrees_common.category.features": "Features",
 	"text.autoconfig.fallingtrees_common.option.features.disableCactusTrees": "Disable Cactus trees",
 	"text.autoconfig.fallingtrees_common.option.features.disableBambooTrees": "Disable Bamboo trees",
-	"text.autoconfig.fallingtrees_common.option.features.disableChorusTrees": "Disable Chorus trees"
+	"text.autoconfig.fallingtrees_common.option.features.disableChorusTrees": "Disable Chorus trees",
+
+	"text.fallingtrees.tree_handler.exception.1": "Panda's Falling Trees: An error occurred when trying to destroy tree.",
+	"text.fallingtrees.tree_handler.exception.2": "Please check logs and report to the author."
 }

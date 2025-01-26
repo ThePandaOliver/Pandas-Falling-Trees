@@ -18,6 +18,8 @@ import me.pandamods.fallingtrees.registry.EntityRegistry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
+import java.util.function.Supplier;
+
 @Environment(EnvType.CLIENT)
 public class FallingTreesClient {
     public static void init() {

@@ -19,8 +19,8 @@ import net.minecraft.world.level.block.Blocks;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StandardTreeConfig extends TreeConfig {
-	public StandardTreeConfig() {
+public class GenericTreeConfig extends TreeConfig {
+	public GenericTreeConfig() {
 		this.allowedToolFilter.whitelistedTags.add(ItemTags.AXES.location().toString());
 	}
 
@@ -36,20 +36,19 @@ public class StandardTreeConfig extends TreeConfig {
 			new ArrayList<>(),
 			new ArrayList<>()
 	);
-	public Filter extraBlockFilter = new Filter(
-			new ArrayList<>(),
-			List.of(
-					Blocks.VINE.arch$registryName().toString(),
-					Blocks.BEE_NEST.arch$registryName().toString(),
-					Blocks.COCOA.arch$registryName().toString()
-			),
-			new ArrayList<>()
-	);
+//	public Filter adjacentBlockFilter = new Filter(
+//			new ArrayList<>(),
+//			List.of(
+//					Blocks.VINE.arch$registryName().toString(),
+//					Blocks.BEE_NEST.arch$registryName().toString(),
+//					Blocks.COCOA.arch$registryName().toString()
+//			),
+//			new ArrayList<>()
+//	);
 
 	public static class Algorithm {
-		public int maxLeavesRadius = 10;
+		public int maxLeavesRadius = 7;
 		public int maxLogAmount = 256;
-		public boolean shouldFallOnMaxLogAmount = false;
 		public boolean shouldIgnorePersistentLeaves = true;
 	}
 }

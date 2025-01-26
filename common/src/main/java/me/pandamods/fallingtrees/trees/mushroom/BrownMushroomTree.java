@@ -10,12 +10,13 @@
  *  along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.pandamods.fallingtrees.trees;
+package me.pandamods.fallingtrees.trees.mushroom;
 
 import me.pandamods.fallingtrees.api.TreeData;
 import me.pandamods.fallingtrees.api.TreeType;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
-import me.pandamods.fallingtrees.config.common.tree.VerticalTreeConfig;
+import me.pandamods.fallingtrees.config.common.tree.TreeConfig;
+import me.pandamods.fallingtrees.trees.GenericTree;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.stats.Stats;
@@ -23,15 +24,20 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-public class VerticalTree implements TreeType {
+public class BrownMushroomTree implements TreeType {
+	private static final BlockPos[] CAP_SCAN_OFFSET = new BlockPos[] {
+			new BlockPos(-1, 0, 0), new BlockPos(1, 0, 0),
+			new BlockPos(0, 0, -1), new BlockPos(0, 0, 1),
+	};
+
 	@Override
 	public boolean isTreeStem(BlockState blockState) {
-		return getConfig().filter.isValid(blockState);
+		return blockState.is(Blocks.MUSHROOM_STEM);
 	}
 
 	@Override
@@ -41,8 +47,15 @@ public class VerticalTree implements TreeType {
 		blockPos = blockPos.immutable();
 		TreeData.Builder builder = TreeData.builder();
 
+		Set<BlockPos> stemBlocks = gatherStemBlocks(level, blockPos);
+		Set<BlockPos> capBlocks = new HashSet<>();
+
+		stemBlocks.forEach(stemPos -> capBlocks.addAll(gatherCapBlocks(level, stemPos.above())));
+		if (capBlocks.isEmpty()) return null;
+
 		List<BlockPos> blocks = new ArrayList<>();
-		gatherBlocks(level, blockPos, blocks);
+		blocks.addAll(stemBlocks);
+		blocks.addAll(capBlocks);
 
 		List<ItemStack> drops = new ArrayList<>();
 		if (level instanceof ServerLevel serverLevel) {
@@ -70,16 +83,65 @@ public class VerticalTree implements TreeType {
 				.build();
 	}
 
-	private void gatherBlocks(Level level, BlockPos blockPos, List<BlockPos> blocks) {
-		BlockState blockState = level.getBlockState(blockPos);
-		blocks.add(blockPos);
+	private Set<BlockPos> gatherStemBlocks(Level level, BlockPos startPos) {
+		Set<BlockPos> blocks = new HashSet<>();
+		Stack<BlockPos> toVisit = new Stack<>();
+		Set<BlockPos> visited = new HashSet<>();
 
-		BlockPos neighborPos = blockPos.above();
-		if (level.getBlockState(neighborPos).is(blockState.getBlock()))
-			gatherBlocks(level, neighborPos, blocks);
+		toVisit.add(startPos);
+		while (!toVisit.isEmpty()) {
+			BlockPos current = toVisit.pop();
+			if (visited.contains(current)) {
+				continue;
+			}
+			visited.add(current);
+
+			BlockState currentState = level.getBlockState(current);
+			if (isTreeStem(currentState)) {
+				blocks.add(current);
+
+				BlockPos neighbor = current.above();
+				if (!visited.contains(neighbor)) {
+					toVisit.add(neighbor);
+				}
+			}
+		}
+		return blocks;
 	}
 
-	public VerticalTreeConfig getConfig() {
-		return FallingTreesConfig.getCommonConfig().trees.verticalTree;
+	private Set<BlockPos> gatherCapBlocks(Level level, BlockPos startPos) {
+		Set<BlockPos> blocks = new HashSet<>();
+		Queue<BlockSearchNode> toVisit = new LinkedList<>();
+		Set<BlockPos> visited = new HashSet<>();
+
+		toVisit.add(new BlockSearchNode(startPos, 1));
+		while (!toVisit.isEmpty()) {
+			BlockSearchNode node = toVisit.poll();
+			BlockPos current = node.position();
+
+			if (visited.contains(current) || node.distance() > 6) {
+				continue;
+			}
+			visited.add(current);
+
+			BlockState currentState = level.getBlockState(current);
+			if (currentState.is(Blocks.BROWN_MUSHROOM_BLOCK)) {
+				blocks.add(current);
+
+				for (BlockPos offset : CAP_SCAN_OFFSET) {
+					BlockPos neighbor = current.offset(offset);
+					if (!visited.contains(neighbor)) {
+						toVisit.add(new BlockSearchNode(neighbor, node.distance() + 1));
+					}
+				}
+			}
+		}
+		return blocks;
+	}
+
+	private record BlockSearchNode(BlockPos position, int distance) { }
+
+	public TreeConfig getConfig() {
+		return FallingTreesConfig.getCommonConfig().trees.mushroomTree;
 	}
 }
