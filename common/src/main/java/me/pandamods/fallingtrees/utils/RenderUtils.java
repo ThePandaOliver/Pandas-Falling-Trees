@@ -37,13 +37,13 @@ public class RenderUtils {
 			switch (renderShape) {
 				case MODEL:
 					BakedModel bakedModel = blockRenderDispatcher.getBlockModel(blockState);
-					int i = blockRenderDispatcher.blockColors.getColor(blockState, level, blockPos, 0);
-					float f = (float)(i >> 16 & 0xFF) / 255.0f;
-					float g = (float)(i >> 8 & 0xFF) / 255.0f;
-					float h = (float)(i & 0xFF) / 255.0f;
+					int color = blockRenderDispatcher.blockColors.getColor(blockState, level, blockPos, 0);
+					float red = (float)(color >> 16 & 0xFF) / 255.0f;
+					float green = (float)(color >> 8 & 0xFF) / 255.0f;
+					float blue = (float)(color & 0xFF) / 255.0f;
 					blockRenderDispatcher.getModelRenderer().renderModel(poseStack.last(),
 							bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(blockState, false)), blockState,
-							bakedModel, f, g, h, packedLight, OverlayTexture.NO_OVERLAY);
+							bakedModel, red, green, blue, packedLight, OverlayTexture.NO_OVERLAY);
 					break;
 				case ENTITYBLOCK_ANIMATED:
 					blockEntityRenderDispatcher.renderByItem(new ItemStack(blockState.getBlock()),

@@ -13,19 +13,19 @@
 package me.pandamods.fallingtrees.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import me.pandamods.fallingtrees.api.TreeType;
 import com.mojang.math.Quaternion;
-import me.pandamods.fallingtrees.api.Tree;
 import me.pandamods.fallingtrees.config.ClientConfig;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.entity.TreeEntity;
 import me.pandamods.fallingtrees.utils.RenderUtils;
 import me.pandamods.joml.Quaternionf;
 import me.pandamods.joml.Vector3f;
+import me.pandamods.joml.Math;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.BlockPos;
@@ -34,6 +34,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -48,9 +52,8 @@ public class TreeRenderer extends EntityRenderer<TreeEntity> {
 	}
 
 	@Override
-	public void render(TreeEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
-		BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
-		Tree<?> tree = entity.getTree();
+	public void render(TreeEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+		TreeType tree = entity.treeType;
 		if (tree == null) return;
 
 		poseStack.pushPose();
@@ -69,10 +72,10 @@ public class TreeRenderer extends EntityRenderer<TreeEntity> {
 		float animation = (fallAnim + bounceAnim) - 90;
 
 		Direction direction = entity.getDirection().getOpposite();
-		int distance = getDistance(tree, blocks, 0, direction.getOpposite());
+		float distance = getDistance(blocks, direction.getOpposite());
 
-		Vector3f pivot =  new Vector3f(0, 0, (.5f + distance) * tree.fallAnimationEdgeDistance());
-		pivot.rotateY((float) Math.toRadians(-direction.toYRot()));
+		Vector3f pivot =  new Vector3f(0, 0, .5f + distance);
+		pivot.rotateY(Math.toRadians(-direction.toYRot()));
 		poseStack.translate(-pivot.x, 0, -pivot.z);
 
 		Vector3f vector = new Vector3f((float) Math.toRadians(animation), 0, 0);
@@ -83,37 +86,52 @@ public class TreeRenderer extends EntityRenderer<TreeEntity> {
 		Level level = entity.getLevel();
 
 		poseStack.translate(pivot.x, 0, pivot.z);
-
 		poseStack.translate(-.5, 0, -.5);
 		blocks.forEach((blockPos, blockState) -> {
 			poseStack.pushPose();
 			poseStack.translate(blockPos.getX(), blockPos.getY(), blockPos.getZ());
 
 			blockPos = blockPos.offset(entity.getOriginPos());
-			RenderUtils.renderSingleBlock(poseStack, blockState, blockPos, level, buffer, packedLight);
+			RenderUtils.renderSingleBlock(poseStack, blockState, blockPos, level, bufferSource, packedLight);
 
 			poseStack.popPose();
 		});
 		poseStack.popPose();
 	}
 
-	@Override
-	public ResourceLocation getTextureLocation(TreeEntity entity) {
-		return null;
-	}
+	private float getDistance(Map<BlockPos, BlockState> blocks, Direction direction) {
+		float distance = 0;
+		BlockPos currentPos = new BlockPos(0, 0, 0);
+		BlockPos next = currentPos.relative(direction);
 
-	private int getDistance(Tree tree, Map<BlockPos, BlockState> blocks, int distance, Direction direction) {
-		BlockPos nextBlockPos = new BlockPos(direction.getNormal().multiply(distance + 1));
-		if (blocks.containsKey(nextBlockPos) && tree.mineableBlock(blocks.get(nextBlockPos)))
-			return getDistance(tree, blocks, distance + 1, direction);
+		while (blocks.containsKey(next)) {
+			currentPos = next;
+			next = currentPos.relative(direction);
+			distance++;
+		}
+		BlockState blockState = blocks.get(currentPos);
+		if (blockState.hasOffsetFunction())
+			return distance - .5f;
+		AABB bounds = blockState.getCollisionShape(Minecraft.getInstance().level, currentPos).bounds();
+		switch (direction) {
+			case WEST -> distance -= (float) (bounds.minX);
+			case EAST -> distance -= (float) (1f - bounds.maxX);
+			case SOUTH -> distance -= (float) (bounds.minZ);
+			case NORTH -> distance -= (float) (1f - bounds.maxZ);
+		}
 		return distance;
 	}
 
 	private float bumpCos(float time) {
-		return (float) Math.max(0, Math.cos(Mth.clamp(time, -Math.PI, Math.PI)));
+		return (float) Math.max(0, Math.cos(Math.clamp(-Math.PI, Math.PI, time)));
 	}
 
 	private float bumpSin(float time) {
-		return (float) Math.max(0, Math.sin(Mth.clamp(time, -Math.PI, Math.PI)));
+		return (float) Math.max(0, Math.sin(Math.clamp(-Math.PI, Math.PI, time)));
+	}
+
+	@Override
+	public ResourceLocation getTextureLocation(TreeEntity entity) {
+		return null;
 	}
 }

@@ -12,11 +12,15 @@
 
 package me.pandamods.fallingtrees.client;
 
+import dev.architectury.platform.Platform;
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import me.pandamods.fallingtrees.client.render.TreeRenderer;
 import me.pandamods.fallingtrees.registry.EntityRegistry;
+import me.pandamods.pandalib.platform.Services;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+
+import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
 public class FallingTreesClient {

@@ -33,7 +33,7 @@ ordering = "AFTER"
 side = "BOTH"
 
 [[dependencies."${mod_id}"]]
-modId="pandalib"
+modId = "pandalib"
 mandatory = true
 versionRange = "[0.5,)"
 ordering = "NONE"

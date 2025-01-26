@@ -13,9 +13,10 @@
 package me.pandamods.fallingtrees.forge.client;
 
 import me.pandamods.fallingtrees.client.FallingTreesClient;
+import net.minecraftforge.eventbus.api.IEventBus;
 
 public class FallingTreesClientForge {
-	public static void clientInit() {
+	public FallingTreesClientForge(IEventBus eventBus) {
 		FallingTreesClient.init();
 	}
 }

@@ -107,6 +107,15 @@ subprojects {
 				includeGroup("maven.modrinth")
 			}
 		}
+
+		maven("https://maven.pkg.github.com/PandaMods-Dev/PandaLib") {
+			credentials {
+				username = System.getenv("GITHUB_ACTOR")
+				password = System.getenv("GITHUB_TOKEN")
+			}
+		}
+
+		maven("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/")
 	}
 
 	@Suppress("UnstableApiUsage")
@@ -122,15 +131,13 @@ subprojects {
 		compileOnly("org.jetbrains:annotations:24.1.0")
 	}
 
-	if (isMinecraftSubProject) {
-		tasks.withType<ShadowJar> {
-			exclude("architectury.common.json")
-		}
-	}
-
 	tasks.withType<ShadowJar> {
 		configurations = listOf(project.configurations.getByName("shadowBundle"), project.configurations.getByName("jarShadow"))
 		archiveClassifier.set("dev-shadow")
+
+		if (isMinecraftSubProject) {
+			exclude("architectury.common.json")
+		}
 	}
 
 	tasks.withType<JavaCompile> {
