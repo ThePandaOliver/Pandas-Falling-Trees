@@ -13,7 +13,6 @@
 package me.pandamods.fallingtrees;
 
 import dev.architectury.platform.Platform;
-import me.pandamods.fallingtrees.compat.Compat;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.event.EventHandler;
 import me.pandamods.fallingtrees.registry.EntityRegistry;
@@ -28,11 +27,8 @@ public class FallingTrees {
     public static final String MOD_ID = "fallingtrees";
 
 	public static final FallingTreesConfig CONFIG = new FallingTreesConfig();
-	private static Compat compat;
 
-    public static void init(Compat compat) {
-		FallingTrees.compat = compat;
-
+    public static void init() {
 		TreeRegistry.TREES.register();
 		SoundRegistry.SOUNDS.register();
 		EntityRegistry.ENTITIES.register();
@@ -46,11 +42,5 @@ public class FallingTrees {
 
 	public static ResourceLocation ID(String path) {
 		return new ResourceLocation(MOD_ID, path);
-	}
-
-	public static Compat getCompat() {
-		if (compat == null)
-			throw new NullPointerException("Panda's Falling Tree's mod compat class not initialized.");
-		return compat;
 	}
 }

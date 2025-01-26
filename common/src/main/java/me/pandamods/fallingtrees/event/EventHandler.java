@@ -16,11 +16,8 @@ import dev.architectury.event.EventResult;
 import dev.architectury.event.events.common.BlockEvent;
 import dev.architectury.utils.value.IntValue;
 import me.pandamods.fallingtrees.api.TreeHandler;
-import me.pandamods.fallingtrees.compat.TreeChopCompat;
-import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -36,7 +33,7 @@ public class EventHandler {
 		if (!TreeHandler.canPlayerChopTree(serverPlayer))
 			return EventResult.pass();
 		
-		if (!TreeChopCompat.isChoppable(level, blockPos) && TreeHandler.destroyTree(level, blockPos, serverPlayer))
+		if (TreeHandler.destroyTree(level, blockPos, serverPlayer))
 			return EventResult.interruptFalse();
 		
 		return EventResult.pass();

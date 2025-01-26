@@ -22,7 +22,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
-@Mod(value = FallingTrees.MOD_ID, dist = Dist.CLIENT)
 public class FallingTreesClientNeoForge {
 	public FallingTreesClientNeoForge(IEventBus modBus) {
 		FallingTreesClient.init();

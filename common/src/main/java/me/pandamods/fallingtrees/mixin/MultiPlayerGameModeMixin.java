@@ -12,7 +12,6 @@
 
 package me.pandamods.fallingtrees.mixin;
 
-import me.pandamods.fallingtrees.compat.Compat;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.registry.TreeRegistry;
 import net.minecraft.client.Minecraft;
@@ -50,7 +49,7 @@ public abstract class MultiPlayerGameModeMixin {
 
 	@Inject(method = "tick", at = @At("RETURN"))
 	public void tick(CallbackInfo ci) {
-		if (FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.disable || Compat.hasTreeChop()) return;
+		if (FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.disable) return;
 		Player player = minecraft.player;
 
 		if (player != null) {

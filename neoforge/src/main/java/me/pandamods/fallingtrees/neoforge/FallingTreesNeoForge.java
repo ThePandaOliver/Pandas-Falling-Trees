@@ -13,12 +13,12 @@
 package me.pandamods.fallingtrees.neoforge;
 
 import me.pandamods.fallingtrees.FallingTrees;
+import me.pandamods.fallingtrees.neoforge.client.FallingTreesClientNeoForge;
 import me.pandamods.fallingtrees.utils.BlockMapEntityData;
 import me.pandamods.fallingtrees.utils.ItemListEntityData;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
@@ -28,9 +28,11 @@ public class FallingTreesNeoForge {
 			DeferredRegister.create(NeoForgeRegistries.ENTITY_DATA_SERIALIZERS, FallingTrees.MOD_ID);
 
     public FallingTreesNeoForge(IEventBus eventBus) {
-		FallingTrees.init(null);
+		FallingTrees.init();
 		ENTITY_DATA.register("block_map", () -> BlockMapEntityData.BLOCK_MAP);
 		ENTITY_DATA.register("item_list", () -> ItemListEntityData.ITEM_LIST);
 		ENTITY_DATA.register(eventBus);
+
+		new FallingTreesClientNeoForge(eventBus);
 	}
 }
