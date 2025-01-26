@@ -15,6 +15,7 @@ package me.pandamods.fallingtrees.compat;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import ht.treechop.api.FellData;
 import ht.treechop.common.chop.ChopUtil;
+import me.pandamods.fallingtrees.api.TreeHandler;
 import me.pandamods.fallingtrees.event.EventHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -27,10 +28,10 @@ public class TreeChopCompat {
 		return tryMakeTreeFall(blockPos, level, serverPlayer);
 	}
 
-	public static boolean tryMakeTreeFall(BlockPos blockPos, LevelAccessor level, ServerPlayer player) {
+	public static boolean tryMakeTreeFall(BlockPos blockPos, Level level, ServerPlayer player) {
 		if (isCoppedLog(level.getBlockState(blockPos)))
 			return tryMakeTreeFall(blockPos.above(), level, player);
-		return EventHandler.makeTreeFall(blockPos.above(), level, player);
+		return TreeHandler.destroyTree(level, blockPos.above(), player);
 	}
 
 	public static boolean isChoppable(Level level, BlockPos blockPos) {

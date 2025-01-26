@@ -12,23 +12,29 @@
 
 package me.pandamods.fallingtrees.utils;
 
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class ItemListEntityData {
-		public static final EntityDataSerializer<List<ItemStack>> ITEM_LIST = new EntityDataSerializer<>() {
-		@Override
-		public StreamCodec<? super RegistryFriendlyByteBuf, List<ItemStack>> codec() {
-			return ItemStack.OPTIONAL_LIST_STREAM_CODEC;
-		}
+public class ItemListEntityData implements EntityDataSerializer<List<ItemStack>> {
+	public static final EntityDataSerializer<List<ItemStack>> ITEM_LIST = new ItemListEntityData();
 
-		@Override
-		public List<ItemStack> copy(List<ItemStack> value) {
-			return value.stream().map(ItemStack::copy).toList();
-		}
-	};
+	@Override
+	public void write(FriendlyByteBuf buffer, List<ItemStack> value) {
+		buffer.writeCollection(value, FriendlyByteBuf::writeItem);
+	}
+
+	@Override
+	public @NotNull List<ItemStack> read(FriendlyByteBuf buffer) {
+		return buffer.readList(FriendlyByteBuf::readItem);
+	}
+
+	@Override
+	public @NotNull List<ItemStack> copy(List<ItemStack> value) {
+		return new ArrayList<>(value);
+	}
 }

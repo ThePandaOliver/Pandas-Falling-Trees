@@ -1,6 +1,7 @@
 package me.pandamods.fallingtrees.mixin;
 
 import me.pandamods.fallingtrees.api.TreeHandler;
+import me.pandamods.fallingtrees.compat.Compat;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
@@ -18,7 +19,7 @@ import java.util.Optional;
 public class BlockBehaviourMixin {
 	@Inject(method = "getDestroyProgress", at = @At("RETURN"), cancellable = true)
 	private void getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos, CallbackInfoReturnable<Float> cir) {
-		if (FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.disable) return;
+		if (FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.disable || Compat.hasTreeChop()) return;
 		if (player == null || !TreeHandler.canPlayerChopTree(player)) return;
 		Optional<Float> miningSpeedOpt = TreeHandler.getMiningSpeed(player, pos, cir.getReturnValue());
 		miningSpeedOpt.ifPresent(cir::setReturnValue);

@@ -18,4 +18,4 @@ pluginManagement.repositories {
 	gradlePluginPortal()
 }
 
-include("common", "fabric", "neoforge")
+include("common", "fabric", "forge")

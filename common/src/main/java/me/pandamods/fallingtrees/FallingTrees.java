@@ -12,7 +12,6 @@
 
 package me.pandamods.fallingtrees;
 
-import dev.architectury.platform.Platform;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.event.EventHandler;
 import me.pandamods.fallingtrees.registry.EntityRegistry;

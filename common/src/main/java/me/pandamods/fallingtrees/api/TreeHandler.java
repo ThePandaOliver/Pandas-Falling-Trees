@@ -50,7 +50,7 @@ public class TreeHandler {
 			if (player.getMainHandItem().isDamageableItem())
 				player.getMainHandItem().hurtAndBreak(
 						FallingTreesConfig.getCommonConfig().disableExtraToolDamage ? 1 : data.toolDamage(),
-						player, EquipmentSlot.MAINHAND
+						player, player1 -> player1.broadcastBreakEvent(EquipmentSlot.MAINHAND)
 				);
 
 			player.awardStat(Stats.ITEM_USED.get(player.getMainHandItem().getItem()));
