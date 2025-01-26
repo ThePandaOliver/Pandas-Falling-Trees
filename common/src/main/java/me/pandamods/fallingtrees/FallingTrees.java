@@ -12,34 +12,45 @@
 
 package me.pandamods.fallingtrees;
 
-import com.mojang.logging.LogUtils;
 import dev.architectury.platform.Platform;
+import me.pandamods.fallingtrees.compat.Compat;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.event.EventHandler;
 import me.pandamods.fallingtrees.registry.EntityRegistry;
 import me.pandamods.fallingtrees.registry.SoundRegistry;
-import me.pandamods.fallingtrees.registry.TreeTypeRegistry;
+import me.pandamods.fallingtrees.registry.TreeRegistry;
 import me.pandamods.fallingtrees.utils.BlockMapEntityData;
+import me.pandamods.fallingtrees.utils.ItemListEntityData;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.resources.ResourceLocation;
-import org.slf4j.Logger;
 
 public class FallingTrees {
     public static final String MOD_ID = "fallingtrees";
-	public static final FallingTreesConfig CONFIG = new FallingTreesConfig();
-	public static final Logger LOGGER = LogUtils.getLogger();
 
-    public static void init() {
-		TreeTypeRegistry.register();
+	public static final FallingTreesConfig CONFIG = new FallingTreesConfig();
+	private static Compat compat;
+
+    public static void init(Compat compat) {
+		FallingTrees.compat = compat;
+
+		TreeRegistry.TREES.register();
 		SoundRegistry.SOUNDS.register();
 		EntityRegistry.ENTITIES.register();
 		EventHandler.register();
 
-		if (!Platform.isNeoForge())
+		if (!Platform.isNeoForge()) {
 			EntityDataSerializers.registerSerializer(BlockMapEntityData.BLOCK_MAP);
+			EntityDataSerializers.registerSerializer(ItemListEntityData.ITEM_LIST);
+		}
     }
 
 	public static ResourceLocation ID(String path) {
 		return new ResourceLocation(MOD_ID, path);
+	}
+
+	public static Compat getCompat() {
+		if (compat == null)
+			throw new NullPointerException("Panda's Falling Tree's mod compat class not initialized.");
+		return compat;
 	}
 }

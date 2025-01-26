@@ -30,8 +30,7 @@ public class FallingTreesClientNeoForge {
 		modBus.addListener(FallingTreesClientNeoForge::registerRenderers);
 	}
 
-	@SubscribeEvent
-	public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+	public static void registerRenderers(final EntityRenderersEvent.RegisterRenderers event) {
 		event.registerEntityRenderer(EntityRegistry.TREE.get(), TreeRenderer::new);
 	}
 }

@@ -12,5 +12,7 @@ dependencies {
 	modImplementation("me.pandamods:pandalib-common:${properties["deps_pandalib_version"]}")
 	modApi("dev.architectury:architectury:${properties["deps_architectury_version"]}")
 
+	modImplementation("maven.modrinth:treechop:${properties["deps_ht_treechop_version"]}-fabric,${properties["deps_ht_treechop_mc_version"]}")
+
 	modImplementation("maven.modrinth:jade:${properties["deps_jade_version"]}+fabric-fabric,${properties["deps_jade_mc_version"]}")
 }

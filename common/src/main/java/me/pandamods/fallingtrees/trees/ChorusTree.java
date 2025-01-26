@@ -12,86 +12,113 @@
 
 package me.pandamods.fallingtrees.trees;
 
-import me.pandamods.fallingtrees.api.Tree;
 import me.pandamods.fallingtrees.api.TreeData;
-import me.pandamods.fallingtrees.api.TreeDataBuilder;
+import me.pandamods.fallingtrees.api.TreeType;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.config.common.tree.TreeConfig;
-import me.pandamods.fallingtrees.entity.TreeEntity;
-import me.pandamods.fallingtrees.utils.ListUtils;
+import me.pandamods.fallingtrees.exceptions.TreeTooBigException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockGetter;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.stats.Stats;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.ChorusPlantBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-public class ChorusTree implements Tree<TreeConfig> {
+public class ChorusTree implements TreeType {
+	private static final Direction[] HORIZONTAL_DIRECTIONS = new Direction[] { Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST };
+
 	@Override
-	public boolean mineableBlock(BlockState blockState) {
+	public boolean isTreeStem(BlockState blockState) {
+		return isPlant(blockState);
+	}
+
+	private static boolean isPlant(BlockState blockState) {
 		return blockState.is(Blocks.CHORUS_PLANT);
 	}
 
-	public boolean extraRequiredBlockCheck(BlockState blockState) {
+	private static boolean isFlower(BlockState blockState) {
 		return blockState.is(Blocks.CHORUS_FLOWER);
 	}
 
 	@Override
-	public TreeData getTreeData(TreeDataBuilder builder, BlockPos blockPos, BlockGetter level) {
-		Set<BlockPos> loopedBlocks = new HashSet<>();
+	public TreeData gatherTreeData(BlockPos blockPos, Level level, Player player) {
+		if (getConfig().requireTool && !getConfig().allowedToolFilter.isValid(player.getMainHandItem())) return null;
 
-		loopBlocks(level, blockPos, builder, loopedBlocks);
+		blockPos = blockPos.immutable();
+		TreeData.Builder builder = TreeData.builder();
+
+		Set<BlockPos> blockPosSet = gatherBlocks(level, blockPos, builder, player);
 		return builder
-				.setAwardedBlocks(builder.getBlocks().size())
-				.setFoodExhaustion(builder.getBlocks().size())
-				.setToolDamage(builder.getBlocks().size())
-				.build(true);
+				.addBlocks(blockPosSet)
+				.setToolDamage(blockPosSet.size())
+				.setFoodExhaustionModifier(originalExhaustion -> originalExhaustion * blockPosSet.size())
+				.setMiningSpeedModifier(originalMiningSpeed -> {
+					float speedMultiplication = FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.speedMultiplication;
+					float multiplyAmount = Math.min(FallingTreesConfig.getCommonConfig().dynamicMiningSpeed.maxSpeedMultiplication, ((float) blockPosSet.size() - 1f));
+					return originalMiningSpeed / (multiplyAmount * speedMultiplication + 1f);
+				})
+				.build();
 	}
 
-	public void loopBlocks(BlockGetter level, BlockPos originPos, TreeDataBuilder builder, Set<BlockPos> loopedBlocks) {
-		if (loopedBlocks.contains(originPos))
-			return;
+	private Set<BlockPos> gatherBlocks(Level level, BlockPos startPos, TreeData.Builder builder, Player player) {
+		Set<BlockPos> blocks = new HashSet<>();
+		Queue<BlockPos> toVisit = new LinkedList<>();
+		Set<BlockPos> visited = new HashSet<>();
 
-		loopedBlocks.add(originPos);
+		toVisit.add(startPos);
+		while (!toVisit.isEmpty()) {
+			BlockPos current = toVisit.poll();
+			if (visited.contains(current)) {
+				continue;
+			}
+			visited.add(current);
 
-		BlockState blockState = level.getBlockState(originPos);
-		if (this.mineableBlock(blockState) || this.extraRequiredBlockCheck(blockState)) {
-			builder.addBlock(originPos);
+			BlockState currentState = level.getBlockState(current);
+			if (isFlower(currentState)) {
+				blocks.add(current);
+				continue;
+			}
 
-			if (this.mineableBlock(blockState)) {
-				for (Direction direction : Direction.values()) {
-					if (blockState.getValue(ChorusPlantBlock.PROPERTY_BY_DIRECTION.get(direction))) {
-						BlockPos neighborPos = originPos.offset(direction.getNormal());
-						loopBlocks(level, neighborPos, builder, loopedBlocks);
+			if (isPlant(currentState)) {
+				blocks.add(current);
+				builder.addAwardedStat(Stats.BLOCK_MINED.get(currentState.getBlock()));
+
+				if (level instanceof ServerLevel serverLevel)
+					builder.addDrops(Block.getDrops(currentState, serverLevel, current, null, player, player.getMainHandItem()));
+
+				for (BlockPos neighbor : gatherValidBlocksAround(level, current)) {
+					if (!visited.contains(neighbor)) {
+						toVisit.add(neighbor);
 					}
 				}
 			}
 		}
+		return blocks;
 	}
 
-	@Override
-	public float fallAnimationEdgeDistance() {
-		return 6f / 16f;
+	private static List<BlockPos> gatherValidBlocksAround(Level level, BlockPos blockPos) {
+		List<BlockPos> blocks = new ArrayList<>();
+		for (Direction direction : HORIZONTAL_DIRECTIONS) {
+			BlockPos neighborPos = blockPos.relative(direction);
+			if (isPlant(level.getBlockState(neighborPos.below())))
+				continue;
+			BlockState blockState = level.getBlockState(neighborPos);
+			if (isPlant(blockState) || isFlower(blockState))
+				blocks.add(neighborPos);
+		}
+		BlockPos neighborPos = blockPos.above();
+		BlockState blockState = level.getBlockState(neighborPos);
+		if (isPlant(blockState) || isFlower(blockState))
+			blocks.add(neighborPos);
+		return blocks;
 	}
 
-	@Override
 	public TreeConfig getConfig() {
 		return FallingTreesConfig.getCommonConfig().trees.chorusTree;
-	}
-
-	@Override
-	public boolean enabled() {
-		return getConfig().enabled;
-	}
-
-	@Override
-	public List<ItemStack> getDrops(TreeEntity entity, Map<BlockPos, BlockState> blocks) {
-		return Tree.super.getDrops(entity, ListUtils.mapRemoveIf(blocks, (blockPos, blockState) -> blockState.is(Blocks.CHORUS_FLOWER)));
 	}
 }

@@ -1,13 +1,13 @@
 {
 	"required": true,
 	"package": "me.pandamods.fallingtrees.mixin",
-	"compatibilityLevel": "JAVA_${java_version}",
+	"compatibilityLevel": "JAVA_21",
 	"minVersion": "0.8",
 	"client": [
 		"MultiPlayerGameModeMixin"
 	],
 	"mixins": [
-		"BlockStateMixin"
+		"BlockBehaviourMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

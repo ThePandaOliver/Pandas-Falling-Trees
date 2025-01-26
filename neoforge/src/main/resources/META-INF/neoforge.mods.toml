@@ -40,6 +40,6 @@ ordering = "NONE"
 side = "BOTH"
 
 [[mixins]]
-config = "${modId}-common.mixins.json"
+config = "${mod_id}-common.mixins.json"
 [[mixins]]
-config = "${modId}.mixins.json"
+config = "${mod_id}.mixins.json"
