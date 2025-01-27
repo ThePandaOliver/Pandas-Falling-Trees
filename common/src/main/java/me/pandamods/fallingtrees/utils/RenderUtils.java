@@ -13,8 +13,8 @@
 package me.pandamods.fallingtrees.utils;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import me.pandamods.fallingtrees.mixin.accessor.BlockRenderDispatcherAccessor;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
@@ -22,35 +22,24 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class RenderUtils {
 	public static void renderSingleBlock(PoseStack poseStack, BlockState blockState, BlockPos blockPos,
 										 BlockAndTintGetter level, MultiBufferSource bufferSource, int packedLight) {
+		int packedOverlay = OverlayTexture.NO_OVERLAY;
 		BlockRenderDispatcher blockRenderDispatcher = Minecraft.getInstance().getBlockRenderer();
-		BlockEntityWithoutLevelRenderer blockEntityRenderDispatcher = blockRenderDispatcher.blockEntityRenderer;
-		RenderShape renderShape = blockState.getRenderShape();
-		if (renderShape != RenderShape.INVISIBLE) {
-			switch (renderShape) {
-				case MODEL:
-					BakedModel bakedModel = blockRenderDispatcher.getBlockModel(blockState);
-					int color = blockRenderDispatcher.blockColors.getColor(blockState, level, blockPos, 0);
-					float red = (float)(color >> 16 & 0xFF) / 255.0f;
-					float green = (float)(color >> 8 & 0xFF) / 255.0f;
-					float blue = (float)(color & 0xFF) / 255.0f;
-					blockRenderDispatcher.getModelRenderer().renderModel(poseStack.last(),
-							bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(blockState)), blockState,
-							bakedModel, red, green, blue, packedLight, OverlayTexture.NO_OVERLAY);
-					break;
-				case ENTITYBLOCK_ANIMATED:
-					blockEntityRenderDispatcher.renderByItem(new ItemStack(blockState.getBlock()),
-							ItemDisplayContext.NONE,
-							poseStack, bufferSource, packedLight, OverlayTexture.NO_OVERLAY);
-			}
+		BlockRenderDispatcherAccessor accessor = (BlockRenderDispatcherAccessor) blockRenderDispatcher;
 
-		}
+		BakedModel bakedModel = blockRenderDispatcher.getBlockModel(blockState);
+		int color = blockRenderDispatcher.blockColors.getColor(blockState, level, blockPos, 0);
+		float red = (float)(color >> 16 & 255) / 255.0F;
+		float green = (float)(color >> 8 & 255) / 255.0F;
+		float blue = (float)(color & 255) / 255.0F;
+		blockRenderDispatcher.getModelRenderer()
+				.renderModel(poseStack.last(), bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(blockState)), blockState, bakedModel, red, green, blue, packedLight, packedOverlay);
+		accessor.getSpecialBlockModelRenderer().get()
+				.renderByBlock(blockState.getBlock(), ItemDisplayContext.NONE, poseStack, bufferSource, packedLight, packedOverlay);
 	}
 }
