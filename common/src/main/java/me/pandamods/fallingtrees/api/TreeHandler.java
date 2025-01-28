@@ -12,7 +12,9 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.slf4j.Logger;
 
@@ -56,9 +58,31 @@ public class TreeHandler {
 			player.awardStat(Stats.ITEM_USED.get(player.getMainHandItem().getItem()));
 			data.awardedStats().forEach(awardedStat -> player.awardStat(awardedStat.stat(), awardedStat.amount()));
 
-			for (BlockPos block : blocks) {
-				level.removeBlock(block, false);
+			Map<BlockPos, BlockState> blockStates = new HashMap<>();
+
+			// Silently remove all blocks
+			BlockState air = Blocks.AIR.defaultBlockState();
+			for (BlockPos pos : blocks) {
+				BlockState oldState = level.getBlockState(pos);
+				level.setBlock(pos, air, 16);
+				level.setBlocksDirty(pos, oldState, level.getBlockState(pos));
+				blockStates.put(pos, oldState);
 			}
+
+			// Update neighbors around removed blocks
+			blockStates.forEach((pos, oldState) -> {
+				BlockState newState = level.getBlockState(pos);
+
+				level.sendBlockUpdated(pos, oldState, newState, 3);
+				level.sendBlockUpdated(pos, oldState, newState, 3);
+				level.blockUpdated(pos, newState.getBlock());
+
+				newState.updateIndirectNeighbourShapes(level, pos, 511);
+				oldState.updateNeighbourShapes(level, pos, 511);
+				oldState.updateIndirectNeighbourShapes(level, pos, 511);
+
+				level.onBlockStateChange(pos, oldState, newState);
+			});
 			level.addFreshEntity(entity);
 			return true;
 		} catch (TreeException e) {
