@@ -12,13 +12,11 @@
 
 package me.pandamods.fallingtrees.entity;
 
-import dev.architectury.utils.Env;
 import me.pandamods.fallingtrees.api.TreeType;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.registry.TreeRegistry;
 import me.pandamods.fallingtrees.utils.BlockMapEntityData;
 import me.pandamods.fallingtrees.utils.ItemListEntityData;
-import me.pandamods.pandalib.utils.EnvRunner;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -26,22 +24,18 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Math;
 
 import java.util.*;
-import java.util.function.Supplier;
 
 public class TreeEntity extends Entity {
 	public static final EntityDataAccessor<Map<BlockPos, BlockState>> BLOCKS = SynchedEntityData.defineId(TreeEntity.class, BlockMapEntityData.BLOCK_MAP);
@@ -55,6 +49,7 @@ public class TreeEntity extends Entity {
 
 	public TreeEntity(EntityType<?> entityType, Level level) {
 		super(entityType, level);
+		this.noCulling = true;
 	}
 
 	public void setData(Entity owner, TreeType tree, BlockPos originBlock, List<BlockPos> blockPosList, List<ItemStack> drops) {
