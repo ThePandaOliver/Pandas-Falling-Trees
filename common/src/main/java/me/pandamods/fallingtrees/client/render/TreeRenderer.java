@@ -31,6 +31,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Math;
 import org.joml.Quaternionf;
@@ -69,7 +70,7 @@ public class TreeRenderer extends EntityRenderer<TreeEntity, TreeRenderState> {
 		float animation = (fallAnim + bounceAnim) - 90;
 
 		Direction direction = renderState.direction.getOpposite();
-		float distance = getDistance(blocks, direction.getOpposite());
+		float distance = getDistance(tree, blocks, direction.getOpposite());
 
 		Vector3f pivot =  new Vector3f(0, 0, .5f + distance);
 		pivot.rotateY(Math.toRadians(-direction.toYRot()));
@@ -113,25 +114,36 @@ public class TreeRenderer extends EntityRenderer<TreeEntity, TreeRenderState> {
 		super.extractRenderState(entity, renderState, f);
 	}
 
-	private float getDistance(Map<BlockPos, BlockState> blocks, Direction direction) {
+	private float getDistance(TreeType tree, Map<BlockPos, BlockState> blocks, Direction direction) {
 		float distance = 0;
 		BlockPos currentPos = new BlockPos(0, 0, 0);
 		BlockPos next = currentPos.relative(direction);
 
 		while (blocks.containsKey(next)) {
+			if (!tree.isTreeStem(blocks.get(next))) break;
+
 			currentPos = next;
 			next = currentPos.relative(direction);
+
 			distance++;
 		}
 		BlockState blockState = blocks.get(currentPos);
 		if (blockState.hasOffsetFunction())
 			return distance - .5f;
-		AABB bounds = blockState.getCollisionShape(Minecraft.getInstance().level, currentPos).bounds();
-		switch (direction) {
-			case WEST -> distance -= (float) (bounds.minX);
-			case EAST -> distance -= (float) (1f - bounds.maxX);
-			case SOUTH -> distance -= (float) (bounds.minZ);
-			case NORTH -> distance -= (float) (1f - bounds.maxZ);
+
+		VoxelShape shape = blockState.getCollisionShape(Minecraft.getInstance().level, currentPos);
+		if (shape.isEmpty()) shape = blockState.getShape(Minecraft.getInstance().level, currentPos);
+
+		if (!shape.isEmpty()) {
+			AABB bounds = shape.bounds();
+			switch (direction) {
+				case WEST -> distance -= (float) (bounds.minX);
+				case EAST -> distance -= (float) (1f - bounds.maxX);
+				case SOUTH -> distance -= (float) (bounds.minZ);
+				case NORTH -> distance -= (float) (1f - bounds.maxZ);
+			}
+		} else {
+			distance -= 1;
 		}
 		return distance;
 	}
