@@ -3,7 +3,7 @@ name: Mod Publishing
 on:
   push:
     branches:
-      - "stable/**"
+      - Stable/**
 
 jobs:
   build:
