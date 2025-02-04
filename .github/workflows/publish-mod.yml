@@ -32,3 +32,5 @@ jobs:
         CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
         MODRINTH_API_KEY: ${{ secrets.MODRINTH_API_KEY }}
         GITHUB_API_KEY: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_ACTOR: ${{ github.actor }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
