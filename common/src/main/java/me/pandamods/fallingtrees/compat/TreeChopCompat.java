@@ -31,7 +31,7 @@ public class TreeChopCompat {
 	public static boolean tryMakeTreeFall(BlockPos blockPos, Level level, ServerPlayer player) {
 		if (isCoppedLog(level.getBlockState(blockPos)))
 			return tryMakeTreeFall(blockPos.above(), level, player);
-		return TreeHandler.destroyTree(level, blockPos.above(), player);
+		return TreeHandler.destroyTree(level, blockPos, player);
 	}
 
 	public static boolean isChoppable(Level level, BlockPos blockPos) {
