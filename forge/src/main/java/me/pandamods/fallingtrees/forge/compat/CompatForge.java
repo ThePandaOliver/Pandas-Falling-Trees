@@ -13,9 +13,20 @@
 package me.pandamods.fallingtrees.forge.compat;
 
 import me.pandamods.fallingtrees.compat.Compat;
+import me.pandamods.fallingtrees.compat.TreeChopCompat;
+import org.jetbrains.annotations.Nullable;
 
-public class CompatForge {
-	public static void init() {
-		if (Compat.hasTreeChop()) TreeChopCompatImpl.init();
+public class CompatForge implements Compat {
+	private TreeChopCompat treeChopCompat;
+
+	public CompatForge() {
+		if (Compat.hasTreeChop())
+			treeChopCompat = new TreeChopCompatImpl();
+	}
+
+	@Override
+	@Nullable
+	public TreeChopCompat getTreeChopCompat() {
+		return treeChopCompat;
 	}
 }

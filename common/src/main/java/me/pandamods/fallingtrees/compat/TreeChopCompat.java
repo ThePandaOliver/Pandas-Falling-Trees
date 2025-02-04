@@ -12,9 +12,9 @@
 
 package me.pandamods.fallingtrees.compat;
 
-import dev.architectury.injectables.annotations.ExpectPlatform;
 import ht.treechop.api.FellData;
 import ht.treechop.common.chop.ChopUtil;
+import me.pandamods.fallingtrees.FallingTrees;
 import me.pandamods.fallingtrees.api.TreeHandler;
 import me.pandamods.fallingtrees.event.EventHandler;
 import net.minecraft.core.BlockPos;
@@ -23,26 +23,23 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class TreeChopCompat {
-	public static boolean beforeFellEvent(Level level, ServerPlayer serverPlayer, BlockPos blockPos, FellData fellData) {
+public interface TreeChopCompat {
+	static boolean beforeFellEvent(Level level, ServerPlayer serverPlayer, BlockPos blockPos, FellData fellData) {
 		return tryMakeTreeFall(blockPos, level, serverPlayer);
 	}
 
-	public static boolean tryMakeTreeFall(BlockPos blockPos, Level level, ServerPlayer player) {
-		if (isCoppedLog(level.getBlockState(blockPos)))
+	static boolean tryMakeTreeFall(BlockPos blockPos, Level level, ServerPlayer player) {
+		if (FallingTrees.getCompat().getTreeChopCompat().isCoppedLog(level.getBlockState(blockPos)))
 			return tryMakeTreeFall(blockPos.above(), level, player);
 		return TreeHandler.destroyTree(level, blockPos, player);
 	}
 
-	public static boolean isChoppable(Level level, BlockPos blockPos) {
+	static boolean isChoppable(Level level, BlockPos blockPos) {
 		if (Compat.hasTreeChop()) {
 			return ChopUtil.isBlockChoppable(level, blockPos);
 		}
 		return false;
 	}
 
-	@ExpectPlatform
-	public static boolean isCoppedLog(BlockState blockState) {
-		throw new AssertionError();
-	}
+	boolean isCoppedLog(BlockState blockState);
 }

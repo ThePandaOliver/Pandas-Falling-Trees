@@ -19,8 +19,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.MinecraftForge;
 
-public class TreeChopCompatImpl {
-	public static void init() {
+public class TreeChopCompatImpl implements TreeChopCompat {
+	public TreeChopCompatImpl() {
 		MinecraftForge.EVENT_BUS.addListener(TreeChopCompatImpl::beforeFellEvent);
 	}
 
@@ -29,7 +29,7 @@ public class TreeChopCompatImpl {
 			event.setCanceled(!TreeChopCompat.beforeFellEvent(event.getLevel(), serverPlayer, event.getChoppedBlockPos(), event.getFellData()));
 	}
 
-	public static boolean isCoppedLog(BlockState blockState) {
+	public boolean isCoppedLog(BlockState blockState) {
 		return blockState.is(ForgeModBlocks.CHOPPED_LOG.get());
 	}
 }
