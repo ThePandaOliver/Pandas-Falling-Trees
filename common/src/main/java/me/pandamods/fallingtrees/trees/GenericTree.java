@@ -12,15 +12,19 @@
 
 package me.pandamods.fallingtrees.trees;
 
-import me.pandamods.fallingtrees.FallingTrees;
 import me.pandamods.fallingtrees.api.TreeData;
 import me.pandamods.fallingtrees.api.TreeType;
+import me.pandamods.fallingtrees.config.ClientConfig;
 import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.config.common.tree.GenericTreeConfig;
+import me.pandamods.fallingtrees.entity.TreeEntity;
 import me.pandamods.fallingtrees.exceptions.TreeTooBigException;
+import me.pandamods.fallingtrees.registry.SoundRegistry;
+import me.pandamods.pandalib.platform.Services;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -30,7 +34,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.storage.loot.LootTable;
 
 import java.util.*;
 
@@ -38,6 +41,26 @@ public class GenericTree implements TreeType {
 	@Override
 	public boolean isTreeStem(BlockState blockState) {
 		return getConfig().logFilter.isValid(blockState);
+	}
+
+	@Override
+	public void onTreeTick(TreeEntity entity) {
+		if (Services.GAME.isClient()) {
+			ClientConfig clientConfig = FallingTreesConfig.getClientConfig();
+			if (entity.tickCount == 1) {
+				if (clientConfig.soundSettings.enabled) {
+					entity.level().playLocalSound(entity.getX(), entity.getY(), entity.getZ(), SoundRegistry.TREE_FALL.get(),
+							SoundSource.BLOCKS, clientConfig.soundSettings.startVolume, 1f, true);
+				}
+			}
+
+			if (entity.tickCount == (int) (clientConfig.animation.fallAnimLength * 20) - 5) {
+				if (clientConfig.soundSettings.enabled) {
+					entity.level().playLocalSound(entity.getX(), entity.getY(), entity.getZ(), SoundRegistry.TREE_IMPACT.get(),
+							SoundSource.BLOCKS, clientConfig.soundSettings.endVolume, 1f, true);
+				}
+			}
+		}
 	}
 
 	@Override
