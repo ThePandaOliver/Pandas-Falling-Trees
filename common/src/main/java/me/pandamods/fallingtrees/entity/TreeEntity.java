@@ -101,6 +101,7 @@ public class TreeEntity extends Entity {
 	@Override
 	public void tick() {
 		super.tick();
+		treeType.onTreeTick(this);
 
 		if (!this.isNoGravity()) {
 			this.setDeltaMovement(this.getDeltaMovement().add(0.0, -0.04, 0.0));
