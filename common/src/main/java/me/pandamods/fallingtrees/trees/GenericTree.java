@@ -49,14 +49,14 @@ public class GenericTree implements TreeType {
 			ClientConfig clientConfig = FallingTreesConfig.getClientConfig();
 			if (entity.tickCount == 1) {
 				if (clientConfig.soundSettings.enabled) {
-					entity.level().playLocalSound(entity.getX(), entity.getY(), entity.getZ(), SoundRegistry.TREE_FALL.get(),
+					entity.level.playLocalSound(entity.getX(), entity.getY(), entity.getZ(), SoundRegistry.TREE_FALL.get(),
 							SoundSource.BLOCKS, clientConfig.soundSettings.startVolume, 1f, true);
 				}
 			}
 
 			if (entity.tickCount == (int) (clientConfig.animation.fallAnimLength * 20) - 5) {
 				if (clientConfig.soundSettings.enabled) {
-					entity.level().playLocalSound(entity.getX(), entity.getY(), entity.getZ(), SoundRegistry.TREE_IMPACT.get(),
+					entity.level.playLocalSound(entity.getX(), entity.getY(), entity.getZ(), SoundRegistry.TREE_IMPACT.get(),
 							SoundSource.BLOCKS, clientConfig.soundSettings.endVolume, 1f, true);
 				}
 			}
