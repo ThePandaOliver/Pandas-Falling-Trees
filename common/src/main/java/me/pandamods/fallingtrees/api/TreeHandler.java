@@ -34,67 +34,74 @@ public class TreeHandler {
 		
 		TreeType tree = TreeRegistry.getTree(blockState);
 		if (tree == null) return false;
-		
-		try {
-			TreeData data = tree.gatherTreeData(blockPos, level, player);
-			if (data == null) return false;
-			List<BlockPos> blocks = data.blocks();
 
-			TreeEntity entity = new TreeEntity(EntityRegistry.TREE.get(), level);
-			entity.setPos(blockPos.getX() + 0.5, blockPos.getY(), blockPos.getZ() + 0.5);
-			entity.setData(player, tree, blockPos, blocks, data.drops());
+		TreeData data = tryGatherTreeData(tree, blockPos, level, player, false);
+		if (data == null) return false;
+		List<BlockPos> blocks = data.blocks();
 
-			player.causeFoodExhaustion(
-					FallingTreesConfig.getCommonConfig().disableExtraFoodExhaustion ? 1 :
-							data.foodExhaustionModifier().getExhaustion(0.005F)
+		TreeEntity entity = new TreeEntity(EntityRegistry.TREE.get(), level);
+		entity.setPos(blockPos.getX() + 0.5, blockPos.getY(), blockPos.getZ() + 0.5);
+		entity.setData(player, tree, blockPos, blocks, data.drops());
+
+		player.causeFoodExhaustion(
+				FallingTreesConfig.getCommonConfig().disableExtraFoodExhaustion ? 1 :
+						data.foodExhaustionModifier().getExhaustion(0.005F)
+		);
+
+		if (player.getMainHandItem().isDamageableItem())
+			player.getMainHandItem().hurtAndBreak(
+					FallingTreesConfig.getCommonConfig().disableExtraToolDamage ? 1 : data.toolDamage(),
+					player, player1 -> player1.broadcastBreakEvent(EquipmentSlot.MAINHAND)
 			);
 
-			if (player.getMainHandItem().isDamageableItem())
-				player.getMainHandItem().hurtAndBreak(
-						FallingTreesConfig.getCommonConfig().disableExtraToolDamage ? 1 : data.toolDamage(),
-						player, player1 -> player1.broadcastBreakEvent(EquipmentSlot.MAINHAND)
-				);
+		player.awardStat(Stats.ITEM_USED.get(player.getMainHandItem().getItem()));
+		data.awardedStats().forEach(awardedStat -> player.awardStat(awardedStat.stat(), awardedStat.amount()));
 
-			player.awardStat(Stats.ITEM_USED.get(player.getMainHandItem().getItem()));
-			data.awardedStats().forEach(awardedStat -> player.awardStat(awardedStat.stat(), awardedStat.amount()));
+		Map<BlockPos, BlockState> blockStates = new HashMap<>();
 
-			Map<BlockPos, BlockState> blockStates = new HashMap<>();
-
-			// Silently remove all blocks
-			BlockState air = Blocks.AIR.defaultBlockState();
-			for (BlockPos pos : blocks) {
-				BlockState oldState = level.getBlockState(pos);
-				level.setBlock(pos, air, 16);
-				level.setBlocksDirty(pos, oldState, level.getBlockState(pos));
-				blockStates.put(pos, oldState);
-			}
-
-			// Update neighbors around removed blocks
-			blockStates.forEach((pos, oldState) -> {
-				BlockState newState = level.getBlockState(pos);
-
-				level.sendBlockUpdated(pos, oldState, newState, 3);
-				level.sendBlockUpdated(pos, oldState, newState, 3);
-				level.blockUpdated(pos, newState.getBlock());
-
-				newState.updateIndirectNeighbourShapes(level, pos, 511);
-				oldState.updateNeighbourShapes(level, pos, 511);
-				oldState.updateIndirectNeighbourShapes(level, pos, 511);
-
-				level.onBlockStateChange(pos, oldState, newState);
-			});
-			level.addFreshEntity(entity);
-			return true;
-		} catch (TreeException e) {
-			LOGGER.warn(e.getMessage());
-		} catch (Exception e) {
-			LOGGER.error("An error occurred when trying to destroy tree", e);
-			player.displayClientMessage(Component.literal("Error: " + e).withStyle(Style.EMPTY.withColor(Color.red.getRGB())), false);
-			player.displayClientMessage(Component.translatable("text.fallingtrees.tree_handler.exception.1").withStyle(Style.EMPTY.withColor(Color.red.getRGB())), false);
-			player.displayClientMessage(Component.translatable("text.fallingtrees.tree_handler.exception.2").withStyle(Style.EMPTY.withColor(Color.red.getRGB())), false);
-			return false;
+		// Silently remove all blocks
+		BlockState air = Blocks.AIR.defaultBlockState();
+		for (BlockPos pos : blocks) {
+			BlockState oldState = level.getBlockState(pos);
+			level.setBlock(pos, air, 16);
+			level.setBlocksDirty(pos, oldState, level.getBlockState(pos));
+			blockStates.put(pos, oldState);
 		}
-		return false;
+
+		// Update neighbors around removed blocks
+		blockStates.forEach((pos, oldState) -> {
+			BlockState newState = level.getBlockState(pos);
+
+			level.sendBlockUpdated(pos, oldState, newState, 3);
+			level.sendBlockUpdated(pos, oldState, newState, 3);
+			level.blockUpdated(pos, newState.getBlock());
+
+			newState.updateIndirectNeighbourShapes(level, pos, 511);
+			oldState.updateNeighbourShapes(level, pos, 511);
+			oldState.updateIndirectNeighbourShapes(level, pos, 511);
+
+			level.onBlockStateChange(pos, oldState, newState);
+		});
+		level.addFreshEntity(entity);
+		return true;
+	}
+
+	public static TreeData tryGatherTreeData(TreeType treeType, BlockPos blockPos, Level level, Player player, boolean ignoreExceptions) {
+		try {
+			return treeType.gatherTreeData(blockPos, level, player);
+		} catch (TreeException e) {
+			if (!ignoreExceptions) {
+				LOGGER.warn(e.getMessage());
+			}
+		} catch (Exception e) {
+			if (!ignoreExceptions) {
+				LOGGER.error("An error occurred when trying to gather tree data", e);
+				player.displayClientMessage(Component.literal("Error: " + e).withStyle(Style.EMPTY.withColor(Color.red.getRGB())), false);
+				player.displayClientMessage(Component.translatable("text.fallingtrees.tree_handler.exception.1").withStyle(Style.EMPTY.withColor(Color.red.getRGB())), false);
+				player.displayClientMessage(Component.translatable("text.fallingtrees.tree_handler.exception.2").withStyle(Style.EMPTY.withColor(Color.red.getRGB())), false);
+			}
+		}
+		return null;
 	}
 	
 	public static boolean canPlayerChopTree(Player player) {
@@ -108,7 +115,7 @@ public class TreeHandler {
 				BlockState blockState = player.level().getBlockState(blockPos);
 				TreeType tree = TreeRegistry.getTree(blockState);
 				if (tree == null) return null;
-				TreeData data = tree.gatherTreeData(blockPos, player.level(), player);
+				TreeData data = tryGatherTreeData(tree, blockPos, player.level(), player, true);
 				if (data == null) return null;
 				return new TreeSpeed(baseSpeed, data.miningSpeedModifier().getMiningSpeed(baseSpeed), blockPos.immutable());
 			}
