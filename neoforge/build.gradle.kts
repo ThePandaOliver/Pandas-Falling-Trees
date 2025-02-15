@@ -62,7 +62,6 @@ publishing {
 				username = System.getenv("NEXUS_USERNAME")
 				password = System.getenv("NEXUS_PASSWORD")
 			}
-			isAllowInsecureProtocol = true
 		}
 	}
 }
