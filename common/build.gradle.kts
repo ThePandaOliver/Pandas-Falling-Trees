@@ -1,3 +1,5 @@
+val isSnapshot = project.findProperty("snapshot") == "true"
+
 architectury {
 	common(properties["supported_mod_loaders"].toString().split(","))
 }
@@ -13,4 +15,31 @@ dependencies {
 	modApi("dev.architectury:architectury:${properties["deps_architectury_version"]}")
 
 	modImplementation("maven.modrinth:jade:${properties["deps_jade_fabric_version"]}+fabric-fabric,${properties["deps_jade_mc_version"]}")
+}
+
+publishing {
+	publications {
+		register("mavenJava", MavenPublication::class) {
+			groupId = properties["maven_group"] as String
+			artifactId = "${properties["mod_id"]}-${project.name}"
+			version = "${project.version}"
+
+			from(components["java"])
+		}
+	}
+
+	repositories {
+		maven {
+			name = "Nexus"
+			url = if (isSnapshot)
+				uri("https://nexus.pandasystems.dev/repository/maven-snapshots/")
+			else
+				uri("https://nexus.pandasystems.dev/repository/maven-releases/")
+			credentials {
+				username = System.getenv("NEXUS_USERNAME")
+				password = System.getenv("NEXUS_PASSWORD")
+			}
+			isAllowInsecureProtocol = true
+		}
+	}
 }

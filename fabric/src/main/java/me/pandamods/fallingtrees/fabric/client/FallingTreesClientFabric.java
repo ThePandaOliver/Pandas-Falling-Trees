@@ -18,6 +18,6 @@ import net.fabricmc.api.ClientModInitializer;
 public class FallingTreesClientFabric implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        FallingTreesClient.init();
+		new FallingTreesClient();
     }
 }

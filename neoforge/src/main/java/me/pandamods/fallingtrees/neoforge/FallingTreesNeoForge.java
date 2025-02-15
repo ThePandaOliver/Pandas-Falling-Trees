@@ -28,7 +28,8 @@ public class FallingTreesNeoForge {
 			DeferredRegister.create(NeoForgeRegistries.ENTITY_DATA_SERIALIZERS, FallingTrees.MOD_ID);
 
     public FallingTreesNeoForge(IEventBus eventBus) {
-		FallingTrees.init();
+		new FallingTrees();
+
 		ENTITY_DATA.register("block_map", () -> BlockMapEntityData.BLOCK_MAP);
 		ENTITY_DATA.register("item_list", () -> ItemListEntityData.ITEM_LIST);
 		ENTITY_DATA.register(eventBus);
