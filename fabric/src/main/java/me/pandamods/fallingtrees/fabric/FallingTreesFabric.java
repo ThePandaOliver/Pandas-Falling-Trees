@@ -18,6 +18,6 @@ import net.fabricmc.api.ModInitializer;
 public class FallingTreesFabric implements ModInitializer {
     @Override
     public void onInitialize() {
-        FallingTrees.init();
+        new FallingTrees();
     }
 }

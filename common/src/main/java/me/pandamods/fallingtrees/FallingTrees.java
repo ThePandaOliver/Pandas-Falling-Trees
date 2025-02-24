@@ -25,10 +25,11 @@ import net.minecraft.resources.ResourceLocation;
 
 public class FallingTrees {
     public static final String MOD_ID = "fallingtrees";
+	private static FallingTrees instance;
 
 	public static final FallingTreesConfig CONFIG = new FallingTreesConfig();
 
-    public static void init() {
+    public FallingTrees() {
 		TreeRegistry.TREES.register();
 		SoundRegistry.SOUNDS.register();
 		EntityRegistry.ENTITIES.register();
@@ -38,9 +39,14 @@ public class FallingTrees {
 			EntityDataSerializers.registerSerializer(BlockMapEntityData.BLOCK_MAP);
 			EntityDataSerializers.registerSerializer(ItemListEntityData.ITEM_LIST);
 		}
+		instance = this;
     }
 
-	public static ResourceLocation ID(String path) {
+	public static ResourceLocation resourceLocation(String path) {
 		return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+	}
+
+	public static FallingTrees getInstance() {
+		return instance;
 	}
 }

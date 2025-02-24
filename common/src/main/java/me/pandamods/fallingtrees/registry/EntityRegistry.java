@@ -30,6 +30,6 @@ public class EntityRegistry {
 					.sized(0.5f, 0.5f)
 					.noSave()
 					.fireImmune()
-					.build(ResourceKey.create(Registries.ENTITY_TYPE, FallingTrees.ID("tree")))
+					.build(ResourceKey.create(Registries.ENTITY_TYPE, FallingTrees.resourceLocation("tree")))
 	);
 }
