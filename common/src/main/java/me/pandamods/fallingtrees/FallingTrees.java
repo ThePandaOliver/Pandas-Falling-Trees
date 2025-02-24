@@ -25,11 +25,12 @@ import net.minecraft.resources.ResourceLocation;
 
 public class FallingTrees {
     public static final String MOD_ID = "fallingtrees";
+	private static FallingTrees instance;
 
 	public static final FallingTreesConfig CONFIG = new FallingTreesConfig();
 	private static Compat compat;
 
-    public static void init(Compat compat) {
+    public FallingTrees(Compat compat) {
 		FallingTrees.compat = compat;
 
 		TreeRegistry.TREES.register();
@@ -39,9 +40,10 @@ public class FallingTrees {
 
 		EntityDataSerializers.registerSerializer(BlockMapEntityData.BLOCK_MAP);
 		EntityDataSerializers.registerSerializer(ItemListEntityData.ITEM_LIST);
+		instance = this;
     }
 
-	public static ResourceLocation ID(String path) {
+	public static ResourceLocation resourceLocation(String path) {
 		return new ResourceLocation(MOD_ID, path);
 	}
 
@@ -49,5 +51,9 @@ public class FallingTrees {
 		if (compat == null)
 			throw new NullPointerException("Panda's Falling Tree's mod compat class not initialized.");
 		return compat;
+	}
+
+	public static FallingTrees getInstance() {
+		return instance;
 	}
 }
