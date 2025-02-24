@@ -31,7 +31,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class TreeRegistry {
-	public static final ResourceKey<Registry<TreeType>> TREE_REGISTRY_KEY = ResourceKey.createRegistryKey(FallingTrees.ID("tree_registry"));
+	public static final ResourceKey<Registry<TreeType>> TREE_REGISTRY_KEY = ResourceKey.createRegistryKey(FallingTrees.resourceLocation("tree_registry"));
 	public static final Registry<TreeType> TREE_REGISTRY = RegistryRegister.register(new MappedRegistry<>(TREE_REGISTRY_KEY, Lifecycle.stable(), null));
 	
 	public static final DeferredRegister<TreeType> TREES = DeferredRegister.create(FallingTrees.MOD_ID, TREE_REGISTRY_KEY);
