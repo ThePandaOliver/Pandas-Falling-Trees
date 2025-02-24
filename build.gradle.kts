@@ -199,7 +199,6 @@ subprojects {
 // Mod Publishing
 var curseForgeAPIKey = providers.environmentVariable("CURSEFORGE_API_KEY")
 var modrinthAPIKey = providers.environmentVariable("MODRINTH_API_KEY")
-var githubAPIKey = providers.environmentVariable("GITHUB_API_KEY")
 
 publishMods {
 	dryRun = properties["publishing_dry_run"].toString().toBoolean()
@@ -285,27 +284,27 @@ publishMods {
 		}
 	}
 
-	val githubRepository = properties["project_github_repo"] as String
-	val releaseType = when (properties["publishing_release_type"].toString().toInt()) {
-		2 -> "alpha"
-		1 -> "beta"
-		else -> "stable"
-	}
-	val githubTagName = "${releaseType}/${properties["mod_version"]}-${minecraftVersionStr}"
-	github {
-		displayName = "${properties["mod_name"]} ${properties["mod_version"]} MC${minecraftVersionStr}"
-		accessToken = githubAPIKey
-		repository = githubRepository
-		tagName = githubTagName
-		commitish = "main"
-
-		modLoaders.addAll(properties["supported_mod_loaders"].toString().trim().split(","))
-		val commonRemapJar = project(":common").tasks.getByName<RemapJarTask>("remapJar")
-		file = commonRemapJar.archiveFile
-
-		properties["supported_mod_loaders"].toString().split(",").forEach {
-			val modRemapJar = project(":$it").tasks.getByName<RemapJarTask>("remapJar")
-			additionalFiles.from(modRemapJar.archiveFile)
-		}
-	}
+//	val githubRepository = properties["project_github_repo"] as String
+//	val releaseType = when (properties["publishing_release_type"].toString().toInt()) {
+//		2 -> "alpha"
+//		1 -> "beta"
+//		else -> "stable"
+//	}
+//	val githubTagName = "${releaseType}/${properties["mod_version"]}-${minecraftVersionStr}"
+//	github {
+//		displayName = "${properties["mod_name"]} ${properties["mod_version"]} MC${minecraftVersionStr}"
+//		accessToken = githubAPIKey
+//		repository = githubRepository
+//		tagName = githubTagName
+//		commitish = "main"
+//
+//		modLoaders.addAll(properties["supported_mod_loaders"].toString().trim().split(","))
+//		val commonRemapJar = project(":common").tasks.getByName<RemapJarTask>("remapJar")
+//		file = commonRemapJar.archiveFile
+//
+//		properties["supported_mod_loaders"].toString().split(",").forEach {
+//			val modRemapJar = project(":$it").tasks.getByName<RemapJarTask>("remapJar")
+//			additionalFiles.from(modRemapJar.archiveFile)
+//		}
+//	}
 }
