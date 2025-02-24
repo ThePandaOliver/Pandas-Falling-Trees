@@ -14,21 +14,22 @@ plugins {
 	id("me.modmuss50.mod-publish-plugin") version "0.6.3"
 }
 
+val isSnapshot = !hasProperty("snapshot") || findProperty("snapshot") == "true"
+
 architectury.minecraft = properties["minecraft_version"] as String
 
 allprojects {
 	apply(plugin = "java")
 
 	base { archivesName = properties["mod_id"] as String }
-	version = "${properties["mod_version"]}-${properties["minecraft_version"]}"
+	version = "mc${properties["minecraft_version"]}-${properties["mod_version"]}"
+	if (isSnapshot)
+		version = "${version}-SNAPSHOT"
 	group = properties["maven_group"] as String
 }
 
 subprojects {
-	val isMinecraftSubProject = findProject(":common") != project && findProject(":testmod-common") != project
-	val isFabric = findProject(":fabric") == project || findProject(":testmod-fabric") == project
-	val isForge = findProject(":forge") == project || findProject(":testmod-forge") == project
-	val isNeoForge = findProject(":neoforge") == project || findProject(":testmod-neoforge") == project
+	val isMinecraftSubProject = findProject(":common") != project
 
 	apply(plugin = "architectury-plugin")
 	apply(plugin = "dev.architectury.loom")
@@ -81,6 +82,13 @@ subprojects {
 		}
 		implementation.get().extendsFrom(configurations["jarShadow"])
 
+		create("forgeJarShadow") {
+			isCanBeResolved = true
+			isCanBeConsumed = false
+		}
+		implementation.get().extendsFrom(configurations["forgeJarShadow"])
+		configurations["jarShadow"].extendsFrom(configurations["forgeJarShadow"])
+
 		create("modShadow")
 		getByName("modImplementation").extendsFrom(configurations["modShadow"])
 		getByName("include").extendsFrom(configurations["modShadow"])
@@ -108,13 +116,7 @@ subprojects {
 			}
 		}
 
-		maven("https://maven.pkg.github.com/PandaMods-Dev/PandaLib") {
-			credentials {
-				username = System.getenv("GITHUB_ACTOR")
-				password = System.getenv("GITHUB_TOKEN")
-			}
-		}
-
+		maven("https://nexus.pandasystems.dev/repository/maven-public/")
 		maven("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/")
 	}
 
@@ -135,9 +137,7 @@ subprojects {
 		configurations = listOf(project.configurations.getByName("shadowBundle"), project.configurations.getByName("jarShadow"))
 		archiveClassifier.set("dev-shadow")
 
-		if (isMinecraftSubProject) {
-			exclude("architectury.common.json")
-		}
+		exclude("architectury.common.json")
 	}
 
 	tasks.withType<JavaCompile> {
@@ -194,22 +194,6 @@ subprojects {
 	java {
 		withSourcesJar()
 	}
-
-	// Maven Publishing
-	publishing {
-		publications {
-			register("mavenJava", MavenPublication::class) {
-				groupId = properties["maven_group"] as String
-				artifactId = "${properties["mod_id"]}-${project.name}"
-				version = project.version as String
-
-				from(components["java"])
-			}
-		}
-
-		repositories {
-		}
-	}
 }
 
 // Mod Publishing
@@ -247,7 +231,7 @@ publishMods {
 			else -> it
 		}
 
-		val remapJar = rootProject.project(":" + loaderName).tasks.getByName<RemapJarTask>("remapJar")
+		val remapJar = rootProject.project(":$loaderName").tasks.getByName<RemapJarTask>("remapJar")
 
 		curseforge("curseforge_${loaderName}") {
 			accessToken = curseForgeAPIKey

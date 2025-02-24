@@ -1,6 +1,8 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import net.fabricmc.loom.task.RemapJarTask
 
+val isSnapshot = !hasProperty("snapshot") || findProperty("snapshot") == "true"
+
 architectury {
 	platformSetupLoomIde()
 	neoForge()
@@ -12,6 +14,7 @@ loom {
 
 configurations {
 	getByName("developmentNeoForge").extendsFrom(configurations["common"])
+	forgeRuntimeLibrary.get().extendsFrom(configurations["forgeJarShadow"])
 }
 
 dependencies {
@@ -35,4 +38,30 @@ tasks.remapJar {
 tasks.withType<RemapJarTask> {
 	val shadowJar = tasks.getByName<ShadowJar>("shadowJar")
 	inputFile.set(shadowJar.archiveFile)
+}
+
+publishing {
+	publications {
+		register("mavenJava", MavenPublication::class) {
+			groupId = properties["maven_group"] as String
+			artifactId = "${properties["mod_id"]}-${project.name}"
+			version = "${project.version}"
+
+			from(components["java"])
+		}
+	}
+
+	repositories {
+		maven {
+			name = "Nexus"
+			url = if (isSnapshot)
+				uri("https://nexus.pandasystems.dev/repository/maven-snapshots/")
+			else
+				uri("https://nexus.pandasystems.dev/repository/maven-releases/")
+			credentials {
+				username = System.getenv("NEXUS_USERNAME")
+				password = System.getenv("NEXUS_PASSWORD")
+			}
+		}
+	}
 }

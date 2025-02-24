@@ -19,6 +19,6 @@ import net.fabricmc.api.ModInitializer;
 public class FallingTreesFabric implements ModInitializer {
     @Override
     public void onInitialize() {
-        FallingTrees.init(new CompatFabric());
+        new FallingTrees(new CompatFabric());
     }
 }
