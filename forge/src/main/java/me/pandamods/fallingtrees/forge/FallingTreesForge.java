@@ -16,7 +16,7 @@ public class FallingTreesForge {
 		IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         EventBuses.registerModEventBus(FallingTrees.MOD_ID, FMLJavaModLoadingContext.get().getModEventBus());
 
-        FallingTrees.init(new CompatForge());
+        new FallingTrees(new CompatForge());
 
 		EnvRunner.runIf(Env.CLIENT, () -> () -> new FallingTreesClientForge(eventBus));
     }

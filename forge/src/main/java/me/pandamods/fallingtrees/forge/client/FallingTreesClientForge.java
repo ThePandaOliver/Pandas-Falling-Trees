@@ -17,6 +17,6 @@ import net.minecraftforge.eventbus.api.IEventBus;
 
 public class FallingTreesClientForge {
 	public FallingTreesClientForge(IEventBus eventBus) {
-		FallingTreesClient.init();
+		new FallingTreesClient();
 	}
 }

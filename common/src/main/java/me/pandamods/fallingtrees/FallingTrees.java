@@ -44,7 +44,7 @@ public class FallingTrees {
     }
 
 	public static ResourceLocation resourceLocation(String path) {
-		return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+		return new ResourceLocation(MOD_ID, path);
 	}
 
 	public static Compat getCompat() {
