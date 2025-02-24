@@ -24,7 +24,7 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
 public class FallingTreesClientNeoForge {
 	public FallingTreesClientNeoForge(IEventBus modBus) {
-		FallingTreesClient.init();
+		new FallingTreesClient();
 
 		modBus.addListener(FallingTreesClientNeoForge::registerRenderers);
 	}

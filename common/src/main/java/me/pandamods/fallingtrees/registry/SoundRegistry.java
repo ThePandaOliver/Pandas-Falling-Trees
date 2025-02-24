@@ -24,10 +24,10 @@ public class SoundRegistry {
 			Registries.SOUND_EVENT);
 
 	public static final RegistrySupplier<SoundEvent> TREE_FALL = SOUNDS.register("tree_fall", () ->
-			createFixedRangeEvent(FallingTrees.ID("tree_fall"), 16));
+			createFixedRangeEvent(FallingTrees.resourceLocation("tree_fall"), 16));
 
 	public static final RegistrySupplier<SoundEvent> TREE_IMPACT = SOUNDS.register("tree_impact", () ->
-			createFixedRangeEvent(FallingTrees.ID("tree_impact"), 16));
+			createFixedRangeEvent(FallingTrees.resourceLocation("tree_impact"), 16));
 
 	private static SoundEvent createFixedRangeEvent(ResourceLocation resourceLocation, int range) {
 		return SoundEvent.createFixedRangeEvent(resourceLocation, range);
