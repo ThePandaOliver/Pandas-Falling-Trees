@@ -14,7 +14,7 @@ plugins {
 	id("me.modmuss50.mod-publish-plugin") version "0.6.3"
 }
 
-val isSnapshot = project.findProperty("snapshot") == "true"
+val isSnapshot = !hasProperty("snapshot") || findProperty("snapshot") == "true"
 
 architectury.minecraft = properties["minecraft_version"] as String
 

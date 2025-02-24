@@ -3,7 +3,7 @@ name: Gradle Package
 on:
   push:
     branches:
-      - "!Stable/**"
+      - "**"
 
 jobs:
   build:

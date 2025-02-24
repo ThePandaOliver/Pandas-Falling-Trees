@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import net.fabricmc.loom.task.RemapJarTask
 
-val isSnapshot = project.findProperty("snapshot") == "true"
+val isSnapshot = !hasProperty("snapshot") || findProperty("snapshot") == "true"
 
 architectury {
 	platformSetupLoomIde()

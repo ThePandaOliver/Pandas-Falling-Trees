@@ -1,4 +1,4 @@
-val isSnapshot = project.findProperty("snapshot") == "true"
+val isSnapshot = !hasProperty("snapshot") || findProperty("snapshot") == "true"
 
 architectury {
 	common(properties["supported_mod_loaders"].toString().split(","))
