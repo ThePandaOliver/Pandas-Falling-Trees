@@ -14,8 +14,8 @@ package me.pandamods.fallingtrees.registry;
 
 import me.pandamods.fallingtrees.FallingTrees;
 import me.pandamods.fallingtrees.entity.TreeEntity;
-import me.pandamods.pandalib.registry.DeferredObject;
-import me.pandamods.pandalib.registry.DeferredRegister;
+import dev.pandasystems.pandalib.registry.DeferredObject;
+import dev.pandasystems.pandalib.registry.DeferredRegister;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;

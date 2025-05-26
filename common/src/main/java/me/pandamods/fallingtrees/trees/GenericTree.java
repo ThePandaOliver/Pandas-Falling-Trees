@@ -20,7 +20,7 @@ import me.pandamods.fallingtrees.config.common.tree.GenericTreeConfig;
 import me.pandamods.fallingtrees.entity.TreeEntity;
 import me.pandamods.fallingtrees.exceptions.TreeTooBigException;
 import me.pandamods.fallingtrees.registry.SoundRegistry;
-import me.pandamods.pandalib.platform.Services;
+import dev.pandasystems.pandalib.platform.Services;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;

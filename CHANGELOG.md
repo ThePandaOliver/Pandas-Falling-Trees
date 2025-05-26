@@ -1,4 +1,2 @@
-# Version 0.13.1 Beta
-
-## Bug Fix
-* Fixed crash when starting to mine trees that are too big to be processed
+# Version 0.13.3
+* Updated PandaLib support to 0.5.3 to fix NeoForge incompatibility with the latest version

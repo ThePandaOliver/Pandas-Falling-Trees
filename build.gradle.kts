@@ -115,8 +115,6 @@ subprojects {
 				includeGroup("maven.modrinth")
 			}
 		}
-
-		maven("https://nexus.pandasystems.dev/repository/maven-public/")
 		maven("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/")
 	}
 

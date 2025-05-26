@@ -14,8 +14,8 @@ package me.pandamods.fallingtrees.config;
 
 import me.pandamods.fallingtrees.FallingTrees;
 import me.pandamods.fallingtrees.config.common.TreeConfigs;
-import me.pandamods.pandalib.config.Config;
-import me.pandamods.pandalib.config.ConfigData;
+import dev.pandasystems.pandalib.config.Config;
+import dev.pandasystems.pandalib.config.ConfigData;
 
 @Config(name = FallingTrees.MOD_ID + "_common", modId = FallingTrees.MOD_ID, synchronize = true)
 public class CommonConfig implements ConfigData {

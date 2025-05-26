@@ -7,7 +7,6 @@ import me.pandamods.fallingtrees.entity.TreeEntity;
 import me.pandamods.fallingtrees.exceptions.TreeException;
 import me.pandamods.fallingtrees.registry.EntityRegistry;
 import me.pandamods.fallingtrees.registry.TreeRegistry;
-import me.pandamods.pandalib.utils.RunUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -108,10 +107,6 @@ public class TreeHandler {
 	
 	public static boolean canPlayerChopTree(Player player) {
 		ClientConfig clientConfig = FallingTreesConfig.getClientConfig(player);
-		if (clientConfig == null) {
-			RunUtil.runOnce("falling_trees_player_client_config_missing_" + player.getUUID(), () -> LOGGER.warn("Couldn't find client config for player: {} [{}]", player.getDisplayName().getString(), player.getUUID()));
-			return false;
-		}
 		boolean invertCrouchMining = clientConfig.invertCrouchMining;
 		return FallingTreesConfig.getCommonConfig().disableCrouchMining || player.isCrouching() == invertCrouchMining;
 	}

@@ -20,7 +20,10 @@ configurations {
 dependencies {
 	neoForge("net.neoforged:neoforge:${properties["neoforge_version"]}")
 
-	modImplementation("me.pandamods:pandalib-neoforge:${properties["deps_pandalib_version"]}")
+	modCompileOnly("dev.pandasystems:pandalib-neoforge:${properties["deps_pandalib_version"]}")
+	runtimeOnly("dev.pandasystems:pandalib-neoforge:${properties["deps_pandalib_version"]}") {
+		exclude(group = "net.neoforged.fancymodloader", module = "loader")
+	}
 	modApi("dev.architectury:architectury-neoforge:${properties["deps_architectury_version"]}")
 
 	modCompileOnly("maven.modrinth:jade:${properties["deps_jade_neoforge_version"]}+neoforge-neoforge,${properties["deps_jade_mc_version"]}")
@@ -48,20 +51,6 @@ publishing {
 			version = "${project.version}"
 
 			from(components["java"])
-		}
-	}
-
-	repositories {
-		maven {
-			name = "Nexus"
-			url = if (isSnapshot)
-				uri("https://nexus.pandasystems.dev/repository/maven-snapshots/")
-			else
-				uri("https://nexus.pandasystems.dev/repository/maven-releases/")
-			credentials {
-				username = System.getenv("NEXUS_USERNAME")
-				password = System.getenv("NEXUS_PASSWORD")
-			}
 		}
 	}
 }

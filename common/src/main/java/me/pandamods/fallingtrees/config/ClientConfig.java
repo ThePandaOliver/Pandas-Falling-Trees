@@ -15,8 +15,8 @@ package me.pandamods.fallingtrees.config;
 import me.pandamods.fallingtrees.FallingTrees;
 import me.pandamods.fallingtrees.config.client.AnimationConfig;
 import me.pandamods.fallingtrees.config.client.SoundSettingsConfig;
-import me.pandamods.pandalib.config.Config;
-import me.pandamods.pandalib.config.ConfigData;
+import dev.pandasystems.pandalib.config.Config;
+import dev.pandasystems.pandalib.config.ConfigData;
 
 
 @Config(name = FallingTrees.MOD_ID + "_client", modId = FallingTrees.MOD_ID, synchronize = true)

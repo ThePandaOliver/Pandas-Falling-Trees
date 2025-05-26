@@ -11,7 +11,7 @@ dependencies {
 	// Do NOT use other classes from fabric loader
 	modImplementation("net.fabricmc:fabric-loader:${properties["fabric_version"]}")
 
-	modImplementation("me.pandamods:pandalib-common:${properties["deps_pandalib_version"]}")
+	modImplementation("dev.pandasystems:pandalib:${properties["deps_pandalib_version"]}")
 	modApi("dev.architectury:architectury:${properties["deps_architectury_version"]}")
 
 	modImplementation("maven.modrinth:jade:${properties["deps_jade_fabric_version"]}+fabric-fabric,${properties["deps_jade_mc_version"]}")
@@ -25,20 +25,6 @@ publishing {
 			version = "${project.version}"
 
 			from(components["java"])
-		}
-	}
-
-	repositories {
-		maven {
-			name = "Nexus"
-			url = if (isSnapshot)
-				uri("https://nexus.pandasystems.dev/repository/maven-snapshots/")
-			else
-				uri("https://nexus.pandasystems.dev/repository/maven-releases/")
-			credentials {
-				username = System.getenv("NEXUS_USERNAME")
-				password = System.getenv("NEXUS_PASSWORD")
-			}
 		}
 	}
 }

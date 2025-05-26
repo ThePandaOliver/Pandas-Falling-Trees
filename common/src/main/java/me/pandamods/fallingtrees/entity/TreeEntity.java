@@ -18,7 +18,7 @@ import me.pandamods.fallingtrees.config.FallingTreesConfig;
 import me.pandamods.fallingtrees.registry.TreeRegistry;
 import me.pandamods.fallingtrees.utils.BlockMapEntityData;
 import me.pandamods.fallingtrees.utils.ItemListEntityData;
-import me.pandamods.pandalib.utils.EnvRunner;
+import dev.pandasystems.pandalib.utils.EnvRunner;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;

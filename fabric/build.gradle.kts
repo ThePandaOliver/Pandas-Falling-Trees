@@ -24,7 +24,7 @@ dependencies {
 	modImplementation("net.fabricmc:fabric-loader:${properties["fabric_version"]}")
 	modApi("net.fabricmc.fabric-api:fabric-api:${properties["fabric_api_version"]}")
 
-	modImplementation("me.pandamods:pandalib-fabric:${properties["deps_pandalib_version"]}")
+	modImplementation("dev.pandasystems:pandalib-fabric:${properties["deps_pandalib_version"]}")
 	modApi("dev.architectury:architectury-fabric:${properties["deps_architectury_version"]}")
 	modApi("com.terraformersmc:modmenu:${properties["deps_modmenu_version"]}")
 
@@ -52,20 +52,6 @@ publishing {
 			version = "${project.version}"
 
 			from(components["java"])
-		}
-	}
-
-	repositories {
-		maven {
-			name = "Nexus"
-			url = if (isSnapshot)
-				uri("https://nexus.pandasystems.dev/repository/maven-snapshots/")
-			else
-				uri("https://nexus.pandasystems.dev/repository/maven-releases/")
-			credentials {
-				username = System.getenv("NEXUS_USERNAME")
-				password = System.getenv("NEXUS_PASSWORD")
-			}
 		}
 	}
 }
