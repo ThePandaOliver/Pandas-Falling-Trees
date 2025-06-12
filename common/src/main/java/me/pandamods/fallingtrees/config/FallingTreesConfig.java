@@ -23,7 +23,8 @@ public class FallingTreesConfig {
 	public final CommonConfigHolder<CommonConfig> commonConfigHolder = PandaLibConfig.registerCommon(CommonConfig.class);
 
 	public static ClientConfig getClientConfig(Player player) {
-		return FallingTrees.CONFIG.clientConfigHolder.getConfig(player);
+		ClientConfig config = FallingTrees.CONFIG.clientConfigHolder.getConfig(player);
+		return config != null ? config : FallingTrees.CONFIG.clientConfigHolder.get();
 	}
 
 	public static ClientConfig getClientConfig() {

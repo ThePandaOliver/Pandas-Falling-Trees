@@ -1,6 +1,12 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Publish Mod" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
+      <option name="env">
+        <map>
+          <entry key="CURSEFORGE_API_KEY" value="88b05679-48ce-493b-bc71-bab8011fae17" />
+          <entry key="MODRINTH_API_KEY" value="mrp_shs7pjTuhwokOIyRjki3JSHco1lyoWV2dTS1NNBT9L7dM0SybVGcBRHYVogR" />
+        </map>
+      </option>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
