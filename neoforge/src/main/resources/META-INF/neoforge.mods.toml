@@ -1,38 +1,30 @@
 modLoader = "javafml"
 loaderVersion = "*"
-issueTrackerURL="https://github.com/${project_github_repo}/issues"
-license = "${mod_license}"
+license = "GPL-3"
 
 [[mods]]
-modId = "${mod_id}"
+modId = "fallingtrees"
 version = "${mod_version}"
-displayName = "${mod_name}"
-authors = "${mod_author}"
-description = "${mod_description}"
-logoFile = "assets/${mod_id}/icon.png"
+displayName = "Panda's Falling Tree's"
+authors = "The Panda Oliver"
+description = "Makes trees fall realistically."
+logoFile = "assets/fallingtrees/icon.png"
 
-[[dependencies."${mod_id}"]]
+[[dependencies.fallingtrees]]
 modId = "neoforge"
 type = "required"
 versionRange = "*"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies."${mod_id}"]]
+[[dependencies.fallingtrees]]
 modId = "minecraft"
 type = "required"
-versionRange = "${neoforge_version_range}"
+versionRange = "*"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies."${mod_id}"]]
-modId = "architectury"
-type = "required"
-versionRange = "*"
-ordering = "AFTER"
-side = "BOTH"
-
-[[dependencies."${mod_id}"]]
+[[dependencies.fallingtrees]]
 modId = "pandalib"
 type = "required"
 versionRange = "[0.5,)"
@@ -40,6 +32,6 @@ ordering = "NONE"
 side = "BOTH"
 
 [[mixins]]
-config = "${mod_id}-common.mixins.json"
+config = "fallingtrees-common.mixins.json"
 [[mixins]]
-config = "${mod_id}.mixins.json"
+config = "fallingtrees.mixins.json"

@@ -1,308 +1,253 @@
+/*
+ * Copyright (c) 2025. Oliver Froberg
+ *
+ * This code is licensed under the GNU Lesser General Public License v3.0
+ * See: https://www.gnu.org/licenses/lgpl-3.0-standalone.html
+ */
+
+@file:Suppress("UnstableApiUsage")
+
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import net.fabricmc.loom.api.LoomGradleExtensionAPI
-import net.fabricmc.loom.task.RemapJarTask
+import org.jetbrains.gradle.ext.packagePrefix
+import org.jetbrains.gradle.ext.settings
 
 plugins {
 	java
+	idea
+	alias(libs.plugins.ideaExt)
+	alias(libs.plugins.kotlinJvm)
+	`maven-publish`
+	`version-catalog`
 
-	id("architectury-plugin") version "3.4-SNAPSHOT"
-	id("dev.architectury.loom") version "1.7-SNAPSHOT" apply false
-
-	id("com.github.johnrengelman.shadow") version "8.1.1" apply false
-
-	id("maven-publish")
-	id("me.modmuss50.mod-publish-plugin") version "0.6.3"
+	alias(libs.plugins.shadow) apply false
+	alias(libs.plugins.architecturyPlugin)
+	alias(libs.plugins.architecturyLoom)
+	alias(libs.plugins.modPublish)
 }
 
-val isSnapshot = !hasProperty("snapshot") || findProperty("snapshot") == "true"
+architectury {
+	minecraft = libs.versions.minecraft.get()
+	common("neoforge", "fabric")
+}
 
-architectury.minecraft = properties["minecraft_version"] as String
+loom {
+	accessWidenerPath = file("src/main/resources/fallingtrees.accesswidener")
+
+	runs.all {
+		ideConfigGenerated(false)
+	}
+}
+
+repositories {
+	mavenLocal()
+}
+
+dependencies {
+	// We depend on fabric loader here to use the fabric @Environment annotations and get the mixin dependencies
+	// Do NOT use other classes from fabric loader
+	modImplementation(libs.fabricLoader)
+
+	modApi(libs.pandalib.common)
+}
 
 allprojects {
 	apply(plugin = "java")
-
-	base { archivesName = properties["mod_id"] as String }
-	version = "mc${properties["minecraft_version"]}-${properties["mod_version"]}"
-	if (isSnapshot)
-		version = "${version}-SNAPSHOT"
-	group = properties["maven_group"] as String
-}
-
-subprojects {
-	val isMinecraftSubProject = findProject(":common") != project
-
-	apply(plugin = "architectury-plugin")
-	apply(plugin = "dev.architectury.loom")
-
+	apply(plugin = "kotlin")
 	apply(plugin = "maven-publish")
-	apply(plugin = "com.github.johnrengelman.shadow")
+	apply(plugin = "version-catalog")
+	apply(plugin = rootProject.libs.plugins.architecturyPlugin.get().pluginId)
+	apply(plugin = rootProject.libs.plugins.architecturyLoom.get().pluginId)
 
-	base { archivesName = "${properties["mod_id"]}-${project.name}" }
+	group = "dev.pandasystems"
+	version = "0.14.0-DEV.1"
 
-	val loom = project.extensions.getByName<LoomGradleExtensionAPI>("loom")
-	loom.silentMojangMappingsLicense()
-	if (isMinecraftSubProject) {
-		loom.runs {
-			named("client") {
-				client()
-				configName = "Client"
-				ideConfigGenerated(true)
-				runDir("../.runs/client")
-				source(sourceSets["main"])
-				programArgs("--username=Dev")
-			}
-			named("server") {
-				server()
-				configName = "Server"
-				ideConfigGenerated(true)
-				runDir("../.runs/server")
-				source(sourceSets["main"])
+	loom {
+		silentMojangMappingsLicense()
+		log4jConfigs.from(rootProject.file("log4j2.xml"))
+
+		decompilers {
+			get("vineflower").apply { // Adds names to lambdas - useful for mixins
+				options.put("mark-corresponding-synthetics", "1")
 			}
 		}
-	}
-
-	configurations {
-		create("common") {
-			isCanBeResolved = true
-			isCanBeConsumed = false
-		}
-		compileClasspath.get().extendsFrom(configurations["common"])
-		runtimeClasspath.get().extendsFrom(configurations["common"])
-
-		// Files in this configuration will be bundled into your mod using the Shadow plugin.
-		// Don't use the `shadow` configuration from the plugin itself as it's meant for excluding files.
-		create("shadowBundle") {
-			isCanBeResolved = true
-			isCanBeConsumed = false
-		}
-
-		create("jarShadow") {
-			isCanBeResolved = true
-			isCanBeConsumed = false
-		}
-		implementation.get().extendsFrom(configurations["jarShadow"])
-
-		create("forgeJarShadow") {
-			isCanBeResolved = true
-			isCanBeConsumed = false
-		}
-		implementation.get().extendsFrom(configurations["forgeJarShadow"])
-		configurations["jarShadow"].extendsFrom(configurations["forgeJarShadow"])
-
-		create("modShadow")
-		getByName("modImplementation").extendsFrom(configurations["modShadow"])
-		getByName("include").extendsFrom(configurations["modShadow"])
 	}
 
 	repositories {
 		mavenCentral()
 		mavenLocal()
-
 		maven("https://maven.architectury.dev/")
 		maven("https://maven.parchmentmc.org/")
 		maven("https://maven.fabricmc.net/")
 		maven("https://maven.minecraftforge.net/")
 		maven("https://maven.neoforged.net/releases/")
-
-		exclusiveContent {
-			forRepository {
-				maven {
-					name = "Modrinth"
-					url = uri("https://api.modrinth.com/maven")
-				}
-			}
-			filter {
-				includeGroup("maven.modrinth")
-			}
-		}
-		maven("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/")
 	}
 
-	@Suppress("UnstableApiUsage")
 	dependencies {
-		"minecraft"("com.mojang:minecraft:${properties["minecraft_version"]}") {
-			exclude(group = "org.joml", module = "joml")
-		}
-		"mappings"(loom.layered {
+		minecraft(rootProject.libs.minecraft)
+		mappings(loom.layered {
 			officialMojangMappings()
-			parchment("org.parchmentmc.data:parchment-${properties["parchment_minecraft_version"]}:${properties["parchment_version"]}@zip")
+			parchment("${rootProject.libs.parchment.get()}@zip")
 		})
-
-		compileOnly("org.jetbrains:annotations:24.1.0")
 	}
 
-	tasks.withType<ShadowJar> {
-		configurations = listOf(project.configurations.getByName("shadowBundle"), project.configurations.getByName("jarShadow"))
-		archiveClassifier.set("dev-shadow")
-
-		exclude("architectury.common.json")
-	}
-
-	tasks.withType<JavaCompile> {
-		options.encoding = "UTF-8"
-		options.release.set(JavaLanguageVersion.of(properties["java_version"] as String).asInt())
+	kotlin {
+		jvmToolchain(21)
+		compilerOptions {
+			freeCompilerArgs = listOf("-Xjvm-default=all")
+		}
 	}
 
 	tasks.processResources {
 		val props = mutableMapOf(
-			"java_version" to properties["java_version"],
-			"supported_mod_loaders" to properties["supported_mod_loaders"],
-
-			"maven_group" to properties["maven_group"],
-			"mod_id" to properties["mod_id"],
-			"mod_version" to properties["mod_version"],
-			"mod_name" to properties["mod_name"],
-			"mod_description" to properties["mod_description"],
-			"mod_author" to properties["mod_author"],
-			"mod_license" to properties["mod_license"],
-
-			"project_curseforge_slug" to properties["project_curseforge_slug"],
-			"project_modrinth_slug" to properties["project_modrinth_slug"],
-			"project_github_repo" to properties["project_github_repo"],
+			"mod_version" to version.toString(),
 		)
 
-		if (properties["fabric_version_range"] != null)
-			props["fabric_version_range"] = properties["fabric_version_range"] as String
-
-		if (properties["forge_version_range"] != null)
-			props["forge_version_range"] = properties["forge_version_range"] as String
-
-		if (properties["neoforge_version_range"] != null)
-			props["neoforge_version_range"] = properties["neoforge_version_range"] as String
-
 		inputs.properties(props)
-		filesMatching(listOf("pack.mcmeta", "fabric.mod.json", "META-INF/mods.toml", "META-INF/neoforge.mods.toml", "*.mixins.json")) {
+		filesMatching(listOf("pack.mcmeta", "fabric.mod.json", "META-INF/mods.toml", "META-INF/neoforge.mods.toml")) {
 			expand(props)
-		}
-	}
-
-	tasks.jar {
-		manifest {
-			attributes(mapOf(
-				"Specification-Title" to properties["mod_name"],
-				"Specification-Vendor" to properties["mod_author"],
-				"Specification-Version" to properties["mod_version"],
-				"Implementation-Title" to name,
-				"Implementation-Vendor" to properties["mod_author"],
-				"Implementation-Version" to archiveVersion
-			))
 		}
 	}
 
 	java {
 		withSourcesJar()
 	}
+
+	idea {
+		module {
+			settings {
+				val packagePrefixStr = "${project.group}.${rootProject.name.lowercase()}".let {
+					if (rootProject != project) "$it.${project.name.lowercase()}" else it
+				}
+				packagePrefix["src/main/kotlin"] = packagePrefixStr
+				packagePrefix["src/main/java"] = packagePrefixStr
+			}
+		}
+	}
 }
 
-// Mod Publishing
-var curseForgeAPIKey = providers.environmentVariable("CURSEFORGE_API_KEY")
-var modrinthAPIKey = providers.environmentVariable("MODRINTH_API_KEY")
+subprojects {
+	apply(plugin = rootProject.libs.plugins.shadow.get().pluginId)
+
+	base { archivesName = "${rootProject.name}-${project.name}" }
+
+	architectury {
+		platformSetupLoomIde()
+	}
+
+	loom {
+		accessWidenerPath = rootProject.loom.accessWidenerPath
+
+		runs {
+			named("client") {
+				client()
+				configName = "Client"
+				runDir("../.runs/client")
+				programArg("--username=Dev")
+				ideConfigGenerated(true)
+			}
+			named("server") {
+				server()
+				configName = "Server"
+				runDir("../.runs/server")
+				ideConfigGenerated(true)
+			}
+		}
+	}
+
+	configurations {
+		val common = create("common") {
+			isCanBeResolved = true
+			isCanBeConsumed = false
+		}
+		compileClasspath.get().extendsFrom(common)
+		runtimeClasspath.get().extendsFrom(common)
+
+		create("shadowBundle") {
+			isCanBeResolved = true
+			isCanBeConsumed = false
+		}
+	}
+
+	tasks.getByName<ShadowJar>("shadowJar") {
+		configurations = listOf(project.configurations["shadowBundle"])
+		archiveClassifier.set("dev-shadow")
+
+		exclude("architectury.common.json")
+	}
+
+	tasks.remapJar {
+		injectAccessWidener.set(true)
+		inputFile = tasks.getByName<ShadowJar>("shadowJar").archiveFile
+	}
+}
+
+allprojects {
+	publishing {
+		publications {
+			create<MavenPublication>("maven") {
+				from(components["java"])
+
+				artifactId = project.base.archivesName.get().lowercase()
+				version = "mc${rootProject.libs.versions.minecraft.get()}-${project.version}"
+			}
+		}
+	}
+}
 
 publishMods {
-	dryRun = properties["publishing_dry_run"].toString().toBoolean()
-
-	version = properties["mod_version"] as String
 	changelog = rootProject.file("CHANGELOG.md").readText()
+	type = BETA
+	dryRun = false
 
-	// Set the release type
-	type = when (properties["publishing_release_type"].toString().toInt()) {
-		2 -> ALPHA
-		1 -> BETA
-		else -> STABLE
+	val gameVerString = rootProject.libs.versions.minecraft.get()
+	val verString = project.version.toString()
+	version = verString
+
+	val cfOptions = curseforgeOptions {
+		accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
+		projectId = "880630"
+		minecraftVersions.add("1.21.4")
+		javaVersions.add(JavaVersion.VERSION_21)
+
+		requires("architectury-api")
+		changelogType = "markdown"
 	}
 
-	val isRangedVersion = properties["publishing_latest_minecraft_version"] != null
-	val minecraftVersionStr = if (isRangedVersion) {
-		"${properties["publishing_minecraft_version"]}-${properties["publishing_latest_minecraft_version"]}"
-	} else {
-		properties["publishing_minecraft_version"]
+	val mrOptions = modrinthOptions {
+		accessToken = providers.environmentVariable("MODRINTH_API_KEY")
+		projectId = "i2kUe4lq"
+		minecraftVersions.add("1.21.4")
+
+		requires("architectury-api")
 	}
 
-	// Creates publish options for each supported mod loader
-	properties["supported_mod_loaders"].toString().split(",").forEach {
-		val loaderName = it
-		val loaderDisplayName = when (it) {
-			"fabric" -> "Fabric"
-			"forge" -> "Forge"
-			"neoforge" -> "NeoForge"
-			else -> it
-		}
-
-		val remapJar = rootProject.project(":$loaderName").tasks.getByName<RemapJarTask>("remapJar")
-
-		curseforge("curseforge_${loaderName}") {
-			accessToken = curseForgeAPIKey
-			displayName = "[${loaderDisplayName} ${minecraftVersionStr}] v${properties["mod_version"]}"
-
-			projectId = properties["project_curseforge_id"] as String
-
-			modLoaders.add(loaderName)
-			file = remapJar.archiveFile
-
-			if (isRangedVersion)
-				minecraftVersionRange {
-					start = properties["publishing_minecraft_version"] as String
-					end = properties["publishing_latest_minecraft_version"] as String
-				}
-			else
-				minecraftVersions.add(properties["publishing_minecraft_version"] as String)
-
-			javaVersions.add(JavaVersion.VERSION_21)
-
-			clientRequired = true
-			serverRequired = true
-
-			if (loaderName == "fabric")
-				requires("fabric-api")
-			requires("architectury-api")
-			requires("pandalib")
-		}
-
-		modrinth("modrinth_" + loaderName) {
-			accessToken = modrinthAPIKey
-			displayName = "[${loaderDisplayName} ${minecraftVersionStr}] v${properties["mod_version"]}"
-
-			projectId = properties["project_modrinth_id"] as String
-
-			modLoaders.add(loaderName)
-			file = remapJar.archiveFile
-
-			if (isRangedVersion)
-				minecraftVersionRange {
-					start = properties["publishing_minecraft_version"] as String
-					end = properties["publishing_latest_minecraft_version"] as String
-				}
-			else
-				minecraftVersions.add(properties["publishing_minecraft_version"] as String)
-
-			if (loaderName == "fabric")
-				requires("fabric-api")
-			requires("architectury-api")
-			requires("pandalib")
-		}
+	curseforge("curseforgeNeoForge") {
+		from(cfOptions)
+		displayName = "[NeoForge $gameVerString] $verString"
+		modLoaders.add("neoforge")
+		file = project(":neoforge").tasks.remapJar.get().archiveFile
 	}
 
-//	val githubRepository = properties["project_github_repo"] as String
-//	val releaseType = when (properties["publishing_release_type"].toString().toInt()) {
-//		2 -> "alpha"
-//		1 -> "beta"
-//		else -> "stable"
-//	}
-//	val githubTagName = "${releaseType}/${properties["mod_version"]}-${minecraftVersionStr}"
-//	github {
-//		displayName = "${properties["mod_name"]} ${properties["mod_version"]} MC${minecraftVersionStr}"
-//		accessToken = githubAPIKey
-//		repository = githubRepository
-//		tagName = githubTagName
-//		commitish = "main"
-//
-//		modLoaders.addAll(properties["supported_mod_loaders"].toString().trim().split(","))
-//		val commonRemapJar = project(":common").tasks.getByName<RemapJarTask>("remapJar")
-//		file = commonRemapJar.archiveFile
-//
-//		properties["supported_mod_loaders"].toString().split(",").forEach {
-//			val modRemapJar = project(":$it").tasks.getByName<RemapJarTask>("remapJar")
-//			additionalFiles.from(modRemapJar.archiveFile)
-//		}
-//	}
+	curseforge("curseforgeFabric") {
+		from(cfOptions)
+		displayName = "[Fabric $gameVerString] $verString"
+		requires("fabric-api")
+		modLoaders.add("fabric")
+		file = project(":fabric").tasks.remapJar.get().archiveFile
+	}
+
+	modrinth("modrinthNeoForge") {
+		from(mrOptions)
+		displayName = "[NeoForge $gameVerString] $verString"
+		modLoaders.add("neoforge")
+		file = project(":neoforge").tasks.remapJar.get().archiveFile
+	}
+
+	modrinth("modrinthFabric") {
+		from(mrOptions)
+		displayName = "[Fabric $gameVerString] $verString"
+		requires("fabric-api")
+		modLoaders.add("fabric")
+		file = project(":fabric").tasks.remapJar.get().archiveFile
+	}
 }

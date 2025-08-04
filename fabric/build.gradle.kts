@@ -1,19 +1,18 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import net.fabricmc.loom.task.RemapJarTask
+/*
+ * Copyright (c) 2025. Oliver Froberg
+ *
+ * This code is licensed under the GNU Lesser General Public License v3.0
+ * See: https://www.gnu.org/licenses/lgpl-3.0-standalone.html
+ */
 
-val isSnapshot = !hasProperty("snapshot") || findProperty("snapshot") == "true"
+@file:Suppress("UnstableApiUsage")
 
 architectury {
-	platformSetupLoomIde()
 	fabric()
 }
 
-loom {
-	accessWidenerPath.set(project(":common").loom.accessWidenerPath)
-}
-
 configurations {
-	getByName("developmentFabric").extendsFrom(configurations["common"])
+	getByName("developmentFabric").extendsFrom(common.get())
 }
 
 repositories {
@@ -21,37 +20,12 @@ repositories {
 }
 
 dependencies {
-	modImplementation("net.fabricmc:fabric-loader:${properties["fabric_version"]}")
-	modApi("net.fabricmc.fabric-api:fabric-api:${properties["fabric_api_version"]}")
+	modImplementation(libs.fabricLoader)
+	modApi(libs.fabricApi)
+	modApi(libs.modmenu)
 
-	modImplementation("dev.pandasystems:pandalib-fabric:${properties["deps_pandalib_version"]}")
-	modApi("dev.architectury:architectury-fabric:${properties["deps_architectury_version"]}")
-	modApi("com.terraformersmc:modmenu:${properties["deps_modmenu_version"]}")
+	modApi(libs.pandalib.fabric)
 
-	modCompileOnly("maven.modrinth:jade:${properties["deps_jade_fabric_version"]}+fabric-fabric,${properties["deps_jade_mc_version"]}")
-//	modLocalRuntime("maven.modrinth:jade:${properties["deps_jade_fabric_version"]}+fabric-fabric,${properties["deps_jade_mc_version"]}")
-
-	common(project(":common", "namedElements")) { isTransitive = false }
-	shadowBundle(project(":common", "transformProductionFabric"))
-}
-
-tasks.remapJar {
-	injectAccessWidener.set(true)
-}
-
-tasks.withType<RemapJarTask> {
-	val shadowJar = tasks.getByName<ShadowJar>("shadowJar")
-	inputFile.set(shadowJar.archiveFile)
-}
-
-publishing {
-	publications {
-		register("mavenJava", MavenPublication::class) {
-			groupId = properties["maven_group"] as String
-			artifactId = "${properties["mod_id"]}-${project.name}"
-			version = "${project.version}"
-
-			from(components["java"])
-		}
-	}
+	common(project(":", configuration = "namedElements")) { isTransitive = false }
+	shadowBundle(project(":", configuration = "transformProductionFabric"))
 }

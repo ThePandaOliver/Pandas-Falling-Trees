@@ -1,54 +1,36 @@
 {
 	"schemaVersion": 1,
-	"id": "${mod_id}",
+	"id": "fallingtrees",
 	"version": "${mod_version}",
-	"name": "${mod_name}",
-	"description": "${mod_description}",
+	"name": "Panda's Falling Tree's",
+	"description": "Makes trees fall realistically.",
 	"authors": [
-		"${mod_author}"
+		"The Panda Oliver"
 	],
 	"contact": {
-		"issues": "https://github.com/${project_github_repo}/issues",
-		"sources": "https://github.com/${project_github_repo}"
 	},
-	"license": "${mod_license}",
-	"icon": "assets/${mod_id}/icon.png",
+	"license": "GPL-3",
+	"icon": "assets/fallingtrees/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"me.pandamods.fallingtrees.fabric.FallingTreesFabric"
+			"dev.pandasystems.fallingtrees.fabric.FallingTreesFabric"
 		],
 		"client": [
-			"me.pandamods.fallingtrees.fabric.client.FallingTreesClientFabric"
-		],
-		"jade": [
-			"me.pandamods.fallingtrees.compat.JadePlugin"
+			"dev.pandasystems.fallingtrees.fabric.client.FallingTreesClientFabric"
 		]
 	},
 	"mixins": [
-		"${mod_id}.mixins.json",
-		"${mod_id}-common.mixins.json"
+		"fallingtrees.mixins.json",
+		"fallingtrees-common.mixins.json"
 	],
 	"depends": {
 		"fabric": "*",
 		"fabric-api": "*",
-		"minecraft": "${fabric_version_range}",
-		"architectury": "*",
+		"minecraft": "*",
 		"pandalib": ">=0.5"
 	},
 	"conflicts": {
 		"treechop": "<0.18.5"
-	},
-	"custom": {
-		"modmenu": {
-			"links": {
-				"modmenu.discord": "https://discord.gg/wjPt4vEfXb",
-				"modmenu.kofi": "https://ko-fi.com/pandamods",
-				"modmenu.curseforge": "https://www.curseforge.com/minecraft/mc-mods/${project_curseforge_slug}",
-				"modmenu.modrinth": "https://modrinth.com/mod/${project_modrinth_slug}",
-				"modmenu.github_releases": "https://github.com/${project_github_repo}/releases"
-			},
-			"update_checker": true
-		}
 	}
 }

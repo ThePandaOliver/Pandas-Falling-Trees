@@ -18,4 +18,6 @@ pluginManagement.repositories {
 	gradlePluginPortal()
 }
 
-include("common", "fabric", "neoforge")
+rootProject.name = "fallingtrees"
+
+include("fabric", "neoforge")
