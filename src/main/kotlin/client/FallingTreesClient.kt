@@ -18,9 +18,8 @@ import dev.pandasystems.pandalib.api.registry.registerEntityRenderer
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 
-@Environment(EnvType.CLIENT)
 object FallingTreesClient {
 	init {
-		registerEntityRenderer(treeEntity.get(), ::TreeRenderer)
+		registerEntityRenderer(treeEntity, ::TreeRenderer)
 	}
 }

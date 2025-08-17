@@ -15,8 +15,11 @@ import dev.pandasystems.fallingtrees.trees.ChorusTree
 import dev.pandasystems.fallingtrees.trees.GenericTree
 import dev.pandasystems.fallingtrees.trees.VerticalTree
 import dev.pandasystems.fallingtrees.trees.mushroom.MushroomTree
+import dev.pandasystems.fallingtrees.utils.BlockMapEntityData
+import dev.pandasystems.fallingtrees.utils.ItemListEntityData
 import dev.pandasystems.pandalib.api.registry.RegistryRegister
 import dev.pandasystems.pandalib.api.registry.deferred.DeferredRegister
+import dev.pandasystems.pandalib.core.platform.registry.registryRegistrations
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.Registries
@@ -39,6 +42,7 @@ val treeRegistry = RegistryRegister.register(MappedRegistry(treeRegistryKey, Lif
 val treeRegister = DeferredRegister.create(FallingTrees.MOD_ID, treeRegistryKey)
 val soundRegister = DeferredRegister.create(FallingTrees.MOD_ID, Registries.SOUND_EVENT)
 val entityRegistar = DeferredRegister.create(FallingTrees.MOD_ID, Registries.ENTITY_TYPE)
+val entityDataRegistar = DeferredRegister.create(FallingTrees.MOD_ID, registryRegistrations.entityDataSerializers)
 
 
 // Trees
@@ -84,3 +88,9 @@ val treeEntity = entityRegistar.register("tree") {
 		.fireImmune()
 		.build(it)
 }
+
+
+// Entity Data
+
+val blockMapSerializer = entityDataRegistar.register("block_map") { BlockMapEntityData.BLOCK_MAP }
+val itemListSerializer = entityDataRegistar.register("item_list") { ItemListEntityData.ITEM_LIST }

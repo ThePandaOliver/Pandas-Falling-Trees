@@ -7,10 +7,6 @@
 package dev.pandasystems.fallingtrees
 
 import dev.pandasystems.fallingtrees.event.EventHandler
-import dev.pandasystems.fallingtrees.utils.BlockMapEntityData
-import dev.pandasystems.fallingtrees.utils.ItemListEntityData
-import dev.pandasystems.pandalib.core.platform.modLoader
-import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.resources.ResourceLocation
 
 object FallingTrees {
@@ -20,6 +16,7 @@ object FallingTrees {
 		treeRegister.register()
 		soundRegister.register()
 		entityRegistar.register()
+		entityDataRegistar.register()
 		EventHandler.register()
 	}
 

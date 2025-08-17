@@ -19,8 +19,5 @@ public class FallingTreesFabric implements ModInitializer {
     @Override
     public void onInitialize() {
         FallingTrees instance = FallingTrees.INSTANCE;
-
-        FabricTrackedDataRegistry.register(FallingTrees.resourceLocation("block_map"), BlockMapEntityData.BLOCK_MAP);
-        FabricTrackedDataRegistry.register(FallingTrees.resourceLocation("item_list"), ItemListEntityData.ITEM_LIST);
     }
 }

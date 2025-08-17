@@ -28,7 +28,7 @@ object BlockMapEntityData {
 			val size = VarInt.read(byteBuf)
 			val map: MutableMap<BlockPos, BlockState> = Maps.newHashMapWithExpectedSize(size)
 			for (i in 0..<size) {
-				map.put(FriendlyByteBuf.readBlockPos(byteBuf), Block.stateById(VarInt.read(byteBuf)))
+				map[FriendlyByteBuf.readBlockPos(byteBuf)] = Block.stateById(VarInt.read(byteBuf))
 			}
 			return map
 		}

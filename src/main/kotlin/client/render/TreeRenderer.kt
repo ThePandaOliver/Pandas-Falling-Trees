@@ -29,13 +29,11 @@ import org.joml.Math
 import org.joml.Quaternionf
 import org.joml.Vector3f
 
-@Environment(EnvType.CLIENT)
 class TreeRenderer(context: EntityRendererProvider.Context) : EntityRenderer<TreeEntity, TreeRenderState>(context) {
 	val config get() = fallingTreesClientConfig.config // TODO: Get player synchronized config instead
 
 	override fun render(renderState: TreeRenderState, poseStack: PoseStack, buffer: MultiBufferSource, packedLight: Int) {
-		val tree = renderState.treeType
-		if (tree == null) return
+		val tree = renderState.treeType ?: return
 
 		poseStack.pushPose()
 
