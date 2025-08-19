@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2025. Oliver Froberg
+  ~
+  ~ This code is licensed under the GNU Lesser General Public License v3.0
+  ~ See: https://www.gnu.org/licenses/lgpl-3.0-standalone.html
+  -->
+
+<Configuration status="WARN">
+	<Loggers>
+		<!-- Set log level for specific package -->
+		<Logger name="dev.pandasystems.pandalib" level="DEBUG" additivity="false">
+			<AppenderRef ref="SysOut"/>
+		</Logger>
+	</Loggers>
+</Configuration>

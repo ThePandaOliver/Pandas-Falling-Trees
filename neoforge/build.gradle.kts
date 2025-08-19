@@ -4,25 +4,33 @@
  * This code is licensed under the GNU Lesser General Public License v3.0
  * See: https://www.gnu.org/licenses/lgpl-3.0-standalone.html
  */
-
 @file:Suppress("UnstableApiUsage")
+
+plugins {
+	id("modloader")
+}
+
+val neoforgeLoaderVersion: String by project
 
 architectury {
 	neoForge()
+	platformSetupLoomIde()
 }
 
 configurations {
 	getByName("developmentNeoForge").extendsFrom(common.get())
 }
 
-val nonModImplementation: Configuration by configurations.creating
-configurations.implementation.get().extendsFrom(nonModImplementation)
+repositories {
+	mavenLocal()
+}
 
 dependencies {
-	neoForge(libs.neoforgeLoader)
+	neoForge("net.neoforged:neoforge:$neoforgeLoaderVersion")
 
-	modApi(libs.pandalib.neoforge)
+	modApi("dev.pandasystems:pandalib-neoforge:mc1.21.8-1.0.0-DEV.11")
 
+	// We just need to add the kotlin libraries to the NeoForge runtime libraries, PandaLib will handle the rest
 	forgeRuntimeLibrary(kotlin("stdlib"))
 	forgeRuntimeLibrary(kotlin("stdlib-jdk8"))
 	forgeRuntimeLibrary(kotlin("stdlib-jdk7"))
@@ -36,8 +44,8 @@ dependencies {
 	forgeRuntimeLibrary("org.jetbrains.kotlinx:kotlinx-io-core:0.7.0")
 	forgeRuntimeLibrary("org.jetbrains.kotlinx:kotlinx-io-bytestring:0.7.0")
 
-	common(project(":", configuration = "namedElements")) { isTransitive = false }
-	shadowBundle(project(":", configuration = "transformProductionNeoForge"))
+	common(project(":common", configuration = "namedElements"))
+	shadowBundle(project(":common", configuration = "transformProductionNeoForge"))
 }
 
 tasks.remapJar {

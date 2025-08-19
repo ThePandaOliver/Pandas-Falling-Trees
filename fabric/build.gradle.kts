@@ -4,11 +4,18 @@
  * This code is licensed under the GNU Lesser General Public License v3.0
  * See: https://www.gnu.org/licenses/lgpl-3.0-standalone.html
  */
-
 @file:Suppress("UnstableApiUsage")
+
+plugins {
+	id("modloader")
+}
+
+val fabricLoaderVersion: String by project
+val fabricApi: String by project
 
 architectury {
 	fabric()
+	platformSetupLoomIde()
 }
 
 configurations {
@@ -16,16 +23,16 @@ configurations {
 }
 
 repositories {
+	mavenLocal()
 	maven("https://maven.terraformersmc.com/releases/")
 }
 
 dependencies {
-	modImplementation(libs.fabricLoader)
-	modApi(libs.fabricApi)
-	modApi(libs.modmenu)
+	modImplementation("net.fabricmc:fabric-loader:$fabricLoaderVersion")
+	modImplementation("net.fabricmc.fabric-api:fabric-api:$fabricApi")
 
-	modApi(libs.pandalib.fabric)
+	modApi("dev.pandasystems:pandalib-fabric:mc1.21.8-1.0.0-DEV.11")
 
-	common(project(":", configuration = "namedElements")) { isTransitive = false }
-	shadowBundle(project(":", configuration = "transformProductionFabric"))
+	common(project(":common", configuration = "namedElements"))
+	shadowBundle(project(":common", configuration = "transformProductionFabric"))
 }
