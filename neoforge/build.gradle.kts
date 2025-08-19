@@ -11,6 +11,7 @@ plugins {
 }
 
 val neoforgeLoaderVersion: String by project
+val pandalib: String by project
 
 architectury {
 	neoForge()
@@ -28,9 +29,8 @@ repositories {
 dependencies {
 	neoForge("net.neoforged:neoforge:$neoforgeLoaderVersion")
 
-	modApi("dev.pandasystems:pandalib-neoforge:mc1.21.8-1.0.0-DEV.11")
+	modApi("dev.pandasystems:pandalib-neoforge:$pandalib")
 
-	// We just need to add the kotlin libraries to the NeoForge runtime libraries, PandaLib will handle the rest
 	forgeRuntimeLibrary(kotlin("stdlib"))
 	forgeRuntimeLibrary(kotlin("stdlib-jdk8"))
 	forgeRuntimeLibrary(kotlin("stdlib-jdk7"))
@@ -44,7 +44,7 @@ dependencies {
 	forgeRuntimeLibrary("org.jetbrains.kotlinx:kotlinx-io-core:0.7.0")
 	forgeRuntimeLibrary("org.jetbrains.kotlinx:kotlinx-io-bytestring:0.7.0")
 
-	common(project(":common", configuration = "namedElements"))
+	common(project(":common", configuration = "namedElements")) { isTransitive = false }
 	shadowBundle(project(":common", configuration = "transformProductionNeoForge"))
 }
 

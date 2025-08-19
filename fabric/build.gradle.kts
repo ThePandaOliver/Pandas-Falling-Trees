@@ -12,6 +12,7 @@ plugins {
 
 val fabricLoaderVersion: String by project
 val fabricApi: String by project
+val pandalib: String by project
 
 architectury {
 	fabric()
@@ -31,8 +32,8 @@ dependencies {
 	modImplementation("net.fabricmc:fabric-loader:$fabricLoaderVersion")
 	modImplementation("net.fabricmc.fabric-api:fabric-api:$fabricApi")
 
-	modApi("dev.pandasystems:pandalib-fabric:mc1.21.8-1.0.0-DEV.11")
+	modApi("dev.pandasystems:pandalib-fabric:$pandalib")
 
-	common(project(":common", configuration = "namedElements"))
+	common(project(":common", configuration = "namedElements")) { isTransitive = false }
 	shadowBundle(project(":common", configuration = "transformProductionFabric"))
 }

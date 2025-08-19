@@ -1,37 +1,31 @@
 modLoader = "javafml"
 loaderVersion = "*"
-license = "GPL-3"
+issueTrackerURL = "https://github.com/ThePandaOliver/Pandas-Falling-Trees"
+license = "${mod_license}"
 
 [[mods]]
-modId = "fallingtrees"
+modId = "${mod_id}"
 version = "${mod_version}"
-displayName = "Panda's Falling Tree's"
-authors = "The Panda Oliver"
-description = "Makes trees fall realistically."
-logoFile = "assets/fallingtrees/icon.png"
+displayName = "${mod_name}"
+authors = "${mod_authors_forge}"
+description = "${mod_description}"
+logoFile = "assets/${mod_id}/icon.png"
 
-[[dependencies.fallingtrees]]
+[[dependencies."${mod_id}"]]
 modId = "neoforge"
 type = "required"
 versionRange = "*"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.fallingtrees]]
+[[dependencies."${mod_id}"]]
 modId = "minecraft"
 type = "required"
-versionRange = "*"
-ordering = "NONE"
-side = "BOTH"
-
-[[dependencies.fallingtrees]]
-modId = "pandalib"
-type = "required"
-versionRange = "[0.5,)"
+versionRange = "${neoforge_loader_version}"
 ordering = "NONE"
 side = "BOTH"
 
 [[mixins]]
-config = "fallingtrees-common.mixins.json"
+config = "${mod_id}-common.mixins.json"
 [[mixins]]
-config = "fallingtrees.mixins.json"
+config = "${mod_id}.mixins.json"

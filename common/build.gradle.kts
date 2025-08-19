@@ -12,7 +12,8 @@ plugins {
 
 val buildFor: String by project
 
-val fabricLoaderVersion: String? by project
+val fabricLoaderVersion: String by project
+val pandalib: String by project
 
 architectury {
 	common(buildFor.split(",").map { it.trim() })
@@ -27,5 +28,5 @@ dependencies {
 	// Do NOT use other classes from fabric loader
 	modImplementation("net.fabricmc:fabric-loader:$fabricLoaderVersion")
 
-	modApi("dev.pandasystems:pandalib:mc1.21.8-1.0.0-DEV.11")
+	modImplementation("dev.pandasystems:pandalib:$pandalib")
 }

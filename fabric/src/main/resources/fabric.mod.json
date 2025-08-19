@@ -1,16 +1,18 @@
 {
 	"schemaVersion": 1,
-	"id": "fallingtrees",
+	"id": "${mod_id}",
 	"version": "${mod_version}",
-	"name": "Panda's Falling Tree's",
-	"description": "Makes trees fall realistically.",
+	"name": "${mod_name}",
+	"description": "${mod_description}",
 	"authors": [
-		"The Panda Oliver"
+		${mod_authors_fabric}
 	],
 	"contact": {
+		"issues": "https://github.com/ThePandaOliver/Pandas-Falling-Trees/issues",
+		"sources": "https://github.com/ThePandaOliver/Pandas-Falling-Trees"
 	},
-	"license": "GPL-3",
-	"icon": "assets/fallingtrees/icon.png",
+	"license": "${mod_license}",
+	"icon": "assets/${mod_id}/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
@@ -21,16 +23,26 @@
 		]
 	},
 	"mixins": [
-		"fallingtrees.mixins.json",
-		"fallingtrees-common.mixins.json"
+		"${mod_id}.mixins.json",
+		"${mod_id}-common.mixins.json"
 	],
 	"depends": {
-		"fabric": "*",
+		"fabric": ">=${fabric_loader_version}",
 		"fabric-api": "*",
-		"minecraft": "*",
-		"pandalib": ">=0.5"
+		"minecraft": "${minecraft_version}"
 	},
-	"conflicts": {
-		"treechop": "<0.18.5"
+	"custom": {
+		"modmenu": {
+			"links": {
+				"modmenu.discord": "https://discord.gg/wjPt4vEfXb",
+				"modmenu.curseforge": "https://www.curseforge.com/minecraft/mc-mods/Pandas-Falling-Trees",
+				"modmenu.modrinth": "https://modrinth.com/mod/Pandas-Falling-Trees",
+				"modmenu.github_releases": "https://github.com/ThePandaOliver/Pandas-Falling-Trees/releases"
+			},
+			"badges": [
+				"library"
+			],
+			"update_checker": true
+		}
 	}
 }
