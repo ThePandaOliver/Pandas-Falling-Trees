@@ -1,4 +1,4 @@
-name: Build
+name: Dependency Submission
 
 env:
   GITHUB_USER: ${{ github.actor }}

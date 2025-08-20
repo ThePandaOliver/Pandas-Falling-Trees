@@ -1,4 +1,4 @@
-name: Build
+name: Publish
 
 env:
   GITHUB_USER: ${{ github.actor }}
