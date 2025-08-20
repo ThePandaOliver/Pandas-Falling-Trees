@@ -22,10 +22,6 @@ configurations {
 	getByName("developmentNeoForge").extendsFrom(common.get())
 }
 
-repositories {
-	mavenLocal()
-}
-
 dependencies {
 	neoForge("net.neoforged:neoforge:$neoforgeLoaderVersion")
 

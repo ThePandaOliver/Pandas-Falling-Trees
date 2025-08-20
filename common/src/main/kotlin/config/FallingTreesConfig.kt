@@ -11,7 +11,6 @@
  */
 package dev.pandasystems.fallingtrees.config
 
-import dev.pandasystems.fallingtrees.FallingTrees
 import dev.pandasystems.pandalib.impl.config.ConfigRegistry
 
 val fallingTreesClientConfig = ConfigRegistry.register(ClientConfig::class.java)

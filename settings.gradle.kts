@@ -22,8 +22,15 @@ pluginManagement.repositories {
 		name = "NeoForge"
 		url = uri("https://maven.neoforged.net/releases/")
 	}
+	maven {
+		name = "Github"
+		url = uri("https://maven.pkg.github.com/ThePandaOliver/Forgix")
+		credentials {
+			username = System.getenv("GITHUB_USER")
+			password = System.getenv("GITHUB_API_TOKEN")
+		}
+	}
 	gradlePluginPortal()
-	mavenLocal()
 }
 
 include("common")

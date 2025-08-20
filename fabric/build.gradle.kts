@@ -24,7 +24,6 @@ configurations {
 }
 
 repositories {
-	mavenLocal()
 	maven("https://maven.terraformersmc.com/releases/")
 }
 

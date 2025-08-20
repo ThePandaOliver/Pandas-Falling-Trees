@@ -15,7 +15,6 @@ import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.level.block.state.BlockState
 import org.slf4j.Logger
 import java.awt.Color
 import java.util.*
@@ -32,11 +31,9 @@ object TreeHandler {
 		if (level.isClientSide()) return false
 		val blockState = level.getBlockState(blockPos)
 
-		val tree = getTree(blockState)
-		if (tree == null) return false
+		val tree = getTree(blockState) ?: return false
 
-		val data = tryGatherTreeData(tree, blockPos, level, player, false)
-		if (data == null) return false
+		val data = tryGatherTreeData(tree, blockPos, level, player, false) ?: return false
 		val blocks = data.blocks
 
 		val entity = TreeEntity(treeEntity.get(), level)
@@ -44,7 +41,7 @@ object TreeHandler {
 		entity.setData(player, tree, blockPos, blocks, data.drops)
 
 		player.causeFoodExhaustion(
-			if (fallingTreesCommonConfig.config.disableExtraFoodExhaustion) 1f else data.foodExhaustionModifier.getExhaustion(0.005f)
+			if (fallingTreesCommonConfig.config.disableExtraFoodExhaustion) 0.005f else data.foodExhaustionModifier.getExhaustion(0.005f)
 		)
 
 		if (player.mainHandItem.isDamageableItem) player.mainHandItem.hurtAndBreak(
@@ -57,31 +54,15 @@ object TreeHandler {
 
 
 		blocks.forEach { pos ->
+			// Remove all blocks but don't update neighbors
 			level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3, 0)
 		}
 
-//		val blockStates = mutableMapOf<BlockPos, BlockState>()
-//
-//		// Silently remove all blocks
-//		val air = Blocks.AIR.defaultBlockState()
-//		for (pos in blocks) {
-//			val oldState = level.getBlockState(pos)
-//			level.setBlock(pos, air, 16)
-//			level.setBlocksDirty(pos, oldState, level.getBlockState(pos))
-//			blockStates.put(pos, oldState)
-//		}
-//
-//		// Update neighbors around removed blocks
-//		blockStates.forEach { (pos: BlockPos, oldState: BlockState) ->
-//			val newState = level.getBlockState(pos)
-//			level.sendBlockUpdated(pos, oldState, newState, 3)
-//			level.blockUpdated(pos, newState.block)
-//
-//			newState.updateIndirectNeighbourShapes(level, pos, 511)
-//			oldState.updateNeighbourShapes(level, pos, 511)
-//			oldState.updateIndirectNeighbourShapes(level, pos, 511)
-//			level.onBlockStateChange(pos, oldState, newState)
-//		}
+		// Make sure all neighboring blocks have been updated after all has been removed
+		blocks.forEach { pos ->
+			level.updateNeighborsAt(pos, Blocks.AIR)
+		}
+
 		level.addFreshEntity(entity)
 		return true
 	}
@@ -120,10 +101,8 @@ object TreeHandler {
 		val treeSpeed = TREE_SPEED_CACHES.compute(player.getUUID()) { uuid: UUID?, speed: TreeSpeed? ->
 			if (speed == null || !speed.isValid(blockPos, baseSpeed)) {
 				val blockState = player.level().getBlockState(blockPos)
-				val tree = getTree(blockState)
-				if (tree == null) return@compute null
-				val data: TreeData? = tryGatherTreeData(tree, blockPos, player.level(), player, true)
-				if (data == null) return@compute null
+				val tree = getTree(blockState) ?: return@compute null
+				val data: TreeData = tryGatherTreeData(tree, blockPos, player.level(), player, true) ?: return@compute null
 				return@compute TreeSpeed(baseSpeed, data.miningSpeedModifier.getMiningSpeed(baseSpeed), blockPos.immutable())
 			}
 			speed
