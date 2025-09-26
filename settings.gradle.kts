@@ -31,6 +31,7 @@ pluginManagement.repositories {
 		}
 	}
 	gradlePluginPortal()
+	mavenLocal()
 }
 
 include("common")

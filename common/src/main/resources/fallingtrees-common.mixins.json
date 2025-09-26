@@ -4,8 +4,7 @@
 	"compatibilityLevel": "JAVA_21",
 	"minVersion": "0.8",
 	"client": [
-		"MultiPlayerGameModeMixin",
-		"accessor.BlockRenderDispatcherAccessor"
+		"MultiPlayerGameModeMixin"
 	],
 	"mixins": [
 		"BlockBehaviourMixin"

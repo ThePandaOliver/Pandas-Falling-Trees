@@ -13,7 +13,6 @@
 package dev.pandasystems.fallingtrees.utils
 
 import com.mojang.blaze3d.vertex.PoseStack
-import dev.pandasystems.fallingtrees.mixin.accessor.BlockRenderDispatcherAccessor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.ItemBlockRenderTypes
 import net.minecraft.client.renderer.MultiBufferSource
@@ -32,7 +31,6 @@ object RenderUtils {
 	) {
 		val packedOverlay = OverlayTexture.NO_OVERLAY
 		val blockRenderDispatcher = Minecraft.getInstance().blockRenderer
-		val accessor = blockRenderDispatcher as BlockRenderDispatcherAccessor
 
 		val bakedModel = blockRenderDispatcher.getBlockModel(blockState)
 		val color = blockRenderDispatcher.blockColors.getColor(blockState, level, blockPos, 0)
@@ -49,7 +47,7 @@ object RenderUtils {
 			packedLight,
 			packedOverlay
 		)
-		accessor.getSpecialBlockModelRenderer().get()
+		blockRenderDispatcher.specialBlockModelRenderer.get()
 			.renderByBlock(blockState.block, ItemDisplayContext.NONE, poseStack, bufferSource, packedLight, packedOverlay)
 	}
 }

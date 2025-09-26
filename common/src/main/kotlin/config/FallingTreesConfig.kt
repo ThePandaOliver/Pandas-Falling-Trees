@@ -11,7 +11,17 @@
  */
 package dev.pandasystems.fallingtrees.config
 
+import dev.pandasystems.pandalib.core.platform.game
 import dev.pandasystems.pandalib.impl.config.ConfigRegistry
+import net.minecraft.client.Minecraft
+import net.minecraft.world.entity.player.Player
 
 val fallingTreesClientConfig = ConfigRegistry.register(ClientConfig::class.java)
 val fallingTreesCommonConfig = ConfigRegistry.register(CommonConfig::class.java)
+
+fun getPlayerConfig(player: Player): PlayerConfigPayload {
+	var player = player
+	if (game.server == null)
+		player = Minecraft.getInstance().player ?: throw IllegalStateException("Player not found")
+	return playerConfigs[player.uuid] ?: throw IllegalStateException("Player config not found")
+}

@@ -1,8 +1,9 @@
 package dev.pandasystems.fallingtrees.api
 
 import com.mojang.logging.LogUtils
-import dev.pandasystems.fallingtrees.config.fallingTreesClientConfig
+import dev.pandasystems.fallingtrees.config.MiningOptionEnum
 import dev.pandasystems.fallingtrees.config.fallingTreesCommonConfig
+import dev.pandasystems.fallingtrees.config.getPlayerConfig
 import dev.pandasystems.fallingtrees.entity.TreeEntity
 import dev.pandasystems.fallingtrees.exceptions.TreeException
 import dev.pandasystems.fallingtrees.getTree
@@ -91,14 +92,14 @@ object TreeHandler {
 
 	@JvmStatic
 	fun canPlayerChopTree(player: Player): Boolean {
-		val clientConfig = fallingTreesClientConfig.config // TODO: Get player synchronized config instead
-		val invertCrouchMining: Boolean = clientConfig.invertCrouchMining
-		return fallingTreesCommonConfig.config.disableCrouchMining || player.isCrouching == invertCrouchMining
+		val config = getPlayerConfig(player)
+		val option = if (player.isCrouching) config.miningWhileCrouchingShould else config.miningShould
+		return fallingTreesCommonConfig.config.disableCrouchMining || option == MiningOptionEnum.CHOP_TREE
 	}
 
 	@JvmStatic
 	fun getMiningSpeed(player: Player, blockPos: BlockPos, baseSpeed: Float): Optional<Float?> {
-		val treeSpeed = TREE_SPEED_CACHES.compute(player.getUUID()) { uuid: UUID?, speed: TreeSpeed? ->
+		val treeSpeed = TREE_SPEED_CACHES.compute(player.getUUID()) { _: UUID?, speed: TreeSpeed? ->
 			if (speed == null || !speed.isValid(blockPos, baseSpeed)) {
 				val blockState = player.level().getBlockState(blockPos)
 				val tree = getTree(blockState) ?: return@compute null

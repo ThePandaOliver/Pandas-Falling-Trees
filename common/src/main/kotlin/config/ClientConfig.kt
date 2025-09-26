@@ -18,7 +18,13 @@ import dev.pandasystems.pandalib.impl.config.Configuration
 
 @Configuration(modId = FallingTrees.MOD_ID, pathName = FallingTrees.MOD_ID + "_client")
 class ClientConfig {
-	var invertCrouchMining = false
+	var miningShould = MiningOptionEnum.CHOP_TREE
+	var miningWhileCrouchingShould = MiningOptionEnum.MINE_SINGLE_BLOCK
 	var soundSettings = SoundSettingsConfig()
 	var animation = AnimationConfig()
+}
+
+enum class MiningOptionEnum {
+	CHOP_TREE,
+	MINE_SINGLE_BLOCK
 }

@@ -41,6 +41,7 @@ subprojects {
 				password = System.getenv("GITHUB_API_TOKEN")
 			}
 		}
+		mavenLocal()
 	}
 
 	dependencies {

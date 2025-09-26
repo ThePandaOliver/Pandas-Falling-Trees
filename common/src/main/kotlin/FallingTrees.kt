@@ -6,6 +6,7 @@
  */
 package dev.pandasystems.fallingtrees
 
+import dev.pandasystems.fallingtrees.config.registerPlayerConfigPayload
 import dev.pandasystems.fallingtrees.event.EventHandler
 import net.minecraft.resources.ResourceLocation
 
@@ -18,6 +19,8 @@ object FallingTrees {
 		entityRegistar.register()
 		entityDataRegistar.register()
 		EventHandler.register()
+
+		registerPlayerConfigPayload()
 	}
 
 	@JvmStatic

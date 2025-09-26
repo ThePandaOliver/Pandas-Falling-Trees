@@ -30,7 +30,7 @@ import org.joml.Quaternionf
 import org.joml.Vector3f
 
 class TreeRenderer(context: EntityRendererProvider.Context) : EntityRenderer<TreeEntity, TreeRenderState>(context) {
-	val config get() = fallingTreesClientConfig.config // TODO: Get player synchronized config instead
+	val config get() = fallingTreesClientConfig.config
 
 	override fun render(renderState: TreeRenderState, poseStack: PoseStack, buffer: MultiBufferSource, packedLight: Int) {
 		val tree = renderState.treeType ?: return
