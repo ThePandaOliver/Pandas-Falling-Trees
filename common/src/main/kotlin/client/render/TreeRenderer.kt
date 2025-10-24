@@ -15,13 +15,15 @@ import com.mojang.blaze3d.vertex.PoseStack
 import dev.pandasystems.fallingtrees.api.TreeType
 import dev.pandasystems.fallingtrees.config.fallingTreesClientConfig
 import dev.pandasystems.fallingtrees.entity.TreeEntity
-import dev.pandasystems.fallingtrees.utils.RenderUtils
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.SubmitNodeCollector
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.client.renderer.state.CameraRenderState
+import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.level.block.state.BlockState
@@ -30,18 +32,20 @@ import org.joml.Quaternionf
 import org.joml.Vector3f
 
 class TreeRenderer(context: EntityRendererProvider.Context) : EntityRenderer<TreeEntity, TreeRenderState>(context) {
-	val config get() = fallingTreesClientConfig.config
+	val config get() = fallingTreesClientConfig.get()
 
-	override fun render(renderState: TreeRenderState, poseStack: PoseStack, buffer: MultiBufferSource, packedLight: Int) {
+	override fun submit(renderState: TreeRenderState, poseStack: PoseStack, nodeCollector: SubmitNodeCollector, cameraRenderState: CameraRenderState) {
+		super.submit(renderState, poseStack, nodeCollector, cameraRenderState)
+
 		val tree = renderState.treeType ?: return
 
 		poseStack.pushPose()
 
 		val blocks: MutableMap<BlockPos, BlockState> = renderState.blocks!!
-		val fallAnimLength: Float = this.config.animation.fallAnimLength
+		val fallAnimLength: Float = this.config.animation.fallAnimLength.value
 
-		val bounceHeight: Float = this.config.animation.bounceAngleHeight
-		val bounceAnimLength: Float = this.config.animation.bounceAnimLength
+		val bounceHeight: Float = this.config.animation.bounceAngleHeight.value
+		val bounceAnimLength: Float = this.config.animation.bounceAnimLength.value
 
 		val time = (renderState.lifeTime * (Math.PI / 2) / fallAnimLength).toFloat()
 
@@ -57,7 +61,7 @@ class TreeRenderer(context: EntityRendererProvider.Context) : EntityRenderer<Tre
 		pivot.rotateY(Math.toRadians(-direction.toYRot()))
 		poseStack.translate(-pivot.x, 0f, -pivot.z)
 
-		val vector: Vector3f = Vector3f(Math.toRadians(animation), 0f, 0f)
+		val vector = Vector3f(Math.toRadians(animation), 0f, 0f)
 		vector.rotateY(Math.toRadians(-direction.toYRot()))
 		val quaternion = Quaternionf().identity().rotateX(vector.x).rotateZ(vector.z)
 		poseStack.mulPose(quaternion)
@@ -67,12 +71,9 @@ class TreeRenderer(context: EntityRendererProvider.Context) : EntityRenderer<Tre
 		poseStack.translate(pivot.x, 0f, pivot.z)
 		poseStack.translate(-.5, 0.0, -.5)
 		blocks.forEach { (blockPos, blockState) ->
-			var blockPos = blockPos
 			poseStack.pushPose()
 			poseStack.translate(blockPos.x.toFloat(), blockPos.y.toFloat(), blockPos.z.toFloat())
-
-			blockPos = blockPos.offset(renderState.originPos!!)
-			RenderUtils.renderSingleBlock(poseStack, blockState, blockPos, level, buffer, packedLight)
+			nodeCollector.submitBlock(poseStack, blockState, renderState.lightCoords, OverlayTexture.NO_OVERLAY, renderState.outlineColor)
 			poseStack.popPose()
 		}
 		poseStack.popPose()

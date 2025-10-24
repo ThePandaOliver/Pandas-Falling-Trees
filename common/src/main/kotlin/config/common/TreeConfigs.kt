@@ -14,10 +14,15 @@ package dev.pandasystems.fallingtrees.config.common
 import dev.pandasystems.fallingtrees.config.common.tree.GenericTreeConfig
 import dev.pandasystems.fallingtrees.config.common.tree.TreeConfig
 import dev.pandasystems.fallingtrees.config.common.tree.VerticalTreeConfig
+import dev.pandasystems.pandalib.config.ConfigCategory
 
 class TreeConfigs {
-	var genericTree = GenericTreeConfig()
-	var verticalTree = VerticalTreeConfig()
-	var chorusTree = TreeConfig()
-	var mushroomTree = TreeConfig()
+	@ConfigCategory
+	val genericTree = GenericTreeConfig()
+	@ConfigCategory
+	val verticalTree = VerticalTreeConfig()
+	@ConfigCategory
+	val chorusTree = TreeConfig()
+	@ConfigCategory
+	val mushroomTree = TreeConfig()
 }

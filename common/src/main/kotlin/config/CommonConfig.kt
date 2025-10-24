@@ -11,24 +11,26 @@
  */
 package dev.pandasystems.fallingtrees.config
 
-import dev.pandasystems.fallingtrees.FallingTrees
 import dev.pandasystems.fallingtrees.config.common.TreeConfigs
-import dev.pandasystems.pandalib.impl.config.Configuration
+import dev.pandasystems.pandalib.config.Config
+import dev.pandasystems.pandalib.config.ConfigCategory
+import dev.pandasystems.pandalib.config.options.configOption
 
-@Configuration(modId = FallingTrees.MOD_ID, pathName = FallingTrees.MOD_ID + "_common")
-class CommonConfig {
-	var disableCrouchMining: Boolean = false
-	var disableExtraToolDamage: Boolean = false
-	var disableExtraFoodExhaustion: Boolean = false
+class CommonConfig : Config() {
+	val disableCrouchMining by configOption(false)
+	val disableExtraToolDamage by configOption(false)
+	val disableExtraFoodExhaustion by configOption(false)
 
-	var treeLifetimeLength: Float = 4f
+	val treeLifetimeLength by configOption(4f)
 
-	var dynamicMiningSpeed: DynamicMiningSpeed = DynamicMiningSpeed()
-	var trees: TreeConfigs = TreeConfigs()
+	@ConfigCategory
+	val dynamicMiningSpeed: DynamicMiningSpeed = DynamicMiningSpeed()
+	@ConfigCategory
+	val trees: TreeConfigs = TreeConfigs()
 
 	class DynamicMiningSpeed {
-		var disable: Boolean = false
-		var speedMultiplication: Float = 0.5f
-		var maxSpeedMultiplication: Float = 16f
+		val disable by configOption(false)
+		val speedMultiplication by configOption( 0.5f)
+		val maxSpeedMultiplication by configOption(16f)
 	}
 }

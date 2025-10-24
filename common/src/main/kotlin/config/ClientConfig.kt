@@ -11,17 +11,21 @@
  */
 package dev.pandasystems.fallingtrees.config
 
-import dev.pandasystems.fallingtrees.FallingTrees
 import dev.pandasystems.fallingtrees.config.client.AnimationConfig
 import dev.pandasystems.fallingtrees.config.client.SoundSettingsConfig
-import dev.pandasystems.pandalib.impl.config.Configuration
+import dev.pandasystems.pandalib.config.Config
+import dev.pandasystems.pandalib.config.ConfigCategory
+import dev.pandasystems.pandalib.config.options.configOption
+import dev.pandasystems.pandalib.config.options.syncable
 
-@Configuration(modId = FallingTrees.MOD_ID, pathName = FallingTrees.MOD_ID + "_client")
-class ClientConfig {
-	var miningShould = MiningOptionEnum.CHOP_TREE
-	var miningWhileCrouchingShould = MiningOptionEnum.MINE_SINGLE_BLOCK
-	var soundSettings = SoundSettingsConfig()
-	var animation = AnimationConfig()
+class ClientConfig : Config() {
+	val miningShould by configOption(MiningOptionEnum.CHOP_TREE).syncable()
+	val miningWhileCrouchingShould by configOption(MiningOptionEnum.MINE_SINGLE_BLOCK).syncable()
+
+	@ConfigCategory
+	val soundSettings = SoundSettingsConfig()
+	@ConfigCategory
+	val animation = AnimationConfig()
 }
 
 enum class MiningOptionEnum {

@@ -27,7 +27,7 @@ import net.minecraft.world.level.block.state.BlockState
 import java.util.*
 
 class ChorusTree : TreeType {
-	val config get() = fallingTreesCommonConfig.config.trees.chorusTree
+	val config get() = fallingTreesCommonConfig.get().trees.chorusTree
 
 	private val horizontalDirections = arrayOf(Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST)
 
@@ -37,7 +37,7 @@ class ChorusTree : TreeType {
 
 	override fun gatherTreeData(blockPos: BlockPos, level: Level, player: Player): TreeData? {
 		var blockPos = blockPos
-		if (this.config.requireTool && !this.config.allowedToolFilter.isValid(player.mainHandItem)) return null
+		if (this.config.requireTool.value && !this.config.allowedToolFilter.isValid(player.mainHandItem)) return null
 
 		blockPos = blockPos.immutable()
 		val builder = TreeData.Builder()
@@ -48,8 +48,8 @@ class ChorusTree : TreeType {
 			.setToolDamage(blockPosSet.size)
 			.setFoodExhaustionModifier { originalExhaustion -> originalExhaustion * blockPosSet.size }
 			.setMiningSpeedModifier { originalMiningSpeed ->
-				val speedMultiplication: Float = fallingTreesCommonConfig.config.dynamicMiningSpeed.speedMultiplication
-				val multiplyAmount = fallingTreesCommonConfig.config.dynamicMiningSpeed.maxSpeedMultiplication.coerceAtMost((blockPosSet.size.toFloat() - 1f))
+				val speedMultiplication: Float = fallingTreesCommonConfig.get().dynamicMiningSpeed.speedMultiplication.value
+				val multiplyAmount = fallingTreesCommonConfig.get().dynamicMiningSpeed.maxSpeedMultiplication.value.coerceAtMost((blockPosSet.size.toFloat() - 1f))
 				originalMiningSpeed / (multiplyAmount * speedMultiplication + 1f)
 			}
 			.build()

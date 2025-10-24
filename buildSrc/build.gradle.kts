@@ -27,6 +27,6 @@ dependencies {
 	applyPlugin("org.jetbrains.kotlin.jvm", "2.2.0")
 	applyPlugin("org.jetbrains.gradle.plugin.idea-ext", "1.1.10")
 	applyPlugin("architectury-plugin", "3.4-SNAPSHOT")
-	applyPlugin("dev.architectury.loom", "1.10-SNAPSHOT")
+	applyPlugin("dev.architectury.loom", "1.11-SNAPSHOT")
 	applyPlugin("com.gradleup.shadow", "9.0.2")
 }

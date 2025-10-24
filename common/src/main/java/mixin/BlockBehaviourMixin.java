@@ -25,7 +25,7 @@ import java.util.Optional;
 public class BlockBehaviourMixin {
 	@Inject(method = "getDestroyProgress", at = @At("RETURN"), cancellable = true)
 	private void getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos, CallbackInfoReturnable<Float> cir) {
-		if (FallingTreesConfigKt.getFallingTreesCommonConfig().getConfig().getDynamicMiningSpeed().getDisable()) return;
+		if (FallingTreesConfigKt.getFallingTreesCommonConfig().get().getDynamicMiningSpeed().getDisable().getValue()) return;
 		if (player == null || !TreeHandler.canPlayerChopTree(player)) return;
 		Optional<Float> miningSpeedOpt = TreeHandler.getMiningSpeed(player, pos, cir.getReturnValue());
 		miningSpeedOpt.ifPresent(cir::setReturnValue);

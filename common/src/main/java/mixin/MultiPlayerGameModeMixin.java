@@ -44,7 +44,7 @@ public abstract class MultiPlayerGameModeMixin {
 
 	@Inject(method = "tick", at = @At("RETURN"))
 	public void tick(CallbackInfo ci) {
-		if (FallingTreesConfigKt.getFallingTreesCommonConfig().getConfig().getDynamicMiningSpeed().getDisable()) return;
+		if (FallingTreesConfigKt.getFallingTreesCommonConfig().get().getDynamicMiningSpeed().getDisable().getValue()) return;
 		Player player = minecraft.player;
 
 		if (player != null) {

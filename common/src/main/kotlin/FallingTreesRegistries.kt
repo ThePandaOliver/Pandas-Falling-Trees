@@ -17,9 +17,8 @@ import dev.pandasystems.fallingtrees.trees.VerticalTree
 import dev.pandasystems.fallingtrees.trees.mushroom.MushroomTree
 import dev.pandasystems.fallingtrees.utils.BlockMapEntityData
 import dev.pandasystems.fallingtrees.utils.ItemListEntityData
-import dev.pandasystems.pandalib.api.registry.RegistryRegister
-import dev.pandasystems.pandalib.api.registry.deferred.DeferredRegister
-import dev.pandasystems.pandalib.core.platform.registry.registryRegistrations
+import dev.pandasystems.pandalib.registry.ENTITY_DATA_SERIALIZERS_REGISTRY
+import dev.pandasystems.pandalib.registry.deferred.DeferredRegister
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.Registries
@@ -29,12 +28,11 @@ import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MobCategory
 import net.minecraft.world.level.block.state.BlockState
-import java.util.function.Supplier
 
 // Registries
 
 val treeRegistryKey: ResourceKey<Registry<TreeType>> = ResourceKey.createRegistryKey(resourceLocation("tree_registry"))
-val treeRegistry = RegistryRegister.register(MappedRegistry(treeRegistryKey, Lifecycle.stable()))
+val treeRegistry = DeferredRegister.registerNewRegistry(MappedRegistry(treeRegistryKey, Lifecycle.stable()))
 
 
 // Deferred registers
@@ -42,7 +40,7 @@ val treeRegistry = RegistryRegister.register(MappedRegistry(treeRegistryKey, Lif
 val treeRegister = DeferredRegister.create(FallingTrees.MOD_ID, treeRegistryKey)
 val soundRegister = DeferredRegister.create(FallingTrees.MOD_ID, Registries.SOUND_EVENT)
 val entityRegistar = DeferredRegister.create(FallingTrees.MOD_ID, Registries.ENTITY_TYPE)
-val entityDataRegistar = DeferredRegister.create(FallingTrees.MOD_ID, registryRegistrations.entityDataSerializers)
+val entityDataRegistar = DeferredRegister.create(FallingTrees.MOD_ID, ENTITY_DATA_SERIALIZERS_REGISTRY)
 
 
 // Trees

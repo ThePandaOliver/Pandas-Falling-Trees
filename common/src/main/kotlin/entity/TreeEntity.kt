@@ -120,7 +120,7 @@ class TreeEntity(entityType: EntityType<*>, level: Level) : Entity(entityType, l
 	}
 
 	val maxLifeTimeTick: Int
-		get() = (fallingTreesCommonConfig.config.treeLifetimeLength * 20).toInt()
+		get() = (fallingTreesCommonConfig.get().treeLifetimeLength.value * 20).toInt()
 
 	fun getLifetime(partialTick: Float): Float {
 		return (this.tickCount + partialTick) / 20

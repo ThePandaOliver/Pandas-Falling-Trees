@@ -2,8 +2,8 @@ package dev.pandasystems.fallingtrees.api
 
 import com.mojang.logging.LogUtils
 import dev.pandasystems.fallingtrees.config.MiningOptionEnum
+import dev.pandasystems.fallingtrees.config.fallingTreesClientConfig
 import dev.pandasystems.fallingtrees.config.fallingTreesCommonConfig
-import dev.pandasystems.fallingtrees.config.getPlayerConfig
 import dev.pandasystems.fallingtrees.entity.TreeEntity
 import dev.pandasystems.fallingtrees.exceptions.TreeException
 import dev.pandasystems.fallingtrees.getTree
@@ -42,11 +42,11 @@ object TreeHandler {
 		entity.setData(player, tree, blockPos, blocks, data.drops)
 
 		player.causeFoodExhaustion(
-			if (fallingTreesCommonConfig.config.disableExtraFoodExhaustion) 0.005f else data.foodExhaustionModifier.getExhaustion(0.005f)
+			if (fallingTreesCommonConfig.get().disableExtraFoodExhaustion.value) 0.005f else data.foodExhaustionModifier.getExhaustion(0.005f)
 		)
 
 		if (player.mainHandItem.isDamageableItem) player.mainHandItem.hurtAndBreak(
-			if (fallingTreesCommonConfig.config.disableExtraToolDamage) 1 else data.toolDamage,
+			if (fallingTreesCommonConfig.get().disableExtraToolDamage.value) 1 else data.toolDamage,
 			player, EquipmentSlot.MAINHAND
 		)
 
@@ -92,9 +92,8 @@ object TreeHandler {
 
 	@JvmStatic
 	fun canPlayerChopTree(player: Player): Boolean {
-		val config = getPlayerConfig(player)
-		val option = if (player.isCrouching) config.miningWhileCrouchingShould else config.miningShould
-		return fallingTreesCommonConfig.config.disableCrouchMining || option == MiningOptionEnum.CHOP_TREE
+		val option = if (player.isCrouching) fallingTreesClientConfig.get().miningWhileCrouchingShould[player] else fallingTreesClientConfig.get().miningShould[player]
+		return fallingTreesCommonConfig.get().disableCrouchMining.value || option == MiningOptionEnum.CHOP_TREE
 	}
 
 	@JvmStatic

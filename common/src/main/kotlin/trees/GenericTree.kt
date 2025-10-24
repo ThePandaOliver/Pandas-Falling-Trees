@@ -20,7 +20,7 @@ import dev.pandasystems.fallingtrees.entity.TreeEntity
 import dev.pandasystems.fallingtrees.exceptions.TreeTooBigException
 import dev.pandasystems.fallingtrees.treeFallSound
 import dev.pandasystems.fallingtrees.treeImpactSound
-import dev.pandasystems.pandalib.core.platform.game
+import dev.pandasystems.pandalib.utils.gameEnvironment
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
@@ -38,29 +38,29 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import java.util.*
 
 class GenericTree : TreeType {
-	val config get() = fallingTreesCommonConfig.config.trees.genericTree
+	val config get() = fallingTreesCommonConfig.get().trees.genericTree
 
 	override fun isTreeStem(blockState: BlockState): Boolean {
 		return this.config.logFilter.isValid(blockState)
 	}
 
 	override fun onTreeTick(entity: TreeEntity) {
-		if (game.isClient) {
-			val clientConfig = fallingTreesClientConfig.config
+		if (gameEnvironment.isClient) {
+			val clientConfig = fallingTreesClientConfig.get()
 			if (entity.tickCount == 1) {
-				if (clientConfig.soundSettings.enabled) {
+				if (clientConfig.soundSettings.enabled.value) {
 					entity.level().playLocalSound(
 						entity.x, entity.y, entity.z, treeFallSound.get(),
-						SoundSource.BLOCKS, clientConfig.soundSettings.startVolume, 1f, true
+						SoundSource.BLOCKS, clientConfig.soundSettings.startVolume.value, 1f, true
 					)
 				}
 			}
 
-			if (entity.tickCount == (clientConfig.animation.fallAnimLength * 20).toInt() - 5) {
-				if (clientConfig.soundSettings.enabled) {
+			if (entity.tickCount == (clientConfig.animation.fallAnimLength.value * 20).toInt() - 5) {
+				if (clientConfig.soundSettings.enabled.value) {
 					entity.level().playLocalSound(
 						entity.x, entity.y, entity.z, treeImpactSound.get(),
-						SoundSource.BLOCKS, clientConfig.soundSettings.endVolume, 1f, true
+						SoundSource.BLOCKS, clientConfig.soundSettings.endVolume.value, 1f, true
 					)
 				}
 			}
@@ -69,7 +69,7 @@ class GenericTree : TreeType {
 
 	override fun gatherTreeData(blockPos: BlockPos, level: Level, player: Player): TreeData? {
 		var blockPos = blockPos
-		if (this.config.requireTool && !this.config.allowedToolFilter.isValid(player.mainHandItem)) return null
+		if (this.config.requireTool.value && !this.config.allowedToolFilter.isValid(player.mainHandItem)) return null
 
 		blockPos = blockPos.immutable()
 		val builder = TreeData.Builder()
@@ -112,8 +112,8 @@ class GenericTree : TreeType {
 			.setFoodExhaustionModifier { originalExhaustion -> originalExhaustion * logs.size }
 			.addDrops(drops)
 			.setMiningSpeedModifier { originalMiningSpeed ->
-				val speedMultiplication: Float = fallingTreesCommonConfig.config.dynamicMiningSpeed.speedMultiplication
-				val multiplyAmount = fallingTreesCommonConfig.config.dynamicMiningSpeed.maxSpeedMultiplication.coerceAtMost((logs.size.toFloat() - 1f))
+				val speedMultiplication: Float = fallingTreesCommonConfig.get().dynamicMiningSpeed.speedMultiplication.value
+				val multiplyAmount = fallingTreesCommonConfig.get().dynamicMiningSpeed.maxSpeedMultiplication.value.coerceAtMost((logs.size.toFloat() - 1f))
 				originalMiningSpeed / (multiplyAmount * speedMultiplication + 1f)
 			}
 			.addAwardedStats(logs.stream().map<Stat<Block>> { logPos: BlockPos? ->
@@ -141,7 +141,7 @@ class GenericTree : TreeType {
 			if (isLogBlock(currentState)) {
 				logs.add(current)
 
-				if (logs.size > this.config.algorithm.maxLogAmount) {
+				if (logs.size > this.config.algorithm.maxLogAmount.value) {
 					throw TreeTooBigException(current, level)
 				}
 
@@ -175,7 +175,7 @@ class GenericTree : TreeType {
 			if (node.distance != optionalDistanceAt.orElse(0)) {
 				continue
 			}
-			if (visited.contains(current) || node.distance > this.config.algorithm.maxLeavesRadius) {
+			if (visited.contains(current) || node.distance > this.config.algorithm.maxLeavesRadius.value) {
 				continue
 			}
 			visited.add(current)
@@ -248,7 +248,7 @@ class GenericTree : TreeType {
 	}
 
 	private fun isLeafBlock(blockState: BlockState): Boolean {
-		if (this.config.algorithm.shouldIgnorePersistentLeaves &&
+		if (this.config.algorithm.shouldIgnorePersistentLeaves.value &&
 			blockState.hasProperty(BlockStateProperties.PERSISTENT) && blockState.getValue(BlockStateProperties.PERSISTENT)
 		) return false
 		return this.config.leavesFilter.isValid(blockState)

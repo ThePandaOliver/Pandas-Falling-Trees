@@ -24,7 +24,7 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 
 class VerticalTree : TreeType {
-	val config get() = fallingTreesCommonConfig.config.trees.verticalTree
+	val config get() = fallingTreesCommonConfig.get().trees.verticalTree
 
 	override fun isTreeStem(blockState: BlockState): Boolean {
 		return this.config.filter.isValid(blockState)
@@ -32,7 +32,7 @@ class VerticalTree : TreeType {
 
 	override fun gatherTreeData(blockPos: BlockPos, level: Level, player: Player): TreeData? {
 		var blockPos = blockPos
-		if (this.config.requireTool && !this.config.allowedToolFilter.isValid(player.mainHandItem)) return null
+		if (this.config.requireTool.value && !this.config.allowedToolFilter.isValid(player.mainHandItem)) return null
 
 		blockPos = blockPos.immutable()
 		val builder = TreeData.Builder()
@@ -55,8 +55,8 @@ class VerticalTree : TreeType {
 			.setFoodExhaustionModifier { originalExhaustion: Float -> originalExhaustion * blocks.size }
 			.addDrops(drops)
 			.setMiningSpeedModifier { originalMiningSpeed: Float ->
-				val speedMultiplication: Float = fallingTreesCommonConfig.config.dynamicMiningSpeed.speedMultiplication
-				val multiplyAmount = fallingTreesCommonConfig.config.dynamicMiningSpeed.maxSpeedMultiplication.coerceAtMost((blocks.size.toFloat() - 1f))
+				val speedMultiplication: Float = fallingTreesCommonConfig.get().dynamicMiningSpeed.speedMultiplication.value
+				val multiplyAmount = fallingTreesCommonConfig.get().dynamicMiningSpeed.maxSpeedMultiplication.value.coerceAtMost((blocks.size.toFloat() - 1f))
 				originalMiningSpeed / (multiplyAmount * speedMultiplication + 1f)
 			}
 			.addAwardedStats(blocks.stream().map { logPos: BlockPos ->

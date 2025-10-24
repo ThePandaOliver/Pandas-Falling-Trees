@@ -13,25 +13,28 @@
 package dev.pandasystems.fallingtrees.event
 
 import dev.pandasystems.fallingtrees.api.TreeHandler
-import dev.pandasystems.pandalib.api.event.addEventListener
-import dev.pandasystems.pandalib.api.event.commonevents.BlockBreakEvent
+import dev.pandasystems.pandalib.event.server.serverBlockBreakPreEvent
+import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.state.BlockState
 
 object EventHandler {
 	fun register() {
-		addEventListener(::onBlockBreak)
+		serverBlockBreakPreEvent += ::onBlockBreak
 	}
 
-	private fun onBlockBreak(event: BlockBreakEvent.Pre) {
-		if (event.entity !is ServerPlayer) return
-		val player = event.entity as ServerPlayer
+	private fun onBlockBreak(level: Level, pos: BlockPos, state: BlockState, entity: Entity?): Boolean {
+		if (entity is ServerPlayer) {
+			if (!TreeHandler.canPlayerChopTree(entity))
+				return true
 
-		if (!TreeHandler.canPlayerChopTree(player))
-			return
-
-		if (TreeHandler.destroyTree(event.level, event.blockPos, player)) {
-			event.cancelled = true
-			return
+			if (TreeHandler.destroyTree(level, pos, entity)) {
+				return false
+			}
 		}
+
+		return true
 	}
 }

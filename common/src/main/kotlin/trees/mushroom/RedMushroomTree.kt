@@ -35,7 +35,7 @@ class RedMushroomTree : TreeType {
 		BlockPos(0, -1, -1), BlockPos(0, -1, 1)
 	)
 
-	val config get() = fallingTreesCommonConfig.config.trees.mushroomTree
+	val config get() = fallingTreesCommonConfig.get().trees.mushroomTree
 
 	override fun isTreeStem(blockState: BlockState): Boolean {
 		return blockState.`is`(Blocks.MUSHROOM_STEM)
@@ -43,7 +43,7 @@ class RedMushroomTree : TreeType {
 
 	override fun gatherTreeData(blockPos: BlockPos, level: Level, player: Player): TreeData? {
 		var blockPos = blockPos
-		if (this.config.requireTool && !this.config.allowedToolFilter.isValid(player.mainHandItem)) return null
+		if (this.config.requireTool.value && !this.config.allowedToolFilter.isValid(player.mainHandItem)) return null
 
 		blockPos = blockPos.immutable()
 		val builder: TreeData.Builder = TreeData.Builder()
@@ -73,8 +73,8 @@ class RedMushroomTree : TreeType {
 			.setFoodExhaustionModifier { originalExhaustion -> originalExhaustion * blocks.size }
 			.addDrops(drops)
 			.setMiningSpeedModifier { originalMiningSpeed ->
-				val speedMultiplication: Float = fallingTreesCommonConfig.config.dynamicMiningSpeed.speedMultiplication
-				val multiplyAmount = fallingTreesCommonConfig.config.dynamicMiningSpeed.maxSpeedMultiplication.coerceAtMost((blocks.size.toFloat() - 1f))
+				val speedMultiplication: Float = fallingTreesCommonConfig.get().dynamicMiningSpeed.speedMultiplication.value
+				val multiplyAmount = fallingTreesCommonConfig.get().dynamicMiningSpeed.maxSpeedMultiplication.value.coerceAtMost((blocks.size.toFloat() - 1f))
 				originalMiningSpeed / (multiplyAmount * speedMultiplication + 1f)
 			}
 			.addAwardedStats(blocks.stream().map { logPos: BlockPos ->

@@ -11,6 +11,8 @@
  */
 package dev.pandasystems.fallingtrees.config.common.tree
 
+import dev.pandasystems.pandalib.config.ConfigCategory
+import dev.pandasystems.pandalib.config.options.configOption
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.tags.TagKey
 import net.minecraft.world.item.Item
@@ -19,30 +21,40 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 
 open class TreeConfig {
-	var enabled: Boolean = true
+	val enabled by configOption(true)
 
-	var requireTool: Boolean = false
-	var allowedToolFilter: Filter = Filter(
+	val requireTool by configOption(false)
+
+	@ConfigCategory
+	open val allowedToolFilter: Filter = Filter(
 		mutableListOf(),
 		mutableListOf(),
 		mutableListOf()
 	)
 
-	class Filter(var whitelistedTags: MutableList<String>, var whitelist: MutableList<String>, var blacklist: MutableList<String>) {
+	class Filter(
+		whitelistedTags: MutableList<String> = mutableListOf(),
+		whitelist: MutableList<String> = mutableListOf(),
+		blacklist: MutableList<String> = mutableListOf()
+	) {
+		val whitelistedTags by configOption(whitelistedTags)
+		val whitelist by configOption(whitelist)
+		val blacklist by configOption(blacklist)
+
 		fun isValid(blockState: BlockState): Boolean {
 			val block = blockState.block
 			val resourceLocation = BuiltInRegistries.BLOCK.getKey(block)
-			if (blacklist.contains(resourceLocation.toString())) return false
-			return blockState.tags.anyMatch { blockTagKey: TagKey<Block> -> whitelistedTags.contains(blockTagKey.location().toString()) } ||
-					whitelist.contains(resourceLocation.toString())
+			if (blacklist.value.contains(resourceLocation.toString())) return false
+			return blockState.tags.anyMatch { blockTagKey: TagKey<Block> -> whitelistedTags.value.contains(blockTagKey.location().toString()) } ||
+					whitelist.value.contains(resourceLocation.toString())
 		}
 
 		fun isValid(itemStack: ItemStack): Boolean {
 			val item = itemStack.item
 			val resourceLocation = BuiltInRegistries.ITEM.getKey(item)
-			if (blacklist.contains(resourceLocation.toString())) return false
-			return itemStack.tags.anyMatch { blockTagKey: TagKey<Item> -> whitelistedTags.contains(blockTagKey.location().toString()) } ||
-					whitelist.contains(resourceLocation.toString())
+			if (blacklist.value.contains(resourceLocation.toString())) return false
+			return itemStack.tags.anyMatch { blockTagKey: TagKey<Item> -> whitelistedTags.value.contains(blockTagKey.location().toString()) } ||
+					whitelist.value.contains(resourceLocation.toString())
 		}
 	}
 }

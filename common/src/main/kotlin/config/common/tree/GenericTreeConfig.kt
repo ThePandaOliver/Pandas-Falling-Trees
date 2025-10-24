@@ -11,31 +11,34 @@
  */
 package dev.pandasystems.fallingtrees.config.common.tree
 
+import dev.pandasystems.pandalib.config.ConfigCategory
+import dev.pandasystems.pandalib.config.options.configOption
 import net.minecraft.tags.BlockTags
 import net.minecraft.tags.ItemTags
 import java.util.List
 
 class GenericTreeConfig : TreeConfig() {
-	var algorithm = Algorithm()
+	@ConfigCategory
+	val algorithm = Algorithm()
 
-	var logFilter = Filter(
+	@ConfigCategory
+	val logFilter = Filter(
 		mutableListOf(BlockTags.LOGS.location().toString()),
 		mutableListOf(),
 		mutableListOf()
 	)
-	var leavesFilter: Filter = Filter(
+	@ConfigCategory
+	val leavesFilter: Filter = Filter(
 		mutableListOf(BlockTags.LEAVES.location().toString()),
 		mutableListOf(),
 		mutableListOf()
 	)
 
-	init {
-		this.allowedToolFilter.whitelistedTags.add(ItemTags.AXES.location().toString())
-	}
+	override val allowedToolFilter: Filter = Filter(mutableListOf(ItemTags.AXES.location().toString()), mutableListOf(), mutableListOf())
 
 	class Algorithm {
-		var maxLeavesRadius: Int = 7
-		var maxLogAmount: Int = 256
-		var shouldIgnorePersistentLeaves: Boolean = true
+		val maxLeavesRadius by configOption(7)
+		val maxLogAmount by configOption(256)
+		val shouldIgnorePersistentLeaves by configOption(true)
 	}
 }

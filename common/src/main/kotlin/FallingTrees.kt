@@ -6,7 +6,7 @@
  */
 package dev.pandasystems.fallingtrees
 
-import dev.pandasystems.fallingtrees.config.registerPlayerConfigPayload
+import dev.pandasystems.fallingtrees.config.initConfigs
 import dev.pandasystems.fallingtrees.event.EventHandler
 import net.minecraft.resources.ResourceLocation
 
@@ -14,16 +14,15 @@ object FallingTrees {
 	const val MOD_ID: String = "fallingtrees"
 
 	init {
+		initConfigs()
+
 		treeRegister.register()
 		soundRegister.register()
 		entityRegistar.register()
 		entityDataRegistar.register()
 		EventHandler.register()
-
-		registerPlayerConfigPayload()
 	}
 
-	@JvmStatic
 	fun resourceLocation(path: String): ResourceLocation {
 		return ResourceLocation.fromNamespaceAndPath(MOD_ID, path)
 	}

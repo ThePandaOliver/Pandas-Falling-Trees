@@ -14,9 +14,7 @@ package dev.pandasystems.fallingtrees.client
 
 import dev.pandasystems.fallingtrees.client.render.TreeRenderer
 import dev.pandasystems.fallingtrees.treeEntity
-import dev.pandasystems.pandalib.api.registry.registerEntityRenderer
-import net.fabricmc.api.EnvType
-import net.fabricmc.api.Environment
+import dev.pandasystems.pandalib.registry.registerEntityRenderer
 
 object FallingTreesClient {
 	init {

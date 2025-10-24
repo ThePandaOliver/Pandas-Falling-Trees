@@ -12,8 +12,10 @@
 
 package dev.pandasystems.fallingtrees.config.client
 
+import dev.pandasystems.pandalib.config.options.configOption
+
 class SoundSettingsConfig {
-	var enabled = true
-	var startVolume = 0.7f
-	var endVolume = 0.7f
+	val enabled by configOption(true)
+	val startVolume by configOption(0.7f)
+	val endVolume by configOption(0.7f)
 }

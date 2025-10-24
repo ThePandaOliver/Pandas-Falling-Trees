@@ -12,8 +12,10 @@
 
 package dev.pandasystems.fallingtrees.config.client
 
+import dev.pandasystems.pandalib.config.options.configOption
+
 class AnimationConfig {
-	var fallAnimLength = 2.5f
-	var bounceAngleHeight = 10f
-	var bounceAnimLength = 1f
+	val fallAnimLength by configOption(2.5f)
+	val bounceAngleHeight by configOption(10f)
+	val bounceAnimLength by configOption(1f)
 }

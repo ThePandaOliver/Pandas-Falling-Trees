@@ -11,11 +11,13 @@
  */
 package dev.pandasystems.fallingtrees.config.common.tree
 
+import dev.pandasystems.pandalib.config.ConfigCategory
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.level.block.Blocks
 
 class VerticalTreeConfig : TreeConfig() {
-	var filter: Filter = Filter(
+	@ConfigCategory
+	val filter: Filter = Filter(
 		mutableListOf(),
 		mutableListOf(BuiltInRegistries.BLOCK.getKey(Blocks.CACTUS).toString(), BuiltInRegistries.BLOCK.getKey(Blocks.BAMBOO).toString()),
 		mutableListOf()
