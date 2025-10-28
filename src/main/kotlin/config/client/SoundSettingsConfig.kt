@@ -9,17 +9,11 @@
  * You should have received a copy of the GNU General Public License
  *  along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package dev.pandasystems.fallingtrees.neoforge.client
 
-import dev.pandasystems.fallingtrees.FallingTrees
-import dev.pandasystems.fallingtrees.client.FallingTreesClient
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.bus.api.IEventBus
-import net.neoforged.fml.common.Mod
+package dev.pandasystems.fallingtrees.config.client
 
-@Mod(value = FallingTrees.modid, dist = [Dist.CLIENT])
-class FallingTreesClientNeoForge(modBus: IEventBus) {
-	init {
-		FallingTreesClient
-	}
+class SoundSettingsConfig {
+	var enabled = true
+	var startVolume = 0.7f
+	var endVolume = 0.7f
 }

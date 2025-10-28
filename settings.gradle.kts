@@ -6,35 +6,20 @@
  */
 
 pluginManagement.repositories {
-	maven {
-		name = "Architectury"
-		url = uri("https://maven.architectury.dev/")
-	}
-	maven {
-		name = "Fabric"
-		url = uri("https://maven.fabricmc.net/")
-	}
-	maven {
-		name = "Forge"
-		url = uri("https://maven.minecraftforge.net/")
-	}
-	maven {
-		name = "NeoForge"
-		url = uri("https://maven.neoforged.net/releases/")
-	}
-	maven {
-		name = "Github"
-		url = uri("https://maven.pkg.github.com/ThePandaOliver/Forgix")
+	maven("https://maven.architectury.dev/") { name = "Architectury" }
+	maven("https://maven.fabricmc.net/") { name = "Fabric" }
+	maven("https://maven.minecraftforge.net/") { name = "Forge" }
+	maven("https://maven.neoforged.net/releases/") { name = "NeoForge" }
+	maven("https://maven.pkg.github.com/ThePandaOliver/Forgix") {
+		name = "Github Forgix"
 		credentials {
 			username = System.getenv("GITHUB_USER")
 			password = System.getenv("GITHUB_API_TOKEN")
 		}
 	}
 	gradlePluginPortal()
-	mavenLocal()
 }
 
-include("common")
 include("fabric")
 include("neoforge")
 

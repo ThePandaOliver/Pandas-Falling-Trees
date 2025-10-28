@@ -9,17 +9,15 @@
  * You should have received a copy of the GNU General Public License
  *  along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package dev.pandasystems.fallingtrees.neoforge.client
 
-import dev.pandasystems.fallingtrees.FallingTrees
-import dev.pandasystems.fallingtrees.client.FallingTreesClient
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.bus.api.IEventBus
-import net.neoforged.fml.common.Mod
+package dev.pandasystems.fallingtrees.client
 
-@Mod(value = FallingTrees.modid, dist = [Dist.CLIENT])
-class FallingTreesClientNeoForge(modBus: IEventBus) {
+import dev.pandasystems.fallingtrees.client.render.TreeRenderer
+import dev.pandasystems.fallingtrees.treeEntity
+import dev.pandasystems.pandalib.registry.registerEntityRenderer
+
+object FallingTreesClient {
 	init {
-		FallingTreesClient
+		registerEntityRenderer(treeEntity, ::TreeRenderer)
 	}
 }

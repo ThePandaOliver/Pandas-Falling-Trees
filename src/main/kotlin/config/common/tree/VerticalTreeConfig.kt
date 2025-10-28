@@ -9,17 +9,15 @@
  * You should have received a copy of the GNU General Public License
  *  along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package dev.pandasystems.fallingtrees.neoforge.client
+package dev.pandasystems.fallingtrees.config.common.tree
 
-import dev.pandasystems.fallingtrees.FallingTrees
-import dev.pandasystems.fallingtrees.client.FallingTreesClient
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.bus.api.IEventBus
-import net.neoforged.fml.common.Mod
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.world.level.block.Blocks
 
-@Mod(value = FallingTrees.modid, dist = [Dist.CLIENT])
-class FallingTreesClientNeoForge(modBus: IEventBus) {
-	init {
-		FallingTreesClient
-	}
+class VerticalTreeConfig : TreeConfig() {
+	val filter: Filter = Filter(
+		mutableListOf(),
+		mutableListOf(BuiltInRegistries.BLOCK.getKey(Blocks.CACTUS).toString(), BuiltInRegistries.BLOCK.getKey(Blocks.BAMBOO).toString()),
+		mutableListOf()
+	)
 }

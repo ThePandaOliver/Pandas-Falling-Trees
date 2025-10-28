@@ -9,17 +9,11 @@
  * You should have received a copy of the GNU General Public License
  *  along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package dev.pandasystems.fallingtrees.neoforge.client
 
-import dev.pandasystems.fallingtrees.FallingTrees
-import dev.pandasystems.fallingtrees.client.FallingTreesClient
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.bus.api.IEventBus
-import net.neoforged.fml.common.Mod
+package dev.pandasystems.fallingtrees.exceptions
 
-@Mod(value = FallingTrees.modid, dist = [Dist.CLIENT])
-class FallingTreesClientNeoForge(modBus: IEventBus) {
-	init {
-		FallingTreesClient
-	}
-}
+import net.minecraft.core.BlockPos
+import net.minecraft.world.level.Level
+
+class TreeTooBigException(blockPos: BlockPos, level: Level) :
+	TreeException(String.format("Tree is too big to be processed at position %s in dimension '%s'", blockPos.toShortString(), level.dimension().location()))
