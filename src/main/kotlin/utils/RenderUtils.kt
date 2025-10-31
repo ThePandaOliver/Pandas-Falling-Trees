@@ -16,7 +16,6 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.ItemBlockRenderTypes
 import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.client.renderer.block.ModelBlockRenderer
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.core.BlockPos
 import net.minecraft.world.item.ItemDisplayContext
@@ -37,16 +36,18 @@ object RenderUtils {
 		val red = (color shr 16 and 255).toFloat() / 255.0f
 		val green = (color shr 8 and 255).toFloat() / 255.0f
 		val blue = (color and 255).toFloat() / 255.0f
-		ModelBlockRenderer.renderModel(
-			poseStack.last(),
-			bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(blockState)),
-			bakedModel,
-			red,
-			green,
-			blue,
-			packedLight,
-			packedOverlay
-		)
+		blockRenderDispatcher.modelRenderer
+			.renderModel(
+				poseStack.last(),
+				bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(blockState)),
+				blockState,
+				bakedModel,
+				red,
+				green,
+				blue,
+				packedLight,
+				packedOverlay
+			)
 		blockRenderDispatcher.specialBlockModelRenderer.get()
 			.renderByBlock(blockState.block, ItemDisplayContext.NONE, poseStack, bufferSource, packedLight, packedOverlay)
 	}
