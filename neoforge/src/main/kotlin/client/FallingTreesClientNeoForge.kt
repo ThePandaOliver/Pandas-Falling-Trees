@@ -11,13 +11,9 @@
  */
 package dev.pandasystems.fallingtrees.neoforge.client
 
-import dev.pandasystems.fallingtrees.FallingTrees
 import dev.pandasystems.fallingtrees.client.FallingTreesClient
-import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.IEventBus
-import net.neoforged.fml.common.Mod
 
-@Mod(value = FallingTrees.modid, dist = [Dist.CLIENT])
 class FallingTreesClientNeoForge(modBus: IEventBus) {
 	init {
 		FallingTreesClient

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025-2025 Oliver Froberg (The Panda Oliver)
+ * Copyright (C) 2025 Oliver Froberg (The Panda Oliver)
  *
  * This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -12,6 +12,7 @@
 package dev.pandasystems.fallingtrees.neoforge
 
 import dev.pandasystems.fallingtrees.FallingTrees
+import dev.pandasystems.pandalib.utils.gameEnvironment
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.fml.common.Mod
 
@@ -19,5 +20,9 @@ import net.neoforged.fml.common.Mod
 class FallingTreesNeoForge(eventBus: IEventBus) {
 	init {
 		FallingTrees
+
+		if (gameEnvironment.isClient) {
+			dev.pandasystems.fallingtrees.neoforge.client.FallingTreesClientNeoForge(eventBus)
+		}
 	}
 }
