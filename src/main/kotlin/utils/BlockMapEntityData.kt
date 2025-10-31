@@ -17,7 +17,6 @@ import dev.pandasystems.pandalib.utils.codecs.StreamCodec
 import io.netty.buffer.ByteBuf
 import net.minecraft.core.BlockPos
 import net.minecraft.network.FriendlyByteBuf
-import net.minecraft.network.VarInt
 import net.minecraft.network.syncher.EntityDataSerializer
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
@@ -25,19 +24,19 @@ import net.minecraft.world.level.block.state.BlockState
 object BlockMapEntityData : EntityDataSerializer<MutableMap<BlockPos, BlockState>>  {
 	var BLOCK_MAP_CODEC = object : StreamCodec<ByteBuf, MutableMap<BlockPos, BlockState>> {
 		override fun decode(byteBuf: ByteBuf): MutableMap<BlockPos, BlockState> {
-			val size = VarInt.read(byteBuf)
+			val size = byteBuf.readInt()
 			val map: MutableMap<BlockPos, BlockState> = Maps.newHashMapWithExpectedSize(size)
 			for (i in 0..<size) {
-				map[BlockPos.of(byteBuf.readLong())] = Block.stateById(VarInt.read(byteBuf))
+				map[BlockPos.of(byteBuf.readLong())] = Block.stateById(byteBuf.readInt())
 			}
 			return map
 		}
 
 		override fun encode(byteBuf: ByteBuf, map: MutableMap<BlockPos, BlockState>) {
-			VarInt.write(byteBuf, map.size)
+			byteBuf.writeInt(map.size)
 			map.forEach { (blockPos: BlockPos, blockState: BlockState) ->
 				byteBuf.writeLong(blockPos.asLong())
-				VarInt.write(byteBuf, Block.getId(blockState))
+				byteBuf.writeInt(Block.getId(blockState))
 			}
 		}
 	}
