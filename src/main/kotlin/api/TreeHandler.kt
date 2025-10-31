@@ -61,8 +61,8 @@ object TreeHandler {
 
 		if (player.mainHandItem.isDamageableItem) player.mainHandItem.hurtAndBreak(
 			if (fallingTreesCommonConfig.get().disableExtraToolDamage) 1 else data.toolDamage,
-			player, EquipmentSlot.MAINHAND
-		)
+			player
+		) { player1 -> player1.broadcastBreakEvent(EquipmentSlot.MAINHAND) }
 
 		player.awardStat(Stats.ITEM_USED.get(player.mainHandItem.item))
 		data.awardedStats.forEach { awardedStat -> player.awardStat(awardedStat.stat, awardedStat.amount) }

@@ -34,6 +34,7 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import org.joml.Math
 
+
 class TreeEntity(entityType: EntityType<*>, level: Level) : Entity(entityType, level) {
 	lateinit var owner: Entity
 	lateinit var treeType: TreeType
@@ -61,12 +62,12 @@ class TreeEntity(entityType: EntityType<*>, level: Level) : Entity(entityType, l
 		)
 	}
 
-	override fun defineSynchedData(builder: SynchedEntityData.Builder) {
-		builder.define(BLOCKS, mutableMapOf())
-		builder.define(DROPS, mutableListOf())
-		builder.define(ORIGIN_POS, BlockPos(0, 0, 0))
-		builder.define(FALL_DIRECTION, Direction.NORTH)
-		builder.define(TREE_TYPE_LOCATION, "")
+	override fun defineSynchedData() {
+		getEntityData().define(BLOCKS, mutableMapOf())
+		getEntityData().define(DROPS, mutableListOf())
+		getEntityData().define(ORIGIN_POS, BlockPos(0, 0, 0))
+		getEntityData().define(FALL_DIRECTION, Direction.NORTH)
+		getEntityData().define(TREE_TYPE_LOCATION, "")
 	}
 
 	override fun onSyncedDataUpdated(dataAccessor: EntityDataAccessor<*>) {

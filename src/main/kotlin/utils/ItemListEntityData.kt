@@ -12,20 +12,31 @@
 
 package dev.pandasystems.fallingtrees.utils
 
-import net.minecraft.network.RegistryFriendlyByteBuf
-import net.minecraft.network.codec.StreamCodec
+import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.syncher.EntityDataSerializer
 import net.minecraft.world.item.ItemStack
 
 object ItemListEntityData {
 	@JvmField
 	val ITEM_LIST = object : EntityDataSerializer<MutableList<ItemStack>> {
-		override fun codec(): StreamCodec<in RegistryFriendlyByteBuf, MutableList<ItemStack>> {
-			return ItemStack.OPTIONAL_LIST_STREAM_CODEC
+		override fun write(buffer: FriendlyByteBuf, value: MutableList<ItemStack>) {
+			buffer.writeVarInt(value.size)
+			value.forEach {
+				buffer.writeItem(it)
+			}
+		}
+
+		override fun read(buffer: FriendlyByteBuf): MutableList<ItemStack>? {
+			val size = buffer.readVarInt()
+			val list = mutableListOf<ItemStack>()
+			repeat(size) {
+				list.add(buffer.readItem())
+			}
+			return list
 		}
 
 		override fun copy(value: MutableList<ItemStack>): MutableList<ItemStack> {
-			return value.stream().map { obj: ItemStack? -> obj!!.copy() }.toList()
+			return value.toMutableList()
 		}
 	}
 }
