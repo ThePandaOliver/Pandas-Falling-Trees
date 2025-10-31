@@ -11,7 +11,6 @@ import net.fabricmc.loom.task.RemapJarTask
 import org.jetbrains.gradle.ext.packagePrefix
 import org.jetbrains.gradle.ext.settings
 
-
 plugins {
 	kotlin("jvm") version "2.2.0"
 	id("architectury-plugin") version "3.4-SNAPSHOT"
@@ -297,6 +296,7 @@ allprojects {
 					.let { if (loomPlatform != null) "$it-$loomPlatform" else "$it-common" }
 				version = modVersion
 					.let { version -> System.getenv("BUILD_NUMBER")?.let { "$version-$it" } ?: version }
+					.let { version -> "$version+mc$mcVersion" }
 			}
 		}
 
