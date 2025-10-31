@@ -22,33 +22,34 @@ import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.block.state.BlockState
 import org.joml.Math
 import org.joml.Quaternionf
 import org.joml.Vector3f
 
-class TreeRenderer(context: EntityRendererProvider.Context) : EntityRenderer<TreeEntity, TreeRenderState>(context) {
+class TreeRenderer(context: EntityRendererProvider.Context) : EntityRenderer<TreeEntity>(context) {
 	val config get() = fallingTreesClientConfig.get()
 
-	override fun render(renderState: TreeRenderState, poseStack: PoseStack, buffer: MultiBufferSource, packedLight: Int) {
-		val tree = renderState.treeType ?: return
+	override fun render(entity: TreeEntity, entityYaw: Float, partialTick: Float, poseStack: PoseStack, buffer: MultiBufferSource, packedLight: Int) {
+		val tree = entity.treeType
 
 		poseStack.pushPose()
 
-		val blocks: MutableMap<BlockPos, BlockState> = renderState.blocks!!
+		val blocks: MutableMap<BlockPos, BlockState> = entity.blocks
 		val fallAnimLength: Float = this.config.animation.fallAnimLength
 
 		val bounceHeight: Float = this.config.animation.bounceAngleHeight
 		val bounceAnimLength: Float = this.config.animation.bounceAnimLength
 
-		val time = (renderState.lifeTime * (Math.PI / 2) / fallAnimLength).toFloat()
+		val time = (entity.getLifetime(partialTick) * (Math.PI / 2) / fallAnimLength).toFloat()
 
 		val fallAnim = bumpCos(time) * 90
 		val bounceAnim = bumpSin(((time - Math.PI / 2) / (bounceAnimLength / (fallAnimLength * 2))).toFloat()) * bounceHeight
 
 		val animation = (fallAnim + bounceAnim) - 90
 
-		val direction = renderState.direction!!.opposite
+		val direction = entity.direction.opposite;
 		val distance = getDistance(tree, blocks, direction.opposite)
 
 		val pivot = Vector3f(0f, 0f, .5f + distance)
@@ -60,7 +61,7 @@ class TreeRenderer(context: EntityRendererProvider.Context) : EntityRenderer<Tre
 		val quaternion = Quaternionf().identity().rotateX(vector.x).rotateZ(vector.z)
 		poseStack.mulPose(quaternion)
 
-		val level = renderState.level!!
+		val level = entity.level()
 
 		poseStack.translate(pivot.x, 0f, pivot.z)
 		poseStack.translate(-.5, 0.0, -.5)
@@ -69,25 +70,15 @@ class TreeRenderer(context: EntityRendererProvider.Context) : EntityRenderer<Tre
 			poseStack.pushPose()
 			poseStack.translate(blockPos.x.toFloat(), blockPos.y.toFloat(), blockPos.z.toFloat())
 
-			blockPos = blockPos.offset(renderState.originPos!!)
+			blockPos = blockPos.offset(entity.originPos)
 			RenderUtils.renderSingleBlock(poseStack, blockState, blockPos, level, buffer, packedLight)
 			poseStack.popPose()
 		}
 		poseStack.popPose()
 	}
 
-	override fun createRenderState(): TreeRenderState {
-		return TreeRenderState()
-	}
-
-	override fun extractRenderState(entity: TreeEntity, renderState: TreeRenderState, f: Float) {
-		renderState.treeType = entity.treeType
-		renderState.blocks = entity.blocks
-		renderState.lifeTime = entity.getLifetime(f).toDouble()
-		renderState.direction = entity.direction
-		renderState.originPos = entity.originPos
-		renderState.level = entity.level()
-		super.extractRenderState(entity, renderState, f)
+	override fun getTextureLocation(entity: TreeEntity): ResourceLocation? {
+		return null
 	}
 
 	private fun getDistance(tree: TreeType, blocks: MutableMap<BlockPos, BlockState>, direction: Direction): Float {
@@ -130,9 +121,5 @@ class TreeRenderer(context: EntityRendererProvider.Context) : EntityRenderer<Tre
 
 	private fun bumpSin(time: Float): Float {
 		return Math.max(0.0, Math.sin(Math.clamp(-Math.PI, Math.PI, time.toDouble()))).toFloat()
-	}
-
-	override fun affectedByCulling(entity: TreeEntity?): Boolean {
-		return false
 	}
 }

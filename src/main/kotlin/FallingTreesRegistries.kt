@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025-2025 Oliver Froberg (The Panda Oliver)
+ * Copyright (C) 2025 Oliver Froberg (The Panda Oliver)
  *
  * This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ fun getTree(blockState: BlockState): TreeType? {
 }
 
 fun getTree(resourceLocation: ResourceLocation): TreeType? {
-	return treeRegistry.getValue(resourceLocation)
+	return treeRegistry.get(resourceLocation)
 }
 
 fun getTreeLocation(tree: TreeType): ResourceLocation {
@@ -89,7 +89,7 @@ val treeEntity = entityRegistar.register("tree") {
 		.sized(0.5f, 0.5f)
 		.noSave()
 		.fireImmune()
-		.build(it)
+		.build(it.location().path)
 }
 
 

@@ -43,7 +43,7 @@ object RenderUtils {
 				val blue = (color and 0xFF).toFloat() / 255.0f
 				blockRenderDispatcher.modelRenderer.renderModel(
 					poseStack.last(),
-					bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(blockState)), blockState,
+					bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(blockState, false)), blockState,
 					bakedModel, red, green, blue, packedLight, OverlayTexture.NO_OVERLAY
 				)
 			}
