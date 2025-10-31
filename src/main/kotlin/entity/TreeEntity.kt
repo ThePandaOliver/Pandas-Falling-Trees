@@ -19,6 +19,7 @@ import dev.pandasystems.fallingtrees.utils.BlockMapEntityData
 import dev.pandasystems.fallingtrees.utils.ItemListEntityData
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
@@ -33,8 +34,6 @@ import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
-import net.minecraft.world.level.storage.ValueInput
-import net.minecraft.world.level.storage.ValueOutput
 import org.joml.Math
 
 class TreeEntity(entityType: EntityType<*>, level: Level) : Entity(entityType, level) {
@@ -79,10 +78,10 @@ class TreeEntity(entityType: EntityType<*>, level: Level) : Entity(entityType, l
 		}
 	}
 
-	override fun readAdditionalSaveData(valueInput: ValueInput) {
+	override fun readAdditionalSaveData(tag: CompoundTag) {
 	}
 
-	override fun addAdditionalSaveData(valueOutput: ValueOutput) {
+	override fun addAdditionalSaveData(tag: CompoundTag) {
 	}
 
 	override fun tick() {
