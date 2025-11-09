@@ -1,13 +1,15 @@
 {
-  "required": true,
-  "package": "dev.pandasystems.fallingtrees.fabric.mixin",
+	"required": true,
+	"package": "dev.pandasystems.fallingtrees.fabric.mixin",
 	"compatibilityLevel": "JAVA_21",
-  "minVersion": "0.8",
-  "client": [
-  ],
-  "mixins": [
-  ],
-  "injectors": {
-    "defaultRequire": 1
-  }
+	"minVersion": "0.8",
+	"client": [
+		"MultiPlayerGameModeMixin"
+	],
+	"mixins": [
+		"BlockBehaviourMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
 }
