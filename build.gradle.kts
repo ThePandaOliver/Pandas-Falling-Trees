@@ -179,6 +179,23 @@ allprojects {
 
 		compileOnly("dev.pandasystems:universal-serializer:0.1.0.16")
 
+		if (loomPlatform == "neoforge") {
+			"forgeRuntimeLibrary"(kotlin("stdlib"))
+			"forgeRuntimeLibrary"(kotlin("stdlib-jdk8"))
+			"forgeRuntimeLibrary"(kotlin("stdlib-jdk7"))
+			"forgeRuntimeLibrary"(kotlin("reflect", version = "2.2.0"))
+			"forgeRuntimeLibrary"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+			"forgeRuntimeLibrary"("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.10.2")
+			"forgeRuntimeLibrary"("org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1")
+			"forgeRuntimeLibrary"("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+			"forgeRuntimeLibrary"("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.8.1")
+			"forgeRuntimeLibrary"("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
+			"forgeRuntimeLibrary"("org.jetbrains.kotlinx:kotlinx-io-core:0.7.0")
+			"forgeRuntimeLibrary"("org.jetbrains.kotlinx:kotlinx-io-bytestring:0.7.0")
+
+			"forgeRuntimeLibrary"("dev.pandasystems:universal-serializer:0.1.0.16")
+		}
+
 		runtimeOnly("com.google.auto.service:auto-service-annotations:1.1.1")
 		compileOnly("com.google.auto.service:auto-service-annotations:1.1.1")
 		ksp("dev.zacsweers.autoservice:auto-service-ksp:1.2.0")
