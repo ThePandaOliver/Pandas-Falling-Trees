@@ -10,7 +10,7 @@
  *  along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.pandasystems.fallingtrees.mixin;
+package dev.pandasystems.fallingtrees.fabric.mixin;
 
 import dev.pandasystems.fallingtrees.api.TreeHandler;
 import dev.pandasystems.fallingtrees.config.FallingTreesConfigKt;
