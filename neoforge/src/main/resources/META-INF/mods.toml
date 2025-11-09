@@ -21,11 +21,16 @@ side = "BOTH"
 [[dependencies."${mod_id}"]]
 modId = "minecraft"
 type = "required"
-versionRange = "${neoforge_loader_version}"
+versionRange = "${minecraft_version}"
 ordering = "NONE"
 side = "BOTH"
 
-[[mixins]]
-config = "${mod_id}-common.mixins.json"
+[[dependencies."${mod_id}"]]
+modId = "pandalib"
+type = "required"
+versionRange = "*"
+ordering = "NONE"
+side = "BOTH"
+
 [[mixins]]
 config = "${mod_id}.mixins.json"
