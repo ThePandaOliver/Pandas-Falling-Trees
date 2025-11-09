@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "dev.pandasystems.fallingtrees.forge.mixin",
+	"compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "client": [
+		"MultiPlayerGameModeMixin"
+  ],
+  "mixins": [
+		"BlockBehaviourMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
