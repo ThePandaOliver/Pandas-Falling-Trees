@@ -1,11 +1,13 @@
 {
   "required": true,
-  "package": "me.pandamods.fallingtrees.neoforge.mixin",
+  "package": "dev.pandasystems.fallingtrees.neoforge.mixin",
 	"compatibilityLevel": "JAVA_21",
   "minVersion": "0.8",
   "client": [
+		"MultiPlayerGameModeMixin"
   ],
   "mixins": [
+		"BlockBehaviourMixin"
   ],
   "injectors": {
     "defaultRequire": 1
