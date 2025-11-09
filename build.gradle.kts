@@ -60,10 +60,9 @@ allprojects {
 	apply(plugin = "maven-publish")
 
 	version = modVersion
-		.let { version -> System.getenv("BUILD_NUMBER")?.let { "$version-$it" } ?: version }
-		.let { version -> "$version+mc$mcVersion" }
+		.let { version -> "$version+$mcVersion" }
 	group = modGroup
-	base { archivesName = modId.let { if (loomPlatform != null) "$it-$loomPlatform" else it } }
+	base { archivesName = "$modId-$loaderEnv" }
 
 	architectury {
 		when (loomPlatform) {
@@ -99,7 +98,6 @@ allprojects {
 				val path = project.projectDir.toPath().relativize(rootProject.file(".runs").toPath())
 
 				configureEach {
-					ideConfigFolder = loomPlatform
 					ideConfigGenerated(true)
 				}
 
@@ -118,8 +116,6 @@ allprojects {
 		} else runs.configureEach { ideConfigGenerated(false) }
 	}
 
-	val nonModImplementation: Configuration by configurations.creating
-
 	val common: Configuration by configurations.creating {
 		isCanBeResolved = true
 		isCanBeConsumed = false
@@ -133,9 +129,6 @@ allprojects {
 	}
 
 	configurations {
-		implementation.get().extendsFrom(nonModImplementation)
-		if (loomPlatform != null) getByName("include").extendsFrom(nonModImplementation)
-
 		when (loomPlatform) {
 			"fabric" -> {
 				getByName("developmentFabric").extendsFrom(common)
@@ -143,7 +136,6 @@ allprojects {
 
 			"neoforge" -> {
 				getByName("developmentNeoForge").extendsFrom(common)
-				getByName("forgeRuntimeLibrary").extendsFrom(nonModImplementation)
 			}
 		}
 	}
@@ -172,20 +164,20 @@ allprojects {
 	}
 
 	dependencies {
-		nonModImplementation(kotlin("stdlib"))
-		nonModImplementation(kotlin("stdlib-jdk8"))
-		nonModImplementation(kotlin("stdlib-jdk7"))
-		nonModImplementation(kotlin("reflect", version = "2.2.0"))
-		nonModImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-		nonModImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.10.2")
-		nonModImplementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1")
-		nonModImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
-		nonModImplementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.8.1")
-		nonModImplementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
-		nonModImplementation("org.jetbrains.kotlinx:kotlinx-io-core:0.7.0")
-		nonModImplementation("org.jetbrains.kotlinx:kotlinx-io-bytestring:0.7.0")
+		compileOnly(kotlin("stdlib"))
+		compileOnly(kotlin("stdlib-jdk8"))
+		compileOnly(kotlin("stdlib-jdk7"))
+		compileOnly(kotlin("reflect", version = "2.2.0"))
+		compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+		compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.10.2")
+		compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1")
+		compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+		compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.8.1")
+		compileOnly("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
+		compileOnly("org.jetbrains.kotlinx:kotlinx-io-core:0.7.0")
+		compileOnly("org.jetbrains.kotlinx:kotlinx-io-bytestring:0.7.0")
 
-		nonModImplementation("dev.pandasystems:universal-serializer:0.1.0.16")
+		compileOnly("dev.pandasystems:universal-serializer:0.1.0.16")
 
 		runtimeOnly("com.google.auto.service:auto-service-annotations:1.1.1")
 		compileOnly("com.google.auto.service:auto-service-annotations:1.1.1")
@@ -292,11 +284,10 @@ allprojects {
 		publications {
 			create<MavenPublication>("maven") {
 				from(components["java"])
-				artifactId = modId
-					.let { if (loomPlatform != null) "$it-$loomPlatform" else "$it-common" }
+				artifactId = "$modId-$loaderEnv"
 				version = modVersion
+					.let { version -> "$version+$mcVersion" }
 					.let { version -> System.getenv("BUILD_NUMBER")?.let { "$version-$it" } ?: version }
-					.let { version -> "$version+mc$mcVersion" }
 			}
 		}
 
