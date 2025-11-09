@@ -18,7 +18,7 @@ plugins {
 	id("com.gradleup.shadow") version "9.0.2" apply false
 	id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.10"
 
-	id("io.github.pacifistmc.forgix") version "2.0.0-SNAPSHOT.5.1-FORK.3"
+	id("io.github.pacifistmc.forgix") version "2.0.0-fork.9"
 	id("me.modmuss50.mod-publish-plugin") version "0.8.4"
 	id("com.google.devtools.ksp") version "2.2.0-2.0.2"
 	`maven-publish`
@@ -179,23 +179,6 @@ allprojects {
 
 		compileOnly("dev.pandasystems:universal-serializer:0.1.0.16")
 
-		if (loomPlatform == "neoforge") {
-			"forgeRuntimeLibrary"(kotlin("stdlib"))
-			"forgeRuntimeLibrary"(kotlin("stdlib-jdk8"))
-			"forgeRuntimeLibrary"(kotlin("stdlib-jdk7"))
-			"forgeRuntimeLibrary"(kotlin("reflect", version = "2.2.0"))
-			"forgeRuntimeLibrary"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-			"forgeRuntimeLibrary"("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.10.2")
-			"forgeRuntimeLibrary"("org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1")
-			"forgeRuntimeLibrary"("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
-			"forgeRuntimeLibrary"("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.8.1")
-			"forgeRuntimeLibrary"("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
-			"forgeRuntimeLibrary"("org.jetbrains.kotlinx:kotlinx-io-core:0.7.0")
-			"forgeRuntimeLibrary"("org.jetbrains.kotlinx:kotlinx-io-bytestring:0.7.0")
-
-			"forgeRuntimeLibrary"("dev.pandasystems:universal-serializer:0.1.0.16")
-		}
-
 		runtimeOnly("com.google.auto.service:auto-service-annotations:1.1.1")
 		compileOnly("com.google.auto.service:auto-service-annotations:1.1.1")
 		ksp("dev.zacsweers.autoservice:auto-service-ksp:1.2.0")
@@ -230,7 +213,11 @@ allprojects {
 			}
 		}
 
-		modImplementation("dev.pandasystems:pandalib-$loaderEnv:$pandalibVersion")
+		if (loomPlatform == "neoforge") {
+			implementation("dev.pandasystems:pandalib-$loaderEnv:$pandalibVersion") { isTransitive = false }
+		} else {
+			modImplementation("dev.pandasystems:pandalib-$loaderEnv:$pandalibVersion")
+		}
 	}
 
 	java {
