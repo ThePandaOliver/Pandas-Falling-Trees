@@ -13,19 +13,24 @@ logoFile = "assets/${mod_id}/icon.png"
 
 [[dependencies."${mod_id}"]]
 modId = "neoforge"
-type = "required"
+mandatory = true
 versionRange = "*"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies."${mod_id}"]]
 modId = "minecraft"
-type = "required"
+mandatory = true
 versionRange = "${minecraft_version}"
 ordering = "NONE"
 side = "BOTH"
 
-[[mixins]]
-config = "${mod_id}-common.mixins.json"
+[[dependencies."${mod_id}"]]
+modId = "pandalib"
+mandatory = true
+versionRange = "*"
+ordering = "NONE"
+side = "BOTH"
+
 [[mixins]]
 config = "${mod_id}.mixins.json"
