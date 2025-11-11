@@ -220,7 +220,7 @@ allprojects {
 			}
 		}
 
-		modImplementation("dev.pandasystems:pandalib-$loaderEnv:$pandalibVersion:slim")
+		modImplementation("dev.pandasystems:pandalib-$loaderEnv:$pandalibVersion:slim") { isTransitive = false }
 	}
 
 	java {
