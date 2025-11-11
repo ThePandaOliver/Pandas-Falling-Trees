@@ -141,6 +141,7 @@ allprojects {
 	}
 
 	repositories {
+		mavenLocal()
 		mavenCentral()
 		maven("https://maven.architectury.dev/")
 		maven("https://maven.parchmentmc.org/")
@@ -164,20 +165,27 @@ allprojects {
 	}
 
 	dependencies {
-		compileOnly(kotlin("stdlib"))
-		compileOnly(kotlin("stdlib-jdk8"))
-		compileOnly(kotlin("stdlib-jdk7"))
-		compileOnly(kotlin("reflect", version = "2.2.0"))
-		compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-		compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.10.2")
-		compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1")
-		compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
-		compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.8.1")
-		compileOnly("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
-		compileOnly("org.jetbrains.kotlinx:kotlinx-io-core:0.7.0")
-		compileOnly("org.jetbrains.kotlinx:kotlinx-io-bytestring:0.7.0")
+		fun addNonMod(dependencyNotation: Any) {
+			implementation(dependencyNotation)
+			if (loomPlatform == "neoforge") {
+				"forgeRuntimeLibrary"(dependencyNotation)
+			}
+		}
 
-		compileOnly("dev.pandasystems:universal-serializer:0.1.0.16")
+		addNonMod(kotlin("stdlib"))
+		addNonMod(kotlin("stdlib-jdk8"))
+		addNonMod(kotlin("stdlib-jdk7"))
+		addNonMod(kotlin("reflect", version = "2.2.0"))
+		addNonMod("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+		addNonMod("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.10.2")
+		addNonMod("org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1")
+		addNonMod("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+		addNonMod("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.8.1")
+		addNonMod("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
+		addNonMod("org.jetbrains.kotlinx:kotlinx-io-core:0.7.0")
+		addNonMod("org.jetbrains.kotlinx:kotlinx-io-bytestring:0.7.0")
+
+		addNonMod("dev.pandasystems:universal-serializer:0.1.0.16")
 
 		if (loomPlatform == "neoforge") {
 			"forgeRuntimeLibrary"(kotlin("stdlib"))
@@ -230,7 +238,7 @@ allprojects {
 			}
 		}
 
-		modImplementation("dev.pandasystems:pandalib-$loaderEnv:$pandalibVersion")
+		modImplementation("dev.pandasystems:pandalib-$loaderEnv:$pandalibVersion:slim")
 	}
 
 	java {
