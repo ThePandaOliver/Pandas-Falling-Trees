@@ -237,6 +237,11 @@ allprojects {
 
 				common(project(":", configuration = "namedElements")) { isTransitive = false }
 				shadowBundle(project(":", configuration = "transformProductionForge"))
+
+				compileOnly("io.github.llamalad7:mixinextras-common:0.5.0")
+				annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0")
+				implementation("io.github.llamalad7:mixinextras-forge:0.5.0")
+				include("io.github.llamalad7:mixinextras-forge:0.5.0")
 			}
 
 			else -> {
