@@ -13,14 +13,24 @@ package dev.pandasystems.fallingtrees.forge
 
 import dev.pandasystems.fallingtrees.FallingTrees
 import dev.pandasystems.fallingtrees.forge.client.FallingTreesClientNeoForge
+import dev.pandasystems.fallingtrees.utils.BlockMapEntityData
+import dev.pandasystems.fallingtrees.utils.ItemListEntityData
 import dev.pandasystems.pandalib.utils.gameEnvironment
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext
+import net.minecraftforge.registries.DeferredRegister
+import net.minecraftforge.registries.ForgeRegistries
 
 @Mod(FallingTrees.modid)
 class FallingTreesForge {
 	init {
 		val eventBus = FMLJavaModLoadingContext.get().modEventBus
+
+		val entityDataRegistar = DeferredRegister.create(ForgeRegistries.ENTITY_DATA_SERIALIZERS, FallingTrees.modid)
+		entityDataRegistar.register("block_map") { BlockMapEntityData.BLOCK_MAP }
+		entityDataRegistar.register("item_list") { ItemListEntityData.ITEM_LIST }
+		entityDataRegistar.register(eventBus)
+
 		FallingTrees
 
 		if (gameEnvironment.isClient) {

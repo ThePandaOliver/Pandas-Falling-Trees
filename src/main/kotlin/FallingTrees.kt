@@ -24,7 +24,7 @@ object FallingTrees {
 		treeRegister.register()
 		soundRegister.register()
 		entityRegistar.register()
-		entityDataRegistar.register()
+		entityDataRegistar?.register()
 		EventHandler.register()
 	}
 
