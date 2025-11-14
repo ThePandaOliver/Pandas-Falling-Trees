@@ -21,6 +21,5 @@ pluginManagement.repositories {
 }
 
 include("fabric")
-include("forge")
 
 rootProject.name = "fallingtrees"
