@@ -298,16 +298,13 @@ allprojects {
 		}
 
 		repositories {
-			maven("https://repo.pandasystems.dev/repository/maven-snapshots/") {
-				name = "Snapshot"
-				credentials {
-					username = System.getenv("NEXUS_USERNAME")
-					password = System.getenv("NEXUS_PASSWORD")
-				}
-			}
-
-			maven("https://repo.pandasystems.dev/repository/maven-releases/") {
-				name = "Release"
+			maven(
+				if (version.toString().endsWith("-SNAPSHOT"))
+					"https://repo.pandasystems.dev/repository/maven-snapshots/"
+				else
+					"https://repo.pandasystems.dev/repository/maven-releases/"
+			) {
+				name = "Nexus"
 				credentials {
 					username = System.getenv("NEXUS_USERNAME")
 					password = System.getenv("NEXUS_PASSWORD")
