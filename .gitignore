@@ -1,0 +1,24 @@
+.gradle/
+build/
+gradle/wrapper/gradle-wrapper.jar
+
+build.properties
+.architectury-transformer
+
+### Minecraft ###
+.runs/
+
+### IntelliJ IDEA ###
+.idea/
+*.iml
+*.ipr
+*.iws
+
+### Java ###
+hs_err_*.log
+replay_*.log
+*.hprof
+*.jfr
+
+### Java ###
+.kotlin
