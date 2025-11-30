@@ -293,6 +293,7 @@ allprojects {
 		publications {
 			create<MavenPublication>("maven") {
 				from(components["java"])
+				artifactId = base.archivesName.get()
 			}
 		}
 
