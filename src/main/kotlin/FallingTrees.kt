@@ -23,8 +23,8 @@ object FallingTrees {
 
 		treeRegister.register()
 		soundRegister.register()
-		entityRegistar.register()
-		entityDataRegistar.register()
+		entityRegister.register()
+		entityDataRegister.register()
 		EventHandler.register()
 	}
 
