@@ -140,7 +140,6 @@ allprojects {
 	}
 
 	repositories {
-		mavenLocal()
 		mavenCentral()
 		maven("https://maven.architectury.dev/")
 		maven("https://maven.parchmentmc.org/")
@@ -239,6 +238,8 @@ allprojects {
 				"mod_license" to modLicense,
 				"mod_authors_fabric" to modAuthors.split(",").joinToString(", ") { "\"$it\"" },
 				"mod_authors_forge" to modAuthors,
+
+				"pandalib_version" to pandalibVersion
 			)
 
 			fabricLoaderVersion?.let { props["fabric_loader_version"] = it }
