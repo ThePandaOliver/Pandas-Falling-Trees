@@ -144,15 +144,9 @@ allprojects {
 		maven("https://maven.architectury.dev/")
 		maven("https://maven.parchmentmc.org/")
 		maven("https://maven.fabricmc.net/")
-		maven("https://maven.minecraftforge.net/")
 		maven("https://maven.neoforged.net/releases/")
 
-		maven("https://repo.pandasystems.dev/repository/maven-snapshots/") {
-			name = "PandasRepository"
-			mavenContent {
-				snapshotsOnly()
-			}
-		}
+		maven("https://repo.pandasystems.dev/repository/maven-public/")
 	}
 
 	dependencies {
