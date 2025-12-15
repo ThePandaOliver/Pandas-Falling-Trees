@@ -172,7 +172,7 @@ class GenericTree : TreeType {
 
 			val currentState = level.getBlockState(current)
 			val optionalDistanceAt = LeavesBlock.getOptionalDistanceAt(currentState)
-			if (node.distance != optionalDistanceAt.orElse(0)) {
+			if (optionalDistanceAt.isPresent() && node.distance != optionalDistanceAt.getAsInt()) {
 				continue
 			}
 			if (visited.contains(current) || node.distance > this.config.algorithm.maxLeavesRadius) {
