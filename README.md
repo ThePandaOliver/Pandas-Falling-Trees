@@ -1,4 +1,4 @@
-![banner](https://github.com/ThePandaOliver/Readme-Assets/blob/main/fallingtrees/banner.png?raw=true)
+![Panda's Falling Tree's Banner](assets/banner.png)
 
 > [![Discord](https://img.shields.io/discord/1021703635178115122?style=for-the-badge&logo=discord&label=Discord&labelColor=black&color=lightblue)](https://discord.gg/wjPt4vEfXb)
 > [![Modrinth](https://img.shields.io/modrinth/dt/i2kUe4lq?style=for-the-badge&logo=modrinth&label=Modrinth&labelColor=black&color=green)](https://modrinth.com/mod/pandas-falling-trees)
@@ -17,31 +17,16 @@ The mod should support other mods if log and leaves blocks are a part of the log
 
 ## Showcase:
 
-![](https://github.com/ThePandaOliver/Readme-Assets/blob/main/fallingtrees/showcase_falling_tree_large.gif?raw=true)
-
-## FAQ:
-
-- [Q] Is the mod safe to use on worlds originally made without the mod.
-  - [A] Yes the mod is 100% safe to use on worlds originally made without the mod.
-- [Q] Will the mod work for more than 1 block thick trees.
-  - [A] Yes the mod works for trees that are more than 1 block thick.
-
-If you have any of your own questions, please leave them [here](https://github.com/PandaDap2006/Pandas-Falling-Trees/discussions/categories/q-a).
-
-You can also join my [Discord](https://discord.gg/wjPt4vEfXb)
+![Tree falling showcase](assets/showcase_falling_tree_large.gif)
 
 ---
 
 ## Advertisement:
 
-> ### Thanks to **Jetbrains** for supporting this project with their open source program.
-> [<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg" width=300px>](https://jb.gg/OpenSourceSupport)
-
 > ### Thanks to **Kinetic Hosting** for supporting this project
-> [![Partner Banner](https://github.com/ThePandaOliver/Readme-Assets/blob/main/Support/Kinetic%20affiliate%20banner%20small.png?raw=true)](https://t.ly/B1Kui)
+> [![Partner Banner](https://github.com/ThePandaOliver/ThePandaOliver/blob/main/assets_for_readme/Support/kinetic_hosting_banner.png?raw=true)](https://billing.kinetichosting.com/aff.php?aff=476)
 >
-> Every purchased server via my [affiliate link](https://t.ly/B1Kui) will help support me and my work.
-> On top of that, you can use code **PANDA** to get 15% off your first month.
+> Every purchased server via my [affiliate link](https://billing.kinetichosting.com/aff.php?aff=476) will help support me and my work.
 
 ## License
 
