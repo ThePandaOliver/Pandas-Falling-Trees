@@ -7,6 +7,7 @@
 @file:Suppress("UnstableApiUsage")
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
 import net.fabricmc.loom.task.RemapJarTask
 import org.jetbrains.gradle.ext.packagePrefix
 import org.jetbrains.gradle.ext.settings
@@ -95,10 +96,6 @@ allprojects {
 		if (loomPlatform != null) {
 			runs {
 				val path = project.projectDir.toPath().relativize(rootProject.file(".runs").toPath())
-
-				configureEach {
-					ideConfigGenerated(true)
-				}
 
 				named("client") {
 					client()
@@ -257,7 +254,7 @@ allprojects {
 				injectAccessWidener.set(true)
 				inputFile = getByName<ShadowJar>("shadowJar").archiveFile
 				if (loomPlatform == "neoforge")
-					atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
+			 		atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
 			}
 
 			val copyBuildModFile by registering(Copy::class) {
@@ -267,6 +264,15 @@ allprojects {
 
 			build {
 				finalizedBy(copyBuildModFile)
+			}
+
+			val copyLicense by register("copyLicense",Copy::class) {
+				from(rootDir.resolve("LICENSE.md"))
+				destinationDir = project.layout.buildDirectory.file("resources/main").get().asFile
+			}
+
+			processResources {
+				dependsOn(copyLicense)
 			}
 		}
 	}

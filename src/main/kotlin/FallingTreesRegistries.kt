@@ -95,5 +95,5 @@ val treeEntity = entityRegister.register("tree") {
 
 // Entity Data
 
-val blockMapSerializer = entityDataRegister.register("block_map") { BlockMapEntityData.BLOCK_MAP }
-val itemListSerializer = entityDataRegister.register("item_list") { ItemListEntityData.ITEM_LIST }
+val blockMapSerializer = entityDataRegister.register("block_map") { BlockMapEntityData }
+val itemListSerializer = entityDataRegister.register("item_list") { ItemListEntityData }
