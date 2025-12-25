@@ -42,10 +42,10 @@ val treeRegistry = DeferredRegister.registerNewRegistry(MappedRegistry(treeRegis
 
 // Deferred registers
 
-val treeRegister = DeferredRegister.create(FallingTrees.modid, treeRegistryKey)
-val soundRegister = DeferredRegister.create(FallingTrees.modid, Registries.SOUND_EVENT)
-val entityRegister = DeferredRegister.create(FallingTrees.modid, Registries.ENTITY_TYPE)
-val entityDataRegister = DeferredRegister.create(FallingTrees.modid, ENTITY_DATA_SERIALIZERS_REGISTRY)
+val treeRegister = DeferredRegister.create(FallingTrees.MODID, treeRegistryKey)
+val soundRegister = DeferredRegister.create(FallingTrees.MODID, Registries.SOUND_EVENT)
+val entityRegister = DeferredRegister.create(FallingTrees.MODID, Registries.ENTITY_TYPE)
+val entityDataRegister = DeferredRegister.create(FallingTrees.MODID, ENTITY_DATA_SERIALIZERS_REGISTRY)
 
 
 // Trees

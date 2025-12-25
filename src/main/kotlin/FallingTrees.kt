@@ -16,7 +16,7 @@ import dev.pandasystems.fallingtrees.config.initConfigs
 import net.minecraft.resources.ResourceLocation
 
 object FallingTrees {
-	const val modid: String = "fallingtrees"
+	const val MODID: String = "fallingtrees"
 
 	init {
 		initConfigs()
@@ -29,6 +29,6 @@ object FallingTrees {
 	}
 
 	fun resourceLocation(path: String): ResourceLocation {
-		return ResourceLocation.fromNamespaceAndPath(modid, path)
+		return ResourceLocation.fromNamespaceAndPath(MODID, path)
 	}
 }
