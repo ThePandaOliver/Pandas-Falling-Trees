@@ -108,8 +108,10 @@ allprojects {
 					configName = "Server"
 					runDir("$path/server")
 				}
+
+				configureEach { ideConfigGenerated(false) }
 			}
-		} else runs.configureEach { ideConfigGenerated(false) }
+		}
 	}
 
 	val common: Configuration by configurations.creating {
