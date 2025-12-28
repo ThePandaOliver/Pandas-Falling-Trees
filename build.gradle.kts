@@ -7,7 +7,6 @@
 @file:Suppress("UnstableApiUsage")
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
 import net.fabricmc.loom.task.RemapJarTask
 import org.jetbrains.gradle.ext.packagePrefix
 import org.jetbrains.gradle.ext.settings
@@ -102,16 +101,16 @@ allprojects {
 					configName = "Client"
 					runDir("$path/client")
 					programArg("--username=Dev")
+					ideConfigGenerated(true)
 				}
 				named("server") {
 					server()
 					configName = "Server"
 					runDir("$path/server")
+					ideConfigGenerated(true)
 				}
-
-				configureEach { ideConfigGenerated(false) }
 			}
-		}
+		} else runs.configureEach { ideConfigGenerated(false) }
 	}
 
 	val common: Configuration by configurations.creating {

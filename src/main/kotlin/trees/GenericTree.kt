@@ -25,7 +25,6 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundSource
-import net.minecraft.stats.Stat
 import net.minecraft.stats.Stats
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
@@ -116,7 +115,7 @@ class GenericTree : TreeType {
 				val multiplyAmount = fallingTreesCommonConfig.get().dynamicMiningSpeed.maxSpeedMultiplication.coerceAtMost((logs.size.toFloat() - 1f))
 				originalMiningSpeed / (multiplyAmount * speedMultiplication + 1f)
 			}
-			.addAwardedStats(logs.stream().map<Stat<Block>> { logPos: BlockPos? ->
+			.addAwardedStats(logs.stream().map { logPos: BlockPos ->
 				val blockState = level.getBlockState(logPos)
 				Stats.BLOCK_MINED.get(blockState.block)
 			}.toList())
@@ -172,9 +171,7 @@ class GenericTree : TreeType {
 
 			val currentState = level.getBlockState(current)
 			val optionalDistanceAt = LeavesBlock.getOptionalDistanceAt(currentState)
-			if (optionalDistanceAt.isPresent() && node.distance != optionalDistanceAt.getAsInt()) {
-				continue
-			}
+			if (optionalDistanceAt.isPresent && node.distance != optionalDistanceAt.getAsInt()) continue
 			if (visited.contains(current) || node.distance > this.config.algorithm.maxLeavesRadius) {
 				continue
 			}
