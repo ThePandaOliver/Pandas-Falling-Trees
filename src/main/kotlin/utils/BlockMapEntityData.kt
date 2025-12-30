@@ -22,28 +22,23 @@ import net.minecraft.network.syncher.EntityDataSerializer
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 
-object BlockMapEntityData {
-	var BLOCK_MAP_CODEC = object : StreamCodec<ByteBuf, MutableMap<BlockPos, BlockState>> {
-		override fun decode(byteBuf: ByteBuf): MutableMap<BlockPos, BlockState> {
-			val size = VarInt.read(byteBuf)
-			val map: MutableMap<BlockPos, BlockState> = Maps.newHashMapWithExpectedSize(size)
-			for (i in 0..<size) {
-				map[FriendlyByteBuf.readBlockPos(byteBuf)] = Block.stateById(VarInt.read(byteBuf))
-			}
-			return map
+var BLOCK_MAP_CODEC = object : StreamCodec<ByteBuf, MutableMap<BlockPos, BlockState>> {
+	override fun decode(byteBuf: ByteBuf): MutableMap<BlockPos, BlockState> {
+		val size = VarInt.read(byteBuf)
+		val map: MutableMap<BlockPos, BlockState> = Maps.newHashMapWithExpectedSize(size)
+		for (i in 0..<size) {
+			map[FriendlyByteBuf.readBlockPos(byteBuf)] = Block.stateById(VarInt.read(byteBuf))
 		}
-
-		override fun encode(byteBuf: ByteBuf, map: MutableMap<BlockPos, BlockState>) {
-			VarInt.write(byteBuf, map.size)
-			map.forEach { (blockPos: BlockPos, blockState: BlockState) ->
-				FriendlyByteBuf.writeBlockPos(byteBuf, blockPos)
-				VarInt.write(byteBuf, Block.getId(blockState))
-			}
-		}
+		return map
 	}
 
-	@JvmField
-	val BLOCK_MAP: EntityDataSerializer<MutableMap<BlockPos, BlockState>> = EntityDataSerializer.forValueType(
-		BLOCK_MAP_CODEC
-	)
+	override fun encode(byteBuf: ByteBuf, map: MutableMap<BlockPos, BlockState>) {
+		VarInt.write(byteBuf, map.size)
+		map.forEach { (blockPos: BlockPos, blockState: BlockState) ->
+			FriendlyByteBuf.writeBlockPos(byteBuf, blockPos)
+			VarInt.write(byteBuf, Block.getId(blockState))
+		}
+	}
 }
+
+object BlockMapEntityData : EntityDataSerializer<MutableMap<BlockPos, BlockState>> by EntityDataSerializer.forValueType(BLOCK_MAP_CODEC)

@@ -28,7 +28,7 @@ side = "BOTH"
 [[dependencies."${mod_id}"]]
 modId = "pandalib"
 type = "required"
-versionRange = "*"
+versionRange = "[${pandalib_version},)"
 ordering = "NONE"
 side = "BOTH"
 
