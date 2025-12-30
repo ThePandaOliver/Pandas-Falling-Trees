@@ -131,9 +131,9 @@ class TreeEntity(entityType: EntityType<*>, level: Level) : Entity(entityType, l
 
 	companion object {
 		val BLOCKS: EntityDataAccessor<MutableMap<BlockPos, BlockState>> =
-			SynchedEntityData.defineId(TreeEntity::class.java, BlockMapEntityData.BLOCK_MAP)
+			SynchedEntityData.defineId(TreeEntity::class.java, BlockMapEntityData)
 		val DROPS: EntityDataAccessor<MutableList<ItemStack>> =
-			SynchedEntityData.defineId(TreeEntity::class.java, ItemListEntityData.ITEM_LIST)
+			SynchedEntityData.defineId(TreeEntity::class.java, ItemListEntityData)
 		val ORIGIN_POS: EntityDataAccessor<BlockPos> =
 			SynchedEntityData.defineId(TreeEntity::class.java, EntityDataSerializers.BLOCK_POS)
 		val FALL_DIRECTION: EntityDataAccessor<Direction> =

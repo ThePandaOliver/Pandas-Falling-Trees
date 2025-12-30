@@ -22,14 +22,18 @@ import dev.pandasystems.fallingtrees.exceptions.TreeException
 import dev.pandasystems.fallingtrees.getTree
 import dev.pandasystems.fallingtrees.treeEntity
 import dev.pandasystems.pandalib.config.getSynced
+import dev.pandasystems.pandalib.event.server.serverBlockBreakPreEvent
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.stats.Stats
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.BlockState
 import org.slf4j.Logger
 import java.awt.Color
 import java.util.*
@@ -41,9 +45,23 @@ object TreeHandler {
 
 	val TREE_SPEED_CACHES: MutableMap<UUID, TreeSpeed> = ConcurrentHashMap<UUID, TreeSpeed>()
 
+	fun init() {
+		serverBlockBreakPreEvent += ::onBlockBreak
+	}
+
+	private fun onBlockBreak(level: Level, pos: BlockPos, state: BlockState, player: ServerPlayer): Boolean {
+		if (!canPlayerChopTree(player))
+			return true
+
+		if (destroyTree(level, pos, player))
+			return false
+
+		return true
+	}
+	
 	@JvmStatic
 	fun destroyTree(level: Level, blockPos: BlockPos, player: Player): Boolean {
-		if (level.isClientSide()) return false
+		if (level.isClientSide) return false
 		val blockState = level.getBlockState(blockPos)
 
 		val tree = getTree(blockState) ?: return false

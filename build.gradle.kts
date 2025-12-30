@@ -18,7 +18,7 @@ plugins {
 	id("com.gradleup.shadow") version "9.0.2" apply false
 	id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.10"
 
-	id("io.github.pacifistmc.forgix") version "2.0.0-fork.9"
+	id("io.github.pacifistmc.forgix") version "2.0.0-SNAPSHOT"
 	id("me.modmuss50.mod-publish-plugin") version "0.8.4"
 	id("com.google.devtools.ksp") version "2.2.0-2.0.2"
 	`maven-publish`
@@ -60,9 +60,8 @@ allprojects {
 	apply(plugin = "maven-publish")
 
 	version = modVersion
-		.let { version -> "$version+$mcVersion" }
 	group = modGroup
-	base { archivesName = "$modId-$loaderEnv" }
+	base { archivesName = "$modId-$loaderEnv-$mcVersion" }
 
 	architectury {
 		when (loomPlatform) {
@@ -97,20 +96,18 @@ allprojects {
 			runs {
 				val path = project.projectDir.toPath().relativize(rootProject.file(".runs").toPath())
 
-				configureEach {
-					ideConfigGenerated(true)
-				}
-
 				named("client") {
 					client()
 					configName = "Client"
 					runDir("$path/client")
 					programArg("--username=Dev")
+					ideConfigGenerated(true)
 				}
 				named("server") {
 					server()
 					configName = "Server"
 					runDir("$path/server")
+					ideConfigGenerated(true)
 				}
 			}
 		} else runs.configureEach { ideConfigGenerated(false) }
@@ -146,22 +143,9 @@ allprojects {
 		maven("https://maven.architectury.dev/")
 		maven("https://maven.parchmentmc.org/")
 		maven("https://maven.fabricmc.net/")
-		maven("https://maven.minecraftforge.net/")
 		maven("https://maven.neoforged.net/releases/")
 
-		maven("https://maven.pkg.github.com/ThePandaOliver/universal-serializer") {
-			credentials {
-				username = System.getenv("GITHUB_USER")
-				password = System.getenv("GITHUB_API_TOKEN")
-			}
-		}
-
-		maven("https://maven.pkg.github.com/ThePandaOliver/PandaLib") {
-			credentials {
-				username = System.getenv("GITHUB_USER")
-				password = System.getenv("GITHUB_API_TOKEN")
-			}
-		}
+		maven("https://repo.pandasystems.dev/repository/maven-public/")
 	}
 
 	dependencies {
@@ -185,7 +169,7 @@ allprojects {
 		addNonMod("org.jetbrains.kotlinx:kotlinx-io-core:0.7.0")
 		addNonMod("org.jetbrains.kotlinx:kotlinx-io-bytestring:0.7.0")
 
-		addNonMod("dev.pandasystems:universal-serializer:0.1.0.16")
+		addNonMod("dev.pandasystems:universal-serializer:0.1.0-SNAPSHOT")
 
 		runtimeOnly("com.google.auto.service:auto-service-annotations:1.1.1")
 		compileOnly("com.google.auto.service:auto-service-annotations:1.1.1")
@@ -221,7 +205,7 @@ allprojects {
 			}
 		}
 
-		modImplementation("dev.pandasystems:pandalib-$loaderEnv:$pandalibVersion:slim") { isTransitive = false }
+		modImplementation("dev.pandasystems:pandalib-$loaderEnv-$mcVersion:$pandalibVersion:slim") { isTransitive = false }
 	}
 
 	java {
@@ -247,6 +231,8 @@ allprojects {
 				"mod_license" to modLicense,
 				"mod_authors_fabric" to modAuthors.split(",").joinToString(", ") { "\"$it\"" },
 				"mod_authors_forge" to modAuthors,
+
+				"pandalib_version" to pandalibVersion
 			)
 
 			fabricLoaderVersion?.let { props["fabric_loader_version"] = it }
@@ -270,7 +256,25 @@ allprojects {
 				injectAccessWidener.set(true)
 				inputFile = getByName<ShadowJar>("shadowJar").archiveFile
 				if (loomPlatform == "neoforge")
-					atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
+			 		atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
+			}
+
+			val copyBuildModFile by registering(Copy::class) {
+				from("build/libs/pandalib-$loomPlatform-$version.jar")
+				into(rootDir.resolve("build/mod-build"))
+			}
+
+			build {
+				finalizedBy(copyBuildModFile)
+			}
+
+			val copyLicense by register("copyLicense",Copy::class) {
+				from(rootDir.resolve("LICENSE.md"))
+				destinationDir = project.layout.buildDirectory.file("resources/main").get().asFile
+			}
+
+			processResources {
+				dependsOn(copyLicense)
 			}
 		}
 	}
@@ -292,20 +296,21 @@ allprojects {
 		publications {
 			create<MavenPublication>("maven") {
 				from(components["java"])
-				artifactId = "$modId-$loaderEnv"
-				version = modVersion
-					.let { version -> "$version+$mcVersion" }
-					.let { version -> System.getenv("BUILD_NUMBER")?.let { "$version-$it" } ?: version }
+				artifactId = base.archivesName.get()
 			}
 		}
 
 		repositories {
-			maven {
-				name = "Github"
-				url = uri("https://maven.pkg.github.com/ThePandaOliver/Pandas-Falling-Trees")
+			maven(
+				if (version.toString().endsWith("-SNAPSHOT"))
+					"https://repo.pandasystems.dev/repository/maven-snapshots/"
+				else
+					"https://repo.pandasystems.dev/repository/maven-releases/"
+			) {
+				name = "Nexus"
 				credentials {
-					username = System.getenv("GITHUB_USER")
-					password = System.getenv("GITHUB_API_TOKEN")
+					username = System.getenv("NEXUS_USERNAME")
+					password = System.getenv("NEXUS_PASSWORD")
 				}
 			}
 		}
