@@ -11,21 +11,21 @@
  */
 package dev.pandasystems.fallingtrees
 
+import dev.pandasystems.fallingtrees.api.TreeHandler
 import dev.pandasystems.fallingtrees.config.initConfigs
-import dev.pandasystems.fallingtrees.event.EventHandler
 import net.minecraft.resources.ResourceLocation
 
 object FallingTrees {
-	const val modid: String = "fallingtrees"
+	const val MODID: String = "fallingtrees"
 
 	init {
 		initConfigs()
 
 		treeRegister.register()
 		soundRegister.register()
-		entityRegistar.register()
-		entityDataRegistar?.register()
-		EventHandler.register()
+		entityRegister.register()
+		entityDataRegister.register()
+		TreeHandler.init()
 	}
 
 	fun resourceLocation(path: String): ResourceLocation {
