@@ -29,6 +29,6 @@ object FallingTrees {
 	}
 
 	fun resourceLocation(path: String): ResourceLocation {
-		return ResourceLocation(modid, path)
+		return ResourceLocation(MODID, path)
 	}
 }
