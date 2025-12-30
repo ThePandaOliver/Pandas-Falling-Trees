@@ -16,27 +16,24 @@ import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.syncher.EntityDataSerializer
 import net.minecraft.world.item.ItemStack
 
-object ItemListEntityData {
-	@JvmField
-	val ITEM_LIST = object : EntityDataSerializer<MutableList<ItemStack>> {
-		override fun write(buffer: FriendlyByteBuf, value: MutableList<ItemStack>) {
-			buffer.writeVarInt(value.size)
-			value.forEach {
-				buffer.writeItem(it)
-			}
+object ItemListEntityData : EntityDataSerializer<MutableList<ItemStack>> {
+	override fun write(buffer: FriendlyByteBuf, value: MutableList<ItemStack>) {
+		buffer.writeVarInt(value.size)
+		value.forEach {
+			buffer.writeItem(it)
 		}
+	}
 
-		override fun read(buffer: FriendlyByteBuf): MutableList<ItemStack>? {
-			val size = buffer.readVarInt()
-			val list = mutableListOf<ItemStack>()
-			repeat(size) {
-				list.add(buffer.readItem())
-			}
-			return list
+	override fun read(buffer: FriendlyByteBuf): MutableList<ItemStack>? {
+		val size = buffer.readVarInt()
+		val list = mutableListOf<ItemStack>()
+		repeat(size) {
+			list.add(buffer.readItem())
 		}
+		return list
+	}
 
-		override fun copy(value: MutableList<ItemStack>): MutableList<ItemStack> {
-			return value.toMutableList()
-		}
+	override fun copy(value: MutableList<ItemStack>): MutableList<ItemStack> {
+		return value.toMutableList()
 	}
 }

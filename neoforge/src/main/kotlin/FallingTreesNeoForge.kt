@@ -16,7 +16,7 @@ import dev.pandasystems.pandalib.utils.gameEnvironment
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.fml.common.Mod
 
-@Mod(FallingTrees.modid)
+@Mod(FallingTrees.MODID)
 class FallingTreesNeoForge(eventBus: IEventBus) {
 	init {
 		FallingTrees
