@@ -17,7 +17,7 @@ import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.fml.common.Mod
 
-@Mod(value = FallingTrees.modid, dist = [Dist.CLIENT])
+@Mod(value = FallingTrees.MODID, dist = [Dist.CLIENT])
 class FallingTreesClientNeoForge(modBus: IEventBus) {
 	init {
 		FallingTreesClient
