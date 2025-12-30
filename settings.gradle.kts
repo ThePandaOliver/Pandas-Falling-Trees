@@ -8,13 +8,11 @@
 pluginManagement.repositories {
 	maven("https://maven.architectury.dev/") { name = "Architectury" }
 	maven("https://maven.fabricmc.net/") { name = "Fabric" }
-	maven("https://maven.minecraftforge.net/") { name = "Forge" }
 	maven("https://maven.neoforged.net/releases/") { name = "NeoForge" }
-	maven("https://maven.pkg.github.com/ThePandaOliver/Forgix") {
-		name = "Github Forgix"
-		credentials {
-			username = System.getenv("GITHUB_USER")
-			password = System.getenv("GITHUB_API_TOKEN")
+	maven("https://repo.pandasystems.dev/repository/maven-snapshots/") {
+		name = "PandasRepository"
+		mavenContent {
+			snapshotsOnly()
 		}
 	}
 	gradlePluginPortal()

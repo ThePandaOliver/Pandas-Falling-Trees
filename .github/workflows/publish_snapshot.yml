@@ -1,0 +1,27 @@
+name: Publish Snapshot
+on: push
+
+env:
+  NEXUS_USERNAME: "${{secrets.NEXUS_USERNAME}}"
+  NEXUS_PASSWORD: "${{secrets.NEXUS_PASSWORD}}"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+          cache: "gradle"
+
+      - name: Set gradlew permission
+        run: chmod +x gradlew
+
+      - name: Build and Publish
+        run: ./gradlew clean build publish
