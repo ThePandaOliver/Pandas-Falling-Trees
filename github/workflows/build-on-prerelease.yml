@@ -1,0 +1,99 @@
+name: Build and Release
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - branch: versions/1.21.10
+            label: "1.21.10"
+          - branch: versions/1.21.9
+            label: "1.21.9"
+          - branch: versions/1.21.8
+            label: "1.21.8"
+          - branch: versions/1.21.7
+            label: "1.21.7"
+          - branch: versions/1.21.6
+            label: "1.21.6"
+          - branch: versions/1.21.5
+            label: "1.21.5"
+          - branch: versions/1.21.4
+            label: "1.21.4"
+          - branch: versions/1.21.3
+            label: "1.21.3"
+          - branch: versions/1.21.2
+            label: "1.21.2"
+          - branch: versions/1.21.1
+            label: "1.21.1"
+          - branch: versions/1.21
+            label: "1.21"
+          - branch: versions/1.20.6
+            label: "1.20.6"
+          - branch: versions/1.20.5
+            label: "1.20.5"
+          - branch: versions/1.20.4
+            label: "1.20.4"
+          - branch: versions/1.20.3
+            label: "1.20.3"
+          - branch: versions/1.20.2
+            label: "1.20.2"
+          - branch: versions/1.20.1
+            label: "1.20.1"
+          - branch: versions/1.20
+            label: "1.20"
+
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.label }}
+          path: build/mod-build/*.jar
+
+      - name: Publish to Modding platforms
+        run: ./gradlew publishMods
+
+  attach-to-release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Upload artifacts to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          files: ./artifacts/**/*
