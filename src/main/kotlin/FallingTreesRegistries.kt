@@ -42,10 +42,10 @@ val treeRegistry = DeferredRegister.registerNewRegistry(MappedRegistry(treeRegis
 
 // Deferred registers
 
-val treeRegister = DeferredRegister.create(FallingTrees.modid, treeRegistryKey)
-val soundRegister = DeferredRegister.create(FallingTrees.modid, Registries.SOUND_EVENT)
-val entityRegistar = DeferredRegister.create(FallingTrees.modid, Registries.ENTITY_TYPE)
-val entityDataRegistar = DeferredRegister.create(FallingTrees.modid, ENTITY_DATA_SERIALIZERS_REGISTRY)
+val treeRegister = DeferredRegister.create(FallingTrees.MODID, treeRegistryKey)
+val soundRegister = DeferredRegister.create(FallingTrees.MODID, Registries.SOUND_EVENT)
+val entityRegister = DeferredRegister.create(FallingTrees.MODID, Registries.ENTITY_TYPE)
+val entityDataRegister = DeferredRegister.create(FallingTrees.MODID, ENTITY_DATA_SERIALIZERS_REGISTRY)
 
 
 // Trees
@@ -83,7 +83,7 @@ private fun createFixedRangeEvent(resourceLocation: ResourceLocation, range: Int
 
 // Entity
 
-val treeEntity = entityRegistar.register("tree") {
+val treeEntity = entityRegister.register("tree") {
 	EntityType.Builder
 		.of(EntityType.EntityFactory(::TreeEntity), MobCategory.MISC)
 		.sized(0.5f, 0.5f)
@@ -95,5 +95,5 @@ val treeEntity = entityRegistar.register("tree") {
 
 // Entity Data
 
-val blockMapSerializer = entityDataRegistar.register("block_map") { BlockMapEntityData.BLOCK_MAP }
-val itemListSerializer = entityDataRegistar.register("item_list") { ItemListEntityData.ITEM_LIST }
+val blockMapSerializer = entityDataRegister.register("block_map") { BlockMapEntityData }
+val itemListSerializer = entityDataRegister.register("item_list") { ItemListEntityData }
