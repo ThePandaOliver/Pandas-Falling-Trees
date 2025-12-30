@@ -17,15 +17,12 @@ import net.minecraft.network.codec.StreamCodec
 import net.minecraft.network.syncher.EntityDataSerializer
 import net.minecraft.world.item.ItemStack
 
-object ItemListEntityData {
-	@JvmField
-	val ITEM_LIST = object : EntityDataSerializer<MutableList<ItemStack>> {
-		override fun codec(): StreamCodec<in RegistryFriendlyByteBuf, MutableList<ItemStack>> {
-			return ItemStack.OPTIONAL_LIST_STREAM_CODEC
-		}
+object ItemListEntityData : EntityDataSerializer<MutableList<ItemStack>> {
+	override fun codec(): StreamCodec<in RegistryFriendlyByteBuf, MutableList<ItemStack>> {
+		return ItemStack.OPTIONAL_LIST_STREAM_CODEC
+	}
 
-		override fun copy(value: MutableList<ItemStack>): MutableList<ItemStack> {
-			return value.stream().map { obj: ItemStack? -> obj!!.copy() }.toList()
-		}
+	override fun copy(value: MutableList<ItemStack>): MutableList<ItemStack> {
+		return value.stream().map { obj: ItemStack? -> obj!!.copy() }.toList()
 	}
 }

@@ -12,15 +12,11 @@
 
 package dev.pandasystems.fallingtrees.neoforge.mixin;
 
-import dev.pandasystems.fallingtrees.FallingTreesRegistriesKt;
-import dev.pandasystems.fallingtrees.config.FallingTreesConfigKt;
+import dev.pandasystems.fallingtrees.mixin.MultiPlayerGameModeKtImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,38 +30,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MultiPlayerGameModeMixin {
 	@Shadow private BlockPos destroyBlockPos;
 
-	@Shadow public abstract boolean isDestroying();
-
 	@Shadow @Final private Minecraft minecraft;
+
 	@Unique
-	private boolean fallingTrees$lastTickCrouchState = false;
-	@Unique
-	private Direction fallingTrees$blockDestroyDirection = Direction.UP;
+	private MultiPlayerGameModeKtImpl fallingtrees$impl = new MultiPlayerGameModeKtImpl();
 
 	@Inject(method = "startDestroyBlock", at = @At("RETURN"))
 	public void startDestroyBlock(BlockPos loc, Direction face, CallbackInfoReturnable<Boolean> cir) {
-		fallingTrees$blockDestroyDirection = face;
+		fallingtrees$impl.startDestroyBlock(face);
 	}
 
 	@Inject(method = "tick", at = @At("RETURN"))
 	public void tick(CallbackInfo ci) {
-		if (FallingTreesConfigKt.getFallingTreesCommonConfig().get().getDynamicMiningSpeed().getDisable()) return;
-		Player player = minecraft.player;
-
-		if (player != null) {
-			Level level = player.level();
-
-			BlockState blockState = level.getBlockState(this.destroyBlockPos);
-			if (FallingTreesRegistriesKt.getTree(blockState) != null) {
-				if (player.isCrouching() != fallingTrees$lastTickCrouchState) {
-					if (this.isDestroying() && minecraft.gameMode != null) {
-						MultiPlayerGameMode gameMode = minecraft.gameMode;
-						gameMode.stopDestroyBlock();
-						gameMode.startDestroyBlock(this.destroyBlockPos, fallingTrees$blockDestroyDirection);
-					}
-				}
-				this.fallingTrees$lastTickCrouchState = player.isCrouching();
-			}
-		}
+		fallingtrees$impl.tick(minecraft, destroyBlockPos, (MultiPlayerGameMode) (Object) this);
 	}
 }

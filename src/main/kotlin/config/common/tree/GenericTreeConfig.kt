@@ -24,7 +24,11 @@ class GenericTreeConfig : TreeConfig() {
 	)
 	val leavesFilter: Filter = Filter(
 		mutableListOf(BlockTags.LEAVES.location().toString()),
-		mutableListOf(),
+		mutableListOf(
+//			BuiltInRegistries.BLOCK.getKey(Blocks.NETHER_WART_BLOCK).toString(),
+//			BuiltInRegistries.BLOCK.getKey(Blocks.WARPED_WART_BLOCK).toString(),
+//			BuiltInRegistries.BLOCK.getKey(Blocks.SHROOMLIGHT).toString(),
+		),
 		mutableListOf()
 	)
 
