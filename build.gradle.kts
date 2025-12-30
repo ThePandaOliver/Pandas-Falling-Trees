@@ -7,6 +7,7 @@
 @file:Suppress("UnstableApiUsage")
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import me.modmuss50.mpp.ReleaseType
 import net.fabricmc.loom.task.RemapJarTask
 import org.jetbrains.gradle.ext.packagePrefix
 import org.jetbrains.gradle.ext.settings
@@ -19,7 +20,7 @@ plugins {
 	id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.10"
 
 	id("io.github.pacifistmc.forgix") version "2.0.0-SNAPSHOT"
-	id("me.modmuss50.mod-publish-plugin") version "0.8.4"
+	id("me.modmuss50.mod-publish-plugin") version "1.1.0"
 	id("com.google.devtools.ksp") version "2.2.0-2.0.2"
 	`maven-publish`
 }
@@ -101,16 +102,16 @@ allprojects {
 					configName = "Client"
 					runDir("$path/client")
 					programArg("--username=Dev")
-					ideConfigGenerated(true)
 				}
 				named("server") {
 					server()
 					configName = "Server"
 					runDir("$path/server")
-					ideConfigGenerated(true)
 				}
 			}
-		} else runs.configureEach { ideConfigGenerated(false) }
+		}
+
+		runs.configureEach { ideConfigGenerated(false) }
 	}
 
 	val common: Configuration by configurations.creating {
@@ -336,5 +337,57 @@ forgix {
 		forge {
 			inputJar = it.tasks.named<RemapJarTask>("remapJar").get().archiveFile
 		}
+	}
+}
+
+publishMods {
+	displayName = "[$mcVersion] ${project.version}"
+	type = ReleaseType.ALPHA
+	changelog = file("CHANGELOG.md").readText()
+
+	val cfOptions = curseforgeOptions {
+		accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+		projectId = "880630"
+		minecraftVersions.add(mcVersion)
+	}
+
+	val mrOptions = modrinthOptions {
+		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+		projectId = "i2kUe4lq"
+		minecraftVersions.add(mcVersion)
+	}
+
+	curseforge("curseforgeFabric") {
+		from(cfOptions)
+		file(project(":fabric").tasks.remapJar.get().archiveFile)
+		modLoaders.add("fabric")
+		requires(
+			"fabric-api",
+			"pandalib"
+		)
+	}
+
+	curseforge("curseforgeNeoForge") {
+		from(cfOptions)
+		file(project(":neoforge").tasks.remapJar.get().archiveFile)
+		modLoaders.add("neoforge")
+		requires("pandalib")
+	}
+
+	modrinth("modrinthFabric") {
+		from(mrOptions)
+		file(project(":fabric").tasks.remapJar.get().archiveFile)
+		modLoaders.add("fabric")
+		requires(
+			"fabric-api",
+			"pandalib"
+		)
+	}
+
+	modrinth("modrinthNeoForge") {
+		from(mrOptions)
+		file(project(":neoforge").tasks.remapJar.get().archiveFile)
+		modLoaders.add("neoforge")
+		requires("pandalib")
 	}
 }
