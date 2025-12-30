@@ -76,6 +76,9 @@ jobs:
           name: build-${{ matrix.label }}
           path: build/mod-build/*.jar
 
+      - name: Publish to Modding platforms
+        run: ./gradlew publishMods
+
   attach-to-release:
     needs: build
     runs-on: ubuntu-latest
