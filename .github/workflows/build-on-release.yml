@@ -78,22 +78,3 @@ jobs:
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
-
-  attach-to-release:
-    needs: build
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
-
-    steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: ./artifacts
-
-      - name: Upload artifacts to release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.event.release.tag_name }}
-          files: ./artifacts/**/*
