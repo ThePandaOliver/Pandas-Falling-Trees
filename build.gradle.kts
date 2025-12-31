@@ -261,7 +261,7 @@ allprojects {
 			}
 
 			val copyBuildModFile by registering(Copy::class) {
-				from("build/libs/${base.archivesName}-$version.jar")
+				from("build/libs/${base.archivesName.get()}-$version.jar")
 				into(rootDir.resolve("build/mod-build"))
 			}
 
