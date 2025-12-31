@@ -1,3 +1,7 @@
+# Version 0.14.0 | Alpha 2
+
+- Fixed an issue where it was depending on the wrong version of PandaLib.
+
 # Version 0.14.0 | Alpha 1
 
 - Updated PandaLib to 1.0.0
