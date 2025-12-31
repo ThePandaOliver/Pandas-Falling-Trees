@@ -15,7 +15,7 @@ import org.jetbrains.gradle.ext.settings
 plugins {
 	kotlin("jvm") version "2.2.0"
 	id("architectury-plugin") version "3.4-SNAPSHOT"
-	id("dev.architectury.loom") version "1.11-SNAPSHOT"
+	id("dev.architectury.loom") version "1.13-SNAPSHOT"
 	id("com.gradleup.shadow") version "9.0.2" apply false
 	id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.10"
 
