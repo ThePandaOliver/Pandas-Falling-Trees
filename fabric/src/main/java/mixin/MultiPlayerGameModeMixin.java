@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025-2025 Oliver Froberg (The Panda Oliver)
+ * Copyright (C) 2025 Oliver Froberg (The Panda Oliver)
  *
  * This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -12,20 +12,14 @@
 
 package dev.pandasystems.fallingtrees.fabric.mixin;
 
-import dev.pandasystems.fallingtrees.FallingTreesRegistriesKt;
-import dev.pandasystems.fallingtrees.config.FallingTreesConfigKt;
 import dev.pandasystems.fallingtrees.mixin.MultiPlayerGameModeKtImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -37,16 +31,13 @@ public abstract class MultiPlayerGameModeMixin {
 
 	@Shadow @Final private Minecraft minecraft;
 
-	@Unique
-	private MultiPlayerGameModeKtImpl fallingtrees$impl = new MultiPlayerGameModeKtImpl();
-
 	@Inject(method = "startDestroyBlock", at = @At("RETURN"))
 	public void startDestroyBlock(BlockPos loc, Direction face, CallbackInfoReturnable<Boolean> cir) {
-		fallingtrees$impl.startDestroyBlock(face);
+		MultiPlayerGameModeKtImpl.INSTANCE.startDestroyBlock(face);
 	}
 
 	@Inject(method = "tick", at = @At("RETURN"))
 	public void tick(CallbackInfo ci) {
-		fallingtrees$impl.tick(minecraft, destroyBlockPos, (MultiPlayerGameMode) (Object) this);
+		MultiPlayerGameModeKtImpl.INSTANCE.tick(minecraft, destroyBlockPos, (MultiPlayerGameMode) (Object) this);
 	}
 }
