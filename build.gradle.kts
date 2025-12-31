@@ -366,13 +366,6 @@ publishMods {
 		)
 	}
 
-	curseforge("curseforgeNeoForge") {
-		from(cfOptions)
-		file = project(":neoforge").tasks.remapJar.get().archiveFile
-		modLoaders.add("neoforge")
-		requires("pandalib")
-	}
-
 	modrinth("modrinthFabric") {
 		from(mrOptions)
 		file = project(":fabric").tasks.remapJar.get().archiveFile
@@ -381,12 +374,5 @@ publishMods {
 			"fabric-api",
 			"pandalib"
 		)
-	}
-
-	modrinth("modrinthNeoForge") {
-		from(mrOptions)
-		file = project(":neoforge").tasks.remapJar.get().archiveFile
-		modLoaders.add("neoforge")
-		requires("pandalib")
 	}
 }
