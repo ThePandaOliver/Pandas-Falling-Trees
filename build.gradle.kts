@@ -260,7 +260,7 @@ allprojects {
 			}
 
 			val copyBuildModFile by registering(Copy::class) {
-				from("build/libs/pandalib-$loomPlatform-$version.jar")
+				from("build/libs/${base.archivesName}-$version.jar")
 				into(rootDir.resolve("build/mod-build"))
 			}
 
@@ -340,7 +340,6 @@ forgix {
 }
 
 publishMods {
-	displayName = "[$mcVersion] ${project.version}"
 	type = ReleaseType.ALPHA
 	changelog = file("CHANGELOG.md").readText()
 
@@ -357,6 +356,7 @@ publishMods {
 	}
 
 	curseforge("curseforgeFabric") {
+		displayName = "[$mcVersion Fabric] ${project.version}"
 		from(cfOptions)
 		file = project(":fabric").tasks.remapJar.get().archiveFile
 		modLoaders.add("fabric")
@@ -367,6 +367,7 @@ publishMods {
 	}
 
 	modrinth("modrinthFabric") {
+		displayName = "[$mcVersion Fabric] ${project.version}"
 		from(mrOptions)
 		file = project(":fabric").tasks.remapJar.get().archiveFile
 		modLoaders.add("fabric")
