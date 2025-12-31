@@ -78,6 +78,9 @@ jobs:
 
       - name: Publish to Modding platforms
         run: ./gradlew publishMods
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
 
   attach-to-release:
     needs: build
