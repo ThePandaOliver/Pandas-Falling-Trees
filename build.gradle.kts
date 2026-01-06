@@ -19,7 +19,7 @@ plugins {
 	id("com.gradleup.shadow") version "9.0.2" apply false
 	id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.10"
 
-	id("io.github.pacifistmc.forgix") version "2.0.0-SNAPSHOT"
+	id("io.github.pacifistmc.forgix") version "2.0.0-SNAPSHOT-5.1"
 	id("me.modmuss50.mod-publish-plugin") version "1.1.0"
 	id("com.google.devtools.ksp") version "2.2.0-2.0.2"
 	`maven-publish`
