@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025-2025 Oliver Froberg (The Panda Oliver)
+ * Copyright (C) 2026 Oliver Froberg (The Panda Oliver)
  *
  * This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@ package dev.pandasystems.fallingtrees
 
 import dev.pandasystems.fallingtrees.api.TreeHandler
 import dev.pandasystems.fallingtrees.config.initConfigs
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 
 object FallingTrees {
 	const val MODID: String = "fallingtrees"
@@ -28,7 +28,6 @@ object FallingTrees {
 		TreeHandler.init()
 	}
 
-	fun resourceLocation(path: String): ResourceLocation {
-		return ResourceLocation.fromNamespaceAndPath(MODID, path)
-	}
+	fun resourceLocation(path: String): Identifier = identifier(path)
+	fun identifier(path: String): Identifier = Identifier.fromNamespaceAndPath(MODID, path)
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025-2025 Oliver Froberg (The Panda Oliver)
+ * Copyright (C) 2026 Oliver Froberg (The Panda Oliver)
  *
  * This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@ import dev.pandasystems.pandalib.registry.deferred.DeferredRegister
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.Registries
+import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MobCategory
@@ -62,22 +62,22 @@ fun getTree(blockState: BlockState): TreeType? {
 	return null
 }
 
-fun getTree(resourceLocation: ResourceLocation): TreeType? {
-	return treeRegistry.getValue(resourceLocation)
+fun getTree(identifier: Identifier): TreeType? {
+	return treeRegistry.getValue(identifier)
 }
 
-fun getTreeLocation(tree: TreeType): ResourceLocation {
+fun getTreeLocation(tree: TreeType): Identifier {
 	return treeRegistry.getKey(tree)!!
 }
 
 
 // Sound
 
-val treeFallSound = soundRegister.register("tree_fall") { createFixedRangeEvent(resourceLocation("tree_fall"), 16) }
-val treeImpactSound = soundRegister.register("tree_impact") { createFixedRangeEvent(resourceLocation("tree_impact"), 16) }
+val treeFallSound = soundRegister.register("tree_fall") { createFixedRangeEvent(FallingTrees.identifier("tree_fall"), 16) }
+val treeImpactSound = soundRegister.register("tree_impact") { createFixedRangeEvent(FallingTrees.identifier("tree_impact"), 16) }
 
-private fun createFixedRangeEvent(resourceLocation: ResourceLocation, range: Int): SoundEvent {
-	return SoundEvent.createFixedRangeEvent(resourceLocation, range.toFloat())
+private fun createFixedRangeEvent(identifier: Identifier, range: Int): SoundEvent {
+	return SoundEvent.createFixedRangeEvent(identifier, range.toFloat())
 }
 
 
