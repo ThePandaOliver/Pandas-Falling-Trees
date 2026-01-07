@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2026 Oliver Froberg (The Panda Oliver)
+ * Copyright (C) 2025 Oliver Froberg (The Panda Oliver)
  *
  * This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ import net.minecraft.core.Direction
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
-import net.minecraft.resources.Identifier
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.Mth
 import net.minecraft.world.damagesource.DamageSource
@@ -75,7 +75,7 @@ class TreeEntity(entityType: EntityType<*>, level: Level) : Entity(entityType, l
 	override fun onSyncedDataUpdated(dataAccessor: EntityDataAccessor<*>) {
 		super.onSyncedDataUpdated(dataAccessor)
 		if (TREE_TYPE_LOCATION == dataAccessor) {
-			this.treeType = getTree(Identifier.tryParse(this.getEntityData().get(TREE_TYPE_LOCATION))!!)!!
+			this.treeType = getTree(ResourceLocation.tryParse(this.getEntityData().get(TREE_TYPE_LOCATION))!!)!!
 		}
 	}
 

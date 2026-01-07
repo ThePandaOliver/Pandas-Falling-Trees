@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2026 Oliver Froberg (The Panda Oliver)
+ * Copyright (C) 2025 Oliver Froberg (The Panda Oliver)
  *
  * This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,4 +16,4 @@ import net.minecraft.core.BlockPos
 import net.minecraft.world.level.Level
 
 class TreeTooBigException(blockPos: BlockPos, level: Level) :
-	TreeException(String.format("Tree is too big to be processed at position %s in dimension '%s'", blockPos.toShortString(), level.dimension().identifier()))
+	TreeException(String.format("Tree is too big to be processed at position %s in dimension '%s'", blockPos.toShortString(), level.dimension().location()))

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2026 Oliver Froberg (The Panda Oliver)
+ * Copyright (C) 2025 Oliver Froberg (The Panda Oliver)
  *
  * This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -132,7 +132,7 @@ class TreeRenderer(context: EntityRendererProvider.Context) : EntityRenderer<Tre
 		return Math.max(0.0, Math.sin(Math.clamp(-Math.PI, Math.PI, time.toDouble()))).toFloat()
 	}
 
-	override fun affectedByCulling(entity: TreeEntity): Boolean {
+	override fun affectedByCulling(entity: TreeEntity?): Boolean {
 		return false
 	}
 }

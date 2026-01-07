@@ -1,13 +1,8 @@
 /*
- * Copyright (C) 2025-2026 Oliver Froberg (The Panda Oliver)
+ * Copyright (c) 2025. Oliver Froberg
  *
- * This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  any later version.
- *
- * You should have received a copy of the GNU General Public License
- *  along with this program. If not, see <https://www.gnu.org/licenses/>.
+ * This code is licensed under the GNU General Public License v3.0
+ * See: https://www.gnu.org/licenses/gpl-3.0-standalone.html
  */
 package dev.pandasystems.fallingtrees.fabric
 

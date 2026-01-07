@@ -19,6 +19,7 @@ plugins {
 	id("com.gradleup.shadow") version "9.0.2" apply false
 	id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.10"
 
+	id("io.github.pacifistmc.forgix") version "2.0.0-SNAPSHOT"
 	id("me.modmuss50.mod-publish-plugin") version "1.1.0"
 	id("com.google.devtools.ksp") version "2.2.0-2.0.2"
 	`maven-publish`
@@ -84,7 +85,7 @@ allprojects {
 	loom {
 		silentMojangMappingsLicense()
 		log4jConfigs.from(rootProject.file("log4j2.xml"))
-//		accessWidenerPath = rootProject.file("src/main/resources/$modId.accesswidener")
+		accessWidenerPath = rootProject.file("src/main/resources/$modId.accesswidener")
 
 		decompilers {
 			get("vineflower").apply { // Adds names to lambdas - useful for mixins
@@ -255,8 +256,8 @@ allprojects {
 			remapJar {
 				injectAccessWidener.set(true)
 				inputFile = getByName<ShadowJar>("shadowJar").archiveFile
-//				if (loomPlatform == "neoforge")
-//			 		atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
+				if (loomPlatform == "neoforge")
+			 		atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
 			}
 
 			val copyBuildModFile by registering(Copy::class) {
@@ -301,21 +302,40 @@ allprojects {
 		}
 
 		repositories {
-			maven("https://repo.pandasystems.dev/repository/maven-snapshots/") {
-				name = "Snapshot"
+			maven(
+				if (version.toString().endsWith("-SNAPSHOT"))
+					"https://repo.pandasystems.dev/repository/maven-snapshots/"
+				else
+					"https://repo.pandasystems.dev/repository/maven-releases/"
+			) {
+				name = "Nexus"
 				credentials {
 					username = System.getenv("NEXUS_USERNAME")
 					password = System.getenv("NEXUS_PASSWORD")
 				}
 			}
+		}
+	}
+}
 
-			maven("https://repo.pandasystems.dev/repository/maven-releases/") {
-				name = "Release"
-				credentials {
-					username = System.getenv("NEXUS_USERNAME")
-					password = System.getenv("NEXUS_PASSWORD")
-				}
-			}
+forgix {
+	archiveClassifier = ""
+
+	findProject(":fabric")?.let {
+		fabric {
+			inputJar = it.tasks.named<RemapJarTask>("remapJar").get().archiveFile
+		}
+	}
+
+	findProject(":neoforge")?.let {
+		neoforge {
+			inputJar = it.tasks.named<RemapJarTask>("remapJar").get().archiveFile
+		}
+	}
+
+	findProject(":forge")?.let {
+		forge {
+			inputJar = it.tasks.named<RemapJarTask>("remapJar").get().archiveFile
 		}
 	}
 }

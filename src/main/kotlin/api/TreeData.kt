@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2026 Oliver Froberg (The Panda Oliver)
+ * Copyright (C) 2025 Oliver Froberg (The Panda Oliver)
  *
  * This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ data class TreeData(
 			return this
 		}
 
-		fun <T : Any> addAwardedStats(stats: MutableCollection<Stat<T>>): Builder {
+		fun <T> addAwardedStats(stats: MutableCollection<Stat<T>>): Builder {
 			stats.forEach { stat: Stat<T> -> this.addAwardedStat(stat) }
 			return this
 		}
