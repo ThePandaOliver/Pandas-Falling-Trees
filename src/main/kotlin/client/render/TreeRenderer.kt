@@ -132,7 +132,7 @@ class TreeRenderer(context: EntityRendererProvider.Context) : EntityRenderer<Tre
 		return Math.max(0.0, Math.sin(Math.clamp(-Math.PI, Math.PI, time.toDouble()))).toFloat()
 	}
 
-	override fun affectedByCulling(entity: TreeEntity?): Boolean {
+	override fun affectedByCulling(display: TreeEntity): Boolean {
 		return false
 	}
 }

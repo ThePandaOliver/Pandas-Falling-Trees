@@ -13,15 +13,14 @@ import org.jetbrains.gradle.ext.packagePrefix
 import org.jetbrains.gradle.ext.settings
 
 plugins {
-	kotlin("jvm") version "2.2.0"
+	kotlin("jvm") version "2.3.0"
 	id("architectury-plugin") version "3.4-SNAPSHOT"
 	id("dev.architectury.loom") version "1.13-SNAPSHOT"
 	id("com.gradleup.shadow") version "9.0.2" apply false
 	id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.10"
 
-	id("io.github.pacifistmc.forgix") version "2.0.0-SNAPSHOT-5.1"
 	id("me.modmuss50.mod-publish-plugin") version "1.1.0"
-	id("com.google.devtools.ksp") version "2.2.0-2.0.2"
+	id("com.google.devtools.ksp") version "2.3.0"
 	`maven-publish`
 }
 
@@ -150,7 +149,8 @@ allprojects {
 	}
 
 	dependencies {
-		fun addNonMod(dependencyNotation: Any) {
+		fun addNonMod(dependencyNotation: Any?) {
+			if (dependencyNotation == null) return
 			implementation(dependencyNotation)
 			if (loomPlatform == "neoforge") {
 				"forgeRuntimeLibrary"(dependencyNotation)
@@ -160,15 +160,15 @@ allprojects {
 		addNonMod(kotlin("stdlib"))
 		addNonMod(kotlin("stdlib-jdk8"))
 		addNonMod(kotlin("stdlib-jdk7"))
-		addNonMod(kotlin("reflect", version = "2.2.0"))
+		addNonMod(kotlin("reflect"))
 		addNonMod("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 		addNonMod("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.10.2")
-		addNonMod("org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1")
-		addNonMod("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
-		addNonMod("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.8.1")
-		addNonMod("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
-		addNonMod("org.jetbrains.kotlinx:kotlinx-io-core:0.7.0")
-		addNonMod("org.jetbrains.kotlinx:kotlinx-io-bytestring:0.7.0")
+		addNonMod("org.jetbrains.kotlinx:kotlinx-serialization-core:1.9.0")
+		addNonMod("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+		addNonMod("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.9.0")
+		addNonMod("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
+		addNonMod("org.jetbrains.kotlinx:kotlinx-io-core:0.8.2")
+		addNonMod("org.jetbrains.kotlinx:kotlinx-io-bytestring:0.8.2")
 
 		addNonMod("dev.pandasystems:universal-serializer:0.1.0-SNAPSHOT")
 
@@ -210,11 +210,13 @@ allprojects {
 	}
 
 	java {
+		sourceCompatibility = JavaVersion.toVersion(javaVersion)
+		targetCompatibility = JavaVersion.toVersion(javaVersion)
 		withSourcesJar()
 	}
 
 	kotlin {
-		jvmToolchain(21)
+		jvmToolchain(javaVersion.toInt())
 	}
 
 	tasks {
@@ -314,28 +316,6 @@ allprojects {
 					password = System.getenv("NEXUS_PASSWORD")
 				}
 			}
-		}
-	}
-}
-
-forgix {
-	archiveClassifier = ""
-
-	findProject(":fabric")?.let {
-		fabric {
-			inputJar = it.tasks.named<RemapJarTask>("remapJar").get().archiveFile
-		}
-	}
-
-	findProject(":neoforge")?.let {
-		neoforge {
-			inputJar = it.tasks.named<RemapJarTask>("remapJar").get().archiveFile
-		}
-	}
-
-	findProject(":forge")?.let {
-		forge {
-			inputJar = it.tasks.named<RemapJarTask>("remapJar").get().archiveFile
 		}
 	}
 }
