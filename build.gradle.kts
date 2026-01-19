@@ -19,7 +19,6 @@ plugins {
 	id("com.gradleup.shadow") version "9.0.2" apply false
 	id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.10"
 
-	id("io.github.pacifistmc.forgix") version "2.0.0-SNAPSHOT"
 	id("me.modmuss50.mod-publish-plugin") version "1.1.0"
 	id("com.google.devtools.ksp") version "2.2.0-2.0.2"
 	`maven-publish`
@@ -313,28 +312,6 @@ allprojects {
 					password = System.getenv("NEXUS_PASSWORD")
 				}
 			}
-		}
-	}
-}
-
-forgix {
-	archiveClassifier = ""
-
-	findProject(":fabric")?.let {
-		fabric {
-			inputJar = it.tasks.named<RemapJarTask>("remapJar").get().archiveFile
-		}
-	}
-
-	findProject(":neoforge")?.let {
-		neoforge {
-			inputJar = it.tasks.named<RemapJarTask>("remapJar").get().archiveFile
-		}
-	}
-
-	findProject(":forge")?.let {
-		forge {
-			inputJar = it.tasks.named<RemapJarTask>("remapJar").get().archiveFile
 		}
 	}
 }
