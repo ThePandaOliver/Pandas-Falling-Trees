@@ -212,7 +212,7 @@ allprojects {
 	}
 
 	kotlin {
-		jvmToolchain(21)
+		jvmToolchain(javaVersion.toInt())
 	}
 
 	tasks {
