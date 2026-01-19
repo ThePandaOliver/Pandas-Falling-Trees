@@ -1,3 +1,8 @@
+# Version 0.14.0 | Alpha 2.2
+
+## Bug fixes
+- Fixed the Java version was set to 21 instead of 17 in the mixin config.
+
 # Version 0.14.0 | Alpha 2
 
 - Fixed an issue where it was depending on the wrong version of PandaLib.
