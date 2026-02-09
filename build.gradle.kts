@@ -1,9 +1,3 @@
-/*
- * Copyright (c) 2025. Oliver Froberg
- *
- * This code is licensed under the GNU Lesser General Public License v3.0
- * See: https://www.gnu.org/licenses/lgpl-3.0-standalone.html
- */
 @file:Suppress("UnstableApiUsage")
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
@@ -149,28 +143,33 @@ allprojects {
 	}
 
 	dependencies {
-		fun addNonMod(dependencyNotation: Any?) {
-			if (dependencyNotation == null) return
+		fun dependNoneMod(dependencyNotation: Any?): Any? {
+			if (dependencyNotation == null) return null
 			implementation(dependencyNotation)
-			if (loomPlatform == "neoforge") {
-				"forgeRuntimeLibrary"(dependencyNotation)
-			}
+			if (loomPlatform == "neoforge") "forgeRuntimeLibrary"(dependencyNotation)
+			return dependencyNotation
 		}
 
-		addNonMod(kotlin("stdlib"))
-		addNonMod(kotlin("stdlib-jdk8"))
-		addNonMod(kotlin("stdlib-jdk7"))
-		addNonMod(kotlin("reflect"))
-		addNonMod("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-		addNonMod("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.10.2")
-		addNonMod("org.jetbrains.kotlinx:kotlinx-serialization-core:1.9.0")
-		addNonMod("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
-		addNonMod("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.9.0")
-		addNonMod("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
-		addNonMod("org.jetbrains.kotlinx:kotlinx-io-core:0.8.2")
-		addNonMod("org.jetbrains.kotlinx:kotlinx-io-bytestring:0.8.2")
+		fun nestNoneMod(dependencyNotation: Any?): Any? {
+			if (dependencyNotation == null) return null
+			if (loomPlatform != null) include(dependencyNotation)
+			return dependencyNotation
+		}
 
-		addNonMod("dev.pandasystems:universal-serializer:0.1.0-SNAPSHOT")
+		dependNoneMod(kotlin("stdlib"))
+		dependNoneMod(kotlin("stdlib-jdk8"))
+		dependNoneMod(kotlin("stdlib-jdk7"))
+		dependNoneMod(kotlin("reflect"))
+		dependNoneMod("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+		dependNoneMod("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.10.2")
+		dependNoneMod("org.jetbrains.kotlinx:kotlinx-serialization-core:1.9.0")
+		dependNoneMod("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+		dependNoneMod("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.9.0")
+		dependNoneMod("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
+		dependNoneMod("org.jetbrains.kotlinx:kotlinx-io-core:0.8.2")
+		dependNoneMod("org.jetbrains.kotlinx:kotlinx-io-bytestring:0.8.2")
+		
+		dependNoneMod("dev.pandasystems:universal-serializer:0.1.0-SNAPSHOT")
 
 		runtimeOnly("com.google.auto.service:auto-service-annotations:1.1.1")
 		compileOnly("com.google.auto.service:auto-service-annotations:1.1.1")
@@ -242,7 +241,15 @@ allprojects {
 			neoforgeLoaderVersion?.let { props["neoforge_loader_version"] = it }
 
 			inputs.properties(props)
-			filesMatching(listOf("META-INF/mods.toml", "META-INF/neoforge.mods.toml", "fabric.mod.json", "**.mixins.json", "pack.mcmeta")) {
+			filesMatching(
+				listOf(
+					"META-INF/mods.toml",
+					"META-INF/neoforge.mods.toml",
+					"fabric.mod.json",
+					"**.mixins.json",
+					"pack.mcmeta"
+				)
+			) {
 				expand(props)
 			}
 		}
@@ -258,8 +265,19 @@ allprojects {
 			remapJar {
 				injectAccessWidener.set(true)
 				inputFile = getByName<ShadowJar>("shadowJar").archiveFile
+				archiveClassifier.set("")
 				if (loomPlatform == "neoforge")
 			 		atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
+			}
+
+			val remapSlimJar by registering(RemapJarTask::class) {
+				dependsOn(getByName<ShadowJar>("shadowJar"))
+				injectAccessWidener.set(true)
+				inputFile = getByName<ShadowJar>("shadowJar").archiveFile
+				archiveClassifier.set("slim")
+				addNestedDependencies.set(false)
+				if (loomPlatform == "neoforge")
+					atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
 			}
 
 			val copyBuildModFile by registering(Copy::class) {
@@ -268,6 +286,7 @@ allprojects {
 			}
 
 			build {
+				dependsOn("remapSlimJar")
 				finalizedBy(copyBuildModFile)
 			}
 
@@ -300,6 +319,16 @@ allprojects {
 			create<MavenPublication>("maven") {
 				from(components["java"])
 				artifactId = base.archivesName.get()
+
+				if (loomPlatform != null) {
+					artifact(tasks.named("remapSlimJar")) {
+						classifier = "slim"
+					}
+				} else {
+					artifact(tasks.remapJar) {
+						classifier = "slim"
+					}
+				}
 			}
 		}
 
@@ -310,7 +339,7 @@ allprojects {
 				else
 					"https://repo.pandasystems.dev/repository/maven-releases/"
 			) {
-				name = "Nexus"
+				name = "pandasystems"
 				credentials {
 					username = System.getenv("NEXUS_USERNAME")
 					password = System.getenv("NEXUS_PASSWORD")
