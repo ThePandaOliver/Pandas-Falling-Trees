@@ -13,7 +13,6 @@ package dev.pandasystems.fallingtrees
 
 import dev.pandasystems.fallingtrees.api.TreeHandler
 import dev.pandasystems.fallingtrees.config.initConfigs
-import dev.pandasystems.pandalib.PandaLib.modid
 import net.minecraft.resources.Identifier
 
 object FallingTrees {
@@ -30,6 +29,6 @@ object FallingTrees {
 	}
 
 	@Deprecated("ResourceLocation renamed to Identifier", ReplaceWith("identifier(path)"))
-	fun resourceLocation(path: String): Identifier = Identifier.fromNamespaceAndPath(modid, path)
-	fun identifier(path: String): Identifier = Identifier.fromNamespaceAndPath(modid, path)
+	fun resourceLocation(path: String): Identifier = Identifier.fromNamespaceAndPath(MODID, path)
+	fun identifier(path: String): Identifier = Identifier.fromNamespaceAndPath(MODID, path)
 }
