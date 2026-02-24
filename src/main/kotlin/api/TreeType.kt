@@ -11,14 +11,10 @@
  */
 package dev.pandasystems.fallingtrees.api
 
-import dev.pandasystems.fallingtrees.entity.TreeEntity
 import net.minecraft.core.BlockPos
-import net.minecraft.world.entity.player.Player
-import net.minecraft.world.level.Level
-import net.minecraft.world.level.block.state.BlockState
 
-interface TreeType {
-	fun isTreeStem(blockState: BlockState): Boolean
-	fun gatherTreeData(blockPos: BlockPos, level: Level, player: Player): TreeData?
-	fun onTreeTick(entity: TreeEntity) {}
+data class TreeType(
+	val blockGroups: Map<String, List<BlockPos>>,
+	val algorithmPipeline: List<AlgorithmModule>
+) {
 }
