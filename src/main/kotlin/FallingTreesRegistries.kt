@@ -18,7 +18,7 @@ import dev.pandasystems.fallingtrees.api.TreeType
 import dev.pandasystems.fallingtrees.entity.TreeEntity
 import dev.pandasystems.fallingtrees.trees.ChorusTree
 import dev.pandasystems.fallingtrees.trees.GenericTree
-import dev.pandasystems.fallingtrees.trees.VerticalTree
+import dev.pandasystems.fallingtrees.trees.OverworldTree
 import dev.pandasystems.fallingtrees.trees.mushroom.MushroomTree
 import dev.pandasystems.fallingtrees.utils.BlockMapEntityData
 import dev.pandasystems.fallingtrees.utils.ItemListEntityData
@@ -51,10 +51,7 @@ val entityDataRegister = DeferredRegister.create(FallingTrees.MODID, ENTITY_DATA
 
 // Trees
 
-var genericTreeType = treeRegister.register("generic") { GenericTree() }
-var verticalTreeType = treeRegister.register("vertical") { VerticalTree() }
-var chorusTreeType = treeRegister.register("chorus") { ChorusTree() }
-var mushroomTreeType = treeRegister.register("mushroom") { MushroomTree() }
+var overworldTreeType = treeRegister.register("overworld_tree") { OverworldTree() }
 
 fun getTree(blockState: BlockState): TreeType? {
 	for (tree in treeRegistry) {
