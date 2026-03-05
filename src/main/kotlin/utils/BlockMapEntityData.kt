@@ -22,8 +22,8 @@ import net.minecraft.network.syncher.EntityDataSerializer
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 
-var BLOCK_MAP_CODEC = object : StreamCodec<ByteBuf, MutableMap<BlockPos, BlockState>> {
-	override fun decode(byteBuf: ByteBuf): MutableMap<BlockPos, BlockState> {
+var BLOCK_MAP_CODEC = object : StreamCodec<ByteBuf, Map<BlockPos, BlockState>> {
+	override fun decode(byteBuf: ByteBuf): Map<BlockPos, BlockState> {
 		val size = VarInt.read(byteBuf)
 		val map: MutableMap<BlockPos, BlockState> = Maps.newHashMapWithExpectedSize(size)
 		for (i in 0..<size) {
@@ -32,7 +32,7 @@ var BLOCK_MAP_CODEC = object : StreamCodec<ByteBuf, MutableMap<BlockPos, BlockSt
 		return map
 	}
 
-	override fun encode(byteBuf: ByteBuf, map: MutableMap<BlockPos, BlockState>) {
+	override fun encode(byteBuf: ByteBuf, map: Map<BlockPos, BlockState>) {
 		VarInt.write(byteBuf, map.size)
 		map.forEach { (blockPos: BlockPos, blockState: BlockState) ->
 			FriendlyByteBuf.writeBlockPos(byteBuf, blockPos)
@@ -41,4 +41,4 @@ var BLOCK_MAP_CODEC = object : StreamCodec<ByteBuf, MutableMap<BlockPos, BlockSt
 	}
 }
 
-object BlockMapEntityData : EntityDataSerializer<MutableMap<BlockPos, BlockState>> by EntityDataSerializer.forValueType(BLOCK_MAP_CODEC)
+object BlockMapEntityData : EntityDataSerializer<Map<BlockPos, BlockState>> by EntityDataSerializer.forValueType(BLOCK_MAP_CODEC)

@@ -56,6 +56,7 @@ object TreeFellingHandler {
 	fun fellTree(treeBlob: TreeBlob, player: ServerPlayer): Boolean {
 		logger.debug("Felling tree at {}", treeBlob.originBlockPos)
 		val level = treeBlob.level
+		val originBlockPos = treeBlob.originBlockPos
 
 		data class BlockRemovalData(val pos: BlockPos, val oldState: BlockState, val newState: BlockState)
 
@@ -79,6 +80,7 @@ object TreeFellingHandler {
 		logger.debug("Removed tree from cache")
 
 		val treeEntity = TreeEntity(level = level)
+		treeEntity.setPos(originBlockPos.x.toDouble() + .5, originBlockPos.y.toDouble(), originBlockPos.z.toDouble() + .5)
 		treeEntity.setData(treeBlob, player)
 		level.addFreshEntity(treeEntity)
 		logger.debug("Tree entity was spawned")

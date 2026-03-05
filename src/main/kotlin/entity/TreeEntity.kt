@@ -11,13 +11,12 @@
  */
 package dev.pandasystems.fallingtrees.entity
 
+import com.mojang.logging.LogUtils
 import dev.pandasystems.fallingtrees.api.TreeBlob
 import dev.pandasystems.fallingtrees.api.TreeType
-import dev.pandasystems.fallingtrees.config.fallingTreesCommonConfig
 import dev.pandasystems.fallingtrees.treeEntity
 import dev.pandasystems.fallingtrees.treeRegistry
 import dev.pandasystems.fallingtrees.utils.BlockMapEntityData
-import dev.pandasystems.fallingtrees.utils.ItemListEntityData
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.network.syncher.EntityDataAccessor
@@ -25,14 +24,11 @@ import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.resources.Identifier
 import net.minecraft.server.level.ServerLevel
-import net.minecraft.util.Mth
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MoverType
-import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.storage.ValueInput
@@ -46,26 +42,17 @@ class TreeEntity(entityType: EntityType<*> = treeEntity.get(), level: Level) : E
 	fun setData(treeBlob: TreeBlob, owningPlayer: Player) {
 		this.treeType = treeBlob.treeType
 		this.owningPlayer = owningPlayer
-		val blockPoses = treeBlob.blockPoses
-		val originBlock = treeBlob.originBlockPos
-		val level = treeBlob.level
+		val originBlockPos = treeBlob.originBlockPos
 
 		val treeTypeLocation = treeRegistry.getKey(treeBlob.treeType)
 		this.getEntityData().set(TREE_TYPE_LOCATION, treeTypeLocation.toString())
 
-		val blockPosMap = mutableMapOf<BlockPos, BlockState>()
-		for (pos in blockPoses) {
-			blockPosMap[pos.immutable().subtract(originBlock)] = level.getBlockState(pos)
-		}
+		val blockStates = treeBlob.blockStates
+			.map { (key, value) -> key.immutable().subtract(originBlockPos) to value }.toMap()
 
-		this.getEntityData().set(ORIGIN_POS, originBlock)
-		this.getEntityData().set(BLOCKS, blockPosMap)
-
-		this.getEntityData().set(
-			FALL_DIRECTION, Direction.fromYRot(
-				-Math.toDegrees(Math.atan2(owningPlayer.x - originBlock.x, owningPlayer.z - originBlock.z))
-			).opposite
-		)
+		this.getEntityData().set(ORIGIN_POS, originBlockPos)
+		this.getEntityData().set(BLOCKS, blockStates)
+		this.getEntityData().set(FALL_DIRECTION, owningPlayer.direction)
 	}
 
 	override fun defineSynchedData(builder: SynchedEntityData.Builder) {
@@ -111,7 +98,7 @@ class TreeEntity(entityType: EntityType<*> = treeEntity.get(), level: Level) : E
 		return (this.tickCount + partialTick) / 20
 	}
 
-	val blocks: MutableMap<BlockPos, BlockState>
+	val blocks: Map<BlockPos, BlockState>
 		get() = this.getEntityData().get(BLOCKS)
 
 	val originPos: BlockPos
@@ -121,7 +108,7 @@ class TreeEntity(entityType: EntityType<*> = treeEntity.get(), level: Level) : E
 		get() = this.getEntityData().get(FALL_DIRECTION)
 
 	companion object {
-		val BLOCKS: EntityDataAccessor<MutableMap<BlockPos, BlockState>> =
+		val BLOCKS: EntityDataAccessor<Map<BlockPos, BlockState>> =
 			SynchedEntityData.defineId(TreeEntity::class.java, BlockMapEntityData)
 		val ORIGIN_POS: EntityDataAccessor<BlockPos> =
 			SynchedEntityData.defineId(TreeEntity::class.java, EntityDataSerializers.BLOCK_POS)

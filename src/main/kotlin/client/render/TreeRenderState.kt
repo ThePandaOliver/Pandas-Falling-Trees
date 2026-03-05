@@ -21,10 +21,10 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 
 class TreeRenderState : EntityRenderState() {
-	var treeType: TreeType? = null
-	var blocks: MutableMap<BlockPos, BlockState>? = null
+	lateinit var treeType: TreeType
+	lateinit var blocks: Map<BlockPos, BlockState>
 	var lifeTime: Double = 0.0
-	var direction: Direction? = null
-	var level: Level? = null
-	var originPos: Vec3i? = null
+	lateinit var direction: Direction
+	lateinit var level: Level
+	lateinit var originPos: Vec3i
 }

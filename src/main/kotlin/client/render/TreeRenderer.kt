@@ -12,17 +12,14 @@
 package dev.pandasystems.fallingtrees.client.render
 
 import com.mojang.blaze3d.vertex.PoseStack
-import dev.pandasystems.fallingtrees.api.TreeType
 import dev.pandasystems.fallingtrees.config.fallingTreesClientConfig
 import dev.pandasystems.fallingtrees.entity.TreeEntity
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.SubmitNodeCollector
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.client.renderer.state.CameraRenderState
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.core.BlockPos
-import net.minecraft.core.Direction
 import net.minecraft.world.level.block.state.BlockState
 import org.joml.Math
 import org.joml.Quaternionf
@@ -34,11 +31,9 @@ class TreeRenderer(context: EntityRendererProvider.Context) : EntityRenderer<Tre
 	override fun submit(renderState: TreeRenderState, poseStack: PoseStack, nodeCollector: SubmitNodeCollector, cameraRenderState: CameraRenderState) {
 		super.submit(renderState, poseStack, nodeCollector, cameraRenderState)
 
-		val tree = renderState.treeType ?: return
-
 		poseStack.pushPose()
 
-		val blocks: MutableMap<BlockPos, BlockState> = renderState.blocks!!
+		val blocks: Map<BlockPos, BlockState> = renderState.blocks
 		val fallAnimLength: Float = this.config.animation.fallAnimLength
 
 		val bounceHeight: Float = this.config.animation.bounceAngleHeight
@@ -51,7 +46,7 @@ class TreeRenderer(context: EntityRendererProvider.Context) : EntityRenderer<Tre
 
 		val animation = (fallAnim + bounceAnim) - 90
 
-		val direction = renderState.direction!!.opposite
+		val direction = renderState.direction.opposite
 
 		val pivot = Vector3f(0f, 0f, .5f)
 		pivot.rotateY(Math.toRadians(-direction.toYRot()))
@@ -81,7 +76,7 @@ class TreeRenderer(context: EntityRendererProvider.Context) : EntityRenderer<Tre
 		renderState.treeType = entity.treeType
 		renderState.blocks = entity.blocks
 		renderState.lifeTime = entity.getLifetime(f).toDouble()
-		renderState.direction = entity.direction
+		renderState.direction = entity.fallDirection
 		renderState.originPos = entity.originPos
 		renderState.level = entity.level()
 		super.extractRenderState(entity, renderState, f)
