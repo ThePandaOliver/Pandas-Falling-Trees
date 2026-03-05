@@ -14,46 +14,15 @@ package dev.pandasystems.fallingtrees.api
 import dev.pandasystems.universalserializer.elements.TreeElement
 import dev.pandasystems.universalserializer.elements.TreeObject
 import net.minecraft.core.BlockPos
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import kotlin.reflect.KProperty
 
 abstract class TreeType {
-	private val _configValues = mutableListOf<ConfigValue<*>>()
-	val configValues: List<ConfigValue<*>> get() = _configValues
+    val enabled: Boolean = true
 
-	val enabled: Boolean by ConfigValue("enabled", true)
-
-	abstract fun scanBlocks(level: Level, pos: BlockPos, state: BlockState = level.getBlockState(pos)) : TreeBlob
-	abstract fun validateTree(blob: TreeBlob) : Boolean
-
-	internal fun loadData(data: TreeObject) {
-		val version = data["version"]?.asPrimitive?.asNumber?.toInt() ?: throw IllegalArgumentException("Tree config is missing version")
-		if (version != 1) throw IllegalArgumentException("Tree config version [${version}] is not supported")
-
-		_configValues.forEach { configValue ->
-			var configElement: TreeElement = data
-			configValue.name.split('.').forEach { name ->
-				configElement = configElement.asObject[name] ?: throw IllegalArgumentException("The config value is missing [${configValue.name}]")
-			}
-			@Suppress("UNCHECKED_CAST")
-			(configValue as ConfigValue<Any?>).value = TODO("Deserialize the config value")
-		}
-	}
-
-	inner class ConfigValue<T>(val name: String, val defaultValue: T) {
-		var value: T = defaultValue
-
-		init {
-			_configValues.add(this)
-		}
-
-		operator fun getValue(thisRef: TreeType, property: KProperty<*>): T {
-			return value
-		}
-
-		operator fun setValue(thisRef: TreeType, property: KProperty<*>, value: T) {
-			this.value = value
-		}
-	}
+    abstract fun canPlayerFellTree(player: Player, level: Level, pos: BlockPos, state: BlockState = level.getBlockState(pos)): Boolean
+    abstract fun scanForTree(level: Level, pos: BlockPos, state: BlockState = level.getBlockState(pos)): TreeBlob?
+    abstract fun validateTree(blob: TreeBlob): Boolean
 }

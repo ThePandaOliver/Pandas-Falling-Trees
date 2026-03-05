@@ -13,27 +13,21 @@
 package dev.pandasystems.fallingtrees
 
 import com.mojang.serialization.Lifecycle
-import dev.pandasystems.fallingtrees.FallingTrees.resourceLocation
 import dev.pandasystems.fallingtrees.api.TreeType
 import dev.pandasystems.fallingtrees.entity.TreeEntity
-import dev.pandasystems.fallingtrees.trees.ChorusTree
-import dev.pandasystems.fallingtrees.trees.GenericTree
 import dev.pandasystems.fallingtrees.trees.OverworldTree
-import dev.pandasystems.fallingtrees.trees.mushroom.MushroomTree
 import dev.pandasystems.fallingtrees.utils.BlockMapEntityData
 import dev.pandasystems.fallingtrees.utils.ItemListEntityData
 import dev.pandasystems.pandalib.registry.ENTITY_DATA_SERIALIZERS_REGISTRY
 import dev.pandasystems.pandalib.registry.deferred.DeferredRegister
-import dev.pandasystems.pandalib.utils.identifier
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.Registries
-import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.Identifier
+import net.minecraft.resources.ResourceKey
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MobCategory
-import net.minecraft.world.level.block.state.BlockState
 
 // Registries
 
@@ -52,21 +46,6 @@ val entityDataRegister = DeferredRegister.create(FallingTrees.MODID, ENTITY_DATA
 // Trees
 
 var overworldTreeType = treeRegister.register("overworld_tree") { OverworldTree() }
-
-fun getTree(blockState: BlockState): TreeType? {
-	for (tree in treeRegistry) {
-		if (tree.isTreeStem(blockState)) return tree
-	}
-	return null
-}
-
-fun getTree(identifier: Identifier): TreeType? {
-	return treeRegistry.getValue(identifier)
-}
-
-fun getTreeLocation(tree: TreeType): Identifier {
-	return treeRegistry.getKey(tree)!!
-}
 
 
 // Sound

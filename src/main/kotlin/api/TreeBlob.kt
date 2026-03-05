@@ -7,6 +7,8 @@ data class TreeBlob(
     val treeType: TreeType,
     val blockPoses: List<BlockPos>,
     val level: Level,
+    val originBlockPos: BlockPos,
     val miningSpeed: Float
 ) {
+    fun validate() = treeType.validateTree(this)
 }

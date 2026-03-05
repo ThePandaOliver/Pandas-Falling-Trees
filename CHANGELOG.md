@@ -1,3 +1,17 @@
+# Version 0.14.0 | Alpha 3
+
+* Renamed GenericTree to OverworldTree
+* Improved block destruction handling (TBT)
+* Tree configs are now stored in separate files (WIP – Requires work on the config system in PandaLib)
+
+## Reworked Mod API
+* Fully reworked the mods API (WIP)
+* Added multiple listenable events (TBD)
+* Reimplemented all tree types to fit with the new API (WIP – Only OverworldTree has been implemented as of now)
+* Improved caching of the tree data (WIP)
+
+---
+
 # Version 0.14.0 | Alpha 2
 
 - Fixed an issue where it was depending on the wrong version of PandaLib.

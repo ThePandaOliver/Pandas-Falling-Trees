@@ -12,8 +12,6 @@
 
 package dev.pandasystems.fallingtrees.mixin
 
-import dev.pandasystems.fallingtrees.api.TreeHandler
-import dev.pandasystems.fallingtrees.api.TreeHandler.canPlayerChopTree
 import dev.pandasystems.fallingtrees.config.fallingTreesCommonConfig
 import net.minecraft.core.BlockPos
 import net.minecraft.world.entity.player.Player

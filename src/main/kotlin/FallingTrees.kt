@@ -11,7 +11,7 @@
  */
 package dev.pandasystems.fallingtrees
 
-import dev.pandasystems.fallingtrees.api.TreeHandler
+import dev.pandasystems.fallingtrees.api.TreeFellingHandler
 import dev.pandasystems.fallingtrees.config.initConfigs
 import net.minecraft.resources.Identifier
 
@@ -25,7 +25,8 @@ object FallingTrees {
 		soundRegister.register()
 		entityRegister.register()
 		entityDataRegister.register()
-		TreeHandler.init()
+		
+		TreeFellingHandler.init()
 	}
 
 	@Deprecated("ResourceLocation renamed to Identifier", ReplaceWith("identifier(path)"))
