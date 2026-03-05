@@ -9,7 +9,7 @@
 <Configuration status="WARN">
 	<Loggers>
 		<!-- Set log level for specific package -->
-		<Logger name="dev.pandasystems.pandalib" level="DEBUG" additivity="false">
+		<Logger name="dev.pandasystems.fallingtrees" level="DEBUG" additivity="false">
 			<AppenderRef ref="SysOut"/>
 		</Logger>
 	</Loggers>

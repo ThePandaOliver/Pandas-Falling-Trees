@@ -10,5 +10,7 @@ data class TreeBlob(
     val originBlockPos: BlockPos,
     val miningSpeed: Float
 ) {
+    val blockStates = blockPoses.associateWith { level.getBlockState(it) }
+    
     fun validate() = treeType.validateTree(this)
 }

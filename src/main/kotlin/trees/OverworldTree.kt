@@ -1,5 +1,6 @@
 package dev.pandasystems.fallingtrees.trees
 
+import com.mojang.logging.LogUtils
 import dev.pandasystems.fallingtrees.api.TreeBlob
 import dev.pandasystems.fallingtrees.api.TreeType
 import net.minecraft.core.BlockPos
@@ -10,8 +11,10 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.LeavesBlock
 import net.minecraft.world.level.block.state.BlockState
+import kotlin.math.log
 
 class OverworldTree : TreeType() {
+    private val logger = LogUtils.getLogger()
     val requireTool: Boolean = false
     val ignorePersistentLeaves: Boolean = true
 
@@ -30,22 +33,32 @@ class OverworldTree : TreeType() {
         pos: BlockPos,
         state: BlockState
     ): TreeBlob? {
+        logger.debug("Scanning for overworld tree at $pos")
         val foundBlocks = mutableListOf<BlockPos>()
+        logger.debug("Scanning for logs")
         foundBlocks.addAll(scanForLogs(level, pos))
-        if (foundBlocks.isEmpty()) return null
+        if (foundBlocks.isEmpty()) {
+            logger.debug("No logs found")
+            return null
+        }
 
         val foundLeavesBlocks = mutableListOf<BlockPos>()
-        for (log in foundBlocks.toList()) {
+        logger.debug("Scanning for leaves")
+        for (logPos in foundBlocks.toList()) {
             for (direction in Direction.entries) {
-                foundLeavesBlocks.addAll(scanForLeaves(level, log.relative(direction)))
+                foundLeavesBlocks.addAll(scanForLeaves(level, logPos.relative(direction)))
             }
         }
-        if (foundLeavesBlocks.isEmpty()) return null
+        if (foundLeavesBlocks.isEmpty()) {
+            logger.debug("No leaves found")
+            return null
+        }
         foundBlocks.addAll(foundLeavesBlocks)
 
+        logger.debug("Completed scanning for overworld tree at {}, found blocks:", pos)
         return TreeBlob(
             this,
-            foundBlocks.toList(),
+            foundBlocks,
             level,
             pos,
             1f
@@ -53,9 +66,22 @@ class OverworldTree : TreeType() {
     }
 
     private val logScanPosOffsets = listOf(
-        BlockPos(0, 0, 0), BlockPos(0, 0, 1),
-        BlockPos(0, 0, -1), BlockPos(1, 0, 0), BlockPos(-1, 0, 0)
-    ) + BlockPos.betweenClosed(BlockPos(-1, 1, -1), BlockPos(1, 1, 1))
+        BlockPos(0, 0, 1),      // North
+        BlockPos(0, 0, -1),     // South
+        BlockPos(1, 0, 0),      // East
+        BlockPos(-1, 0, 0),     // West
+        
+        // UP
+        BlockPos(1, 1, 1),      // North-East
+        BlockPos(0, 1, 1),      // North
+        BlockPos(-1, 1, 1),     // North-West
+        BlockPos(1, 1, 0),      // East
+        BlockPos(0, 1, 0),      // Center
+        BlockPos(-1, 1, 0),     // West
+        BlockPos(1, 1, -1),     // South-East
+        BlockPos(0, 1, -1),     // South
+        BlockPos(-1, 1, -1),    // South-West
+    )
 
     fun scanForLogs(level: Level, pos: BlockPos): List<BlockPos> {
         if (!isLog(level.getBlockState(pos))) return emptyList()
@@ -66,15 +92,18 @@ class OverworldTree : TreeType() {
 
         while (queue.isNotEmpty()) {
             val currentPos = queue.removeFirst()
-            if (visited.contains(currentPos)) continue
+            if (currentPos in visited) continue
             visited.add(currentPos)
             logs.add(currentPos)
+            logger.debug("Visited and added log at {}", currentPos)
 
             for (offset in logScanPosOffsets) {
-                val next = currentPos.offset(offset)
-                if (next !in visited && isLog(level.getBlockState(next))) {
-                    visited.add(next)
+                val next = currentPos.immutable().offset(offset)
+                if (isLog(level.getBlockState(next))) {
+                    logger.debug("Found log at {}", next)
                     queue.addLast(next)
+                } else {
+                    logger.debug("Checked block at {} and it's not a log", next)
                 }
             }
         }
@@ -116,12 +145,15 @@ class OverworldTree : TreeType() {
             }
 
             leaves.add(currentPos)
+            logger.debug("Visited and added leaves at {}", currentPos)
 
             for (direction in Direction.entries) {
                 val next = currentPos.relative(direction)
-                if (next !in visited && isLeaves(level.getBlockState(next))) {
-                    visited.add(next)
+                if (isLeaves(level.getBlockState(next))) {
+                    logger.debug("Found leaves at {}", next)
                     queue.addLast(LeavesData(expectedDistance + 1, next))
+                } else {
+                    logger.debug("Checked block at {} and it's not leaves", next)
                 }
             }
         }
@@ -130,7 +162,7 @@ class OverworldTree : TreeType() {
     }
 
     fun isLeaves(state: BlockState): Boolean {
-        return state.`is`(BlockTags.LEAVES)
+        return state.`is`(BlockTags.LEAVES) || state.block is LeavesBlock
     }
 
     override fun validateTree(blob: TreeBlob): Boolean {

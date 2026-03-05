@@ -52,9 +52,8 @@ class TreeRenderer(context: EntityRendererProvider.Context) : EntityRenderer<Tre
 		val animation = (fallAnim + bounceAnim) - 90
 
 		val direction = renderState.direction!!.opposite
-		val distance = getDistance(tree, blocks, direction.opposite)
 
-		val pivot = Vector3f(0f, 0f, .5f + distance)
+		val pivot = Vector3f(0f, 0f, .5f)
 		pivot.rotateY(Math.toRadians(-direction.toYRot()))
 		poseStack.translate(-pivot.x, 0f, -pivot.z)
 
@@ -62,8 +61,6 @@ class TreeRenderer(context: EntityRendererProvider.Context) : EntityRenderer<Tre
 		vector.rotateY(Math.toRadians(-direction.toYRot()))
 		val quaternion = Quaternionf().identity().rotateX(vector.x).rotateZ(vector.z)
 		poseStack.mulPose(quaternion)
-
-		val level = renderState.level!!
 
 		poseStack.translate(pivot.x, 0f, pivot.z)
 		poseStack.translate(-.5, 0.0, -.5)
@@ -88,40 +85,6 @@ class TreeRenderer(context: EntityRendererProvider.Context) : EntityRenderer<Tre
 		renderState.originPos = entity.originPos
 		renderState.level = entity.level()
 		super.extractRenderState(entity, renderState, f)
-	}
-
-	private fun getDistance(tree: TreeType, blocks: MutableMap<BlockPos, BlockState>, direction: Direction): Float {
-		var distance = 0f
-		var currentPos = BlockPos(0, 0, 0)
-		var next = currentPos.relative(direction)
-
-		while (blocks.containsKey(next)) {
-			if (!tree.isTreeStem(blocks[next]!!)) break
-
-			currentPos = next
-			next = currentPos.relative(direction)
-
-			distance++
-		}
-		val blockState: BlockState = blocks[currentPos]!!
-		if (blockState.hasOffsetFunction()) return distance - .5f
-
-		var shape = blockState.getCollisionShape(Minecraft.getInstance().level!!, currentPos)
-		if (shape.isEmpty) shape = blockState.getShape(Minecraft.getInstance().level!!, currentPos)
-
-		if (!shape.isEmpty) {
-			val bounds = shape.bounds()
-			when (direction) {
-				Direction.WEST -> distance -= (bounds.minX).toFloat()
-				Direction.EAST -> distance -= (1f - bounds.maxX).toFloat()
-				Direction.SOUTH -> distance -= (bounds.minZ).toFloat()
-				Direction.NORTH -> distance -= (1f - bounds.maxZ).toFloat()
-				else -> 0
-			}
-		} else {
-			distance -= 1f
-		}
-		return distance
 	}
 
 	private fun bumpCos(time: Float): Float {
