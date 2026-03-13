@@ -1,8 +1,11 @@
 package dev.pandasystems.fallingtrees.trees
 
 import com.mojang.logging.LogUtils
+import dev.pandasystems.fallingtrees.FallingTrees
 import dev.pandasystems.fallingtrees.api.TreeBlob
 import dev.pandasystems.fallingtrees.api.TreeType
+import dev.pandasystems.pandalib.config.ConfigRegistry
+import dev.pandasystems.pandalib.config.syncOption
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.tags.BlockTags
@@ -11,12 +14,9 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.LeavesBlock
 import net.minecraft.world.level.block.state.BlockState
-import kotlin.math.log
 
 class OverworldTree : TreeType() {
     private val logger = LogUtils.getLogger()
-    val requireTool: Boolean = false
-    val ignorePersistentLeaves: Boolean = true
 
     override fun canPlayerFellTree(
         player: Player,
@@ -25,7 +25,7 @@ class OverworldTree : TreeType() {
         state: BlockState
     ): Boolean {
         // TODO: Validate the mainHandItem with a tool filter from the trees config
-        return !(requireTool && !player.mainHandItem.`is`(ItemTags.AXES))
+        return !(config.get().requireTool && !player.mainHandItem.`is`(ItemTags.AXES))
     }
 
     override fun scanForTree(
@@ -70,7 +70,7 @@ class OverworldTree : TreeType() {
         BlockPos(0, 0, -1),     // South
         BlockPos(1, 0, 0),      // East
         BlockPos(-1, 0, 0),     // West
-        
+
         // UP
         BlockPos(1, 1, 1),      // North-East
         BlockPos(0, 1, 1),      // North
@@ -139,7 +139,7 @@ class OverworldTree : TreeType() {
                     continue
             }
 
-            if (ignorePersistentLeaves && state.hasProperty(LeavesBlock.PERSISTENT)) {
+            if (config.get().ignorePersistentLeaves && state.hasProperty(LeavesBlock.PERSISTENT)) {
                 if (state.getValue(LeavesBlock.PERSISTENT))
                     continue
             }
@@ -167,5 +167,19 @@ class OverworldTree : TreeType() {
 
     override fun validateTree(blob: TreeBlob): Boolean {
         TODO("Not yet implemented")
+    }
+
+    companion object {
+        val config = ConfigRegistry.create(FallingTrees.identifier("trees/overworld"), Config()).apply {
+            load()
+            val config = get()
+            syncOption(config::requireTool)
+            syncOption(config::ignorePersistentLeaves)
+        }
+    }
+
+    class Config {
+        var requireTool: Boolean = true
+        var ignorePersistentLeaves: Boolean = true
     }
 }
