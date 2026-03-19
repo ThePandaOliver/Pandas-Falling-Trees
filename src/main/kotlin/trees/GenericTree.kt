@@ -92,7 +92,7 @@ class GenericTree : TreeType {
 
 		val adjacent = gatherAdjacentBlocks(level, logs, leaves)
 
-		val allBlocks = logs
+		val allBlocks = logs.toMutableSet()
 		allBlocks.addAll(leaves)
 		allBlocks.addAll(adjacent)
 
@@ -105,6 +105,7 @@ class GenericTree : TreeType {
 			}
 		}
 
+		println(logs)
 		return builder
 			.addBlocks(allBlocks)
 			.setToolDamage(logs.size)
