@@ -1,3 +1,11 @@
+# Version 0.14.0 | Alpha 3
+
+- Fixed tool damage counting every block of the tree.
+- Fixed mining speed adding every block to the calculation.
+- Fixed blocks like snow not breaking whenn tree falls.
+
+---
+
 # Version 0.14.0 | Alpha 2
 
 - Fixed an issue where it was depending on the wrong version of PandaLib.
