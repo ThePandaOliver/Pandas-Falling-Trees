@@ -1,4 +1,3 @@
 accessWidener v2 named
 
 accessible field net/minecraft/client/renderer/block/BlockRenderDispatcher blockColors Lnet/minecraft/client/color/block/BlockColors;
-accessible field net/minecraft/client/renderer/block/BlockRenderDispatcher blockEntityRenderer Lnet/minecraft/client/renderer/BlockEntityWithoutLevelRenderer;
