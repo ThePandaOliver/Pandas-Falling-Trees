@@ -13,7 +13,6 @@
 package dev.pandasystems.fallingtrees
 
 import com.mojang.serialization.Lifecycle
-import dev.pandasystems.fallingtrees.FallingTrees.resourceLocation
 import dev.pandasystems.fallingtrees.api.TreeType
 import dev.pandasystems.fallingtrees.entity.TreeEntity
 import dev.pandasystems.fallingtrees.trees.ChorusTree
