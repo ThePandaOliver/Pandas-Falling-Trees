@@ -24,7 +24,6 @@ import dev.pandasystems.fallingtrees.utils.BlockMapEntityData
 import dev.pandasystems.fallingtrees.utils.ItemListEntityData
 import dev.pandasystems.pandalib.registry.ENTITY_DATA_SERIALIZERS_REGISTRY
 import dev.pandasystems.pandalib.registry.deferred.DeferredRegister
-import dev.pandasystems.pandalib.utils.resourceLocation
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.Registries
