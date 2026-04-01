@@ -13,6 +13,8 @@
 package dev.pandasystems.fallingtrees.api
 
 import com.mojang.logging.LogUtils
+import dev.pandasystems.fallingtrees.compat.ModCompatibilities
+import dev.pandasystems.fallingtrees.compat.TreeChopCompat
 import dev.pandasystems.fallingtrees.config.ClientConfig
 import dev.pandasystems.fallingtrees.config.MiningOptionEnum
 import dev.pandasystems.fallingtrees.config.fallingTreesClientConfig
@@ -28,7 +30,6 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.stats.Stats
-import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
@@ -50,6 +51,9 @@ object TreeHandler {
 	}
 
 	private fun onBlockBreak(level: Level, pos: BlockPos, state: BlockState, player: ServerPlayer): Boolean {
+		if (ModCompatibilities.isTreeChopLoaded && TreeChopCompat.isChoppable(level, pos))
+			return true
+
 		if (!canPlayerChopTree(player))
 			return true
 
@@ -86,14 +90,18 @@ object TreeHandler {
 		data.awardedStats.forEach { awardedStat -> player.awardStat(awardedStat.stat, awardedStat.amount) }
 
 
-		blocks.forEach { pos ->
-			// Remove all blocks but don't update neighbors
-			level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3, 0)
-		}
+		data class BlockRemovalData(val pos: BlockPos, val oldState: BlockState, val newState: BlockState)
 
-		// Make sure all neighboring blocks have been updated after all has been removed
-		blocks.forEach { pos ->
-			level.updateNeighborsAt(pos, Blocks.AIR)
+		blocks.map { blockPos -> // First loop we remove the blocks without updating neighbors
+			val newState = Blocks.AIR.defaultBlockState()
+			val oldState = level.getBlockState(blockPos)
+			level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 3, 0)
+			BlockRemovalData(blockPos, oldState, newState) // This data is used in the second loop
+		}.forEach { (pos, oldState, newState) -> // Second loop we update the neighbors
+			val flags = 3 and -34
+			oldState.updateIndirectNeighbourShapes(level, pos, flags, 511)
+			newState.updateNeighbourShapes(level, pos, flags, 511)
+			newState.updateIndirectNeighbourShapes(level, pos, flags, 511);
 		}
 
 		level.addFreshEntity(entity)

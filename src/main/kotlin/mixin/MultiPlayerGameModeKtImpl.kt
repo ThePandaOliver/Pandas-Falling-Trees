@@ -12,6 +12,7 @@
 
 package dev.pandasystems.fallingtrees.mixin
 
+import dev.pandasystems.fallingtrees.compat.ModCompatibilities
 import dev.pandasystems.fallingtrees.config.fallingTreesCommonConfig
 import dev.pandasystems.fallingtrees.getTree
 import net.minecraft.client.Minecraft
@@ -29,7 +30,7 @@ object MultiPlayerGameModeKtImpl {
 	}
 
 	fun tick(minecraft: Minecraft, destroyBlockPos: BlockPos, gameMode: MultiPlayerGameMode) {
-		if (fallingTreesCommonConfig.get().dynamicMiningSpeed.disable) return
+		if (fallingTreesCommonConfig.get().dynamicMiningSpeed.disable || ModCompatibilities.isTreeChopLoaded) return
 		val player: Player? = minecraft.player
 
 		if (player != null) {

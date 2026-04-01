@@ -13,7 +13,6 @@
 package dev.pandasystems.fallingtrees
 
 import com.mojang.serialization.Lifecycle
-import dev.pandasystems.fallingtrees.FallingTrees.resourceLocation
 import dev.pandasystems.fallingtrees.api.TreeType
 import dev.pandasystems.fallingtrees.entity.TreeEntity
 import dev.pandasystems.fallingtrees.trees.ChorusTree
@@ -36,7 +35,7 @@ import net.minecraft.world.level.block.state.BlockState
 
 // Registries
 
-val treeRegistryKey: ResourceKey<Registry<TreeType>> = ResourceKey.createRegistryKey(resourceLocation("tree_registry"))
+val treeRegistryKey: ResourceKey<Registry<TreeType>> = ResourceKey.createRegistryKey(FallingTrees.resourceLocation("tree_registry"))
 val treeRegistry = DeferredRegister.registerNewRegistry(MappedRegistry(treeRegistryKey, Lifecycle.stable()))
 
 
@@ -62,8 +61,8 @@ fun getTree(blockState: BlockState): TreeType? {
 	return null
 }
 
-fun getTree(resourceLocation: ResourceLocation): TreeType? {
-	return treeRegistry.get(resourceLocation)
+fun getTree(identifier: ResourceLocation): TreeType? {
+	return treeRegistry.get(identifier)
 }
 
 fun getTreeLocation(tree: TreeType): ResourceLocation {
@@ -73,11 +72,11 @@ fun getTreeLocation(tree: TreeType): ResourceLocation {
 
 // Sound
 
-val treeFallSound = soundRegister.register("tree_fall") { createFixedRangeEvent(resourceLocation("tree_fall"), 16) }
-val treeImpactSound = soundRegister.register("tree_impact") { createFixedRangeEvent(resourceLocation("tree_impact"), 16) }
+val treeFallSound = soundRegister.register("tree_fall") { createFixedRangeEvent(FallingTrees.resourceLocation("tree_fall"), 16) }
+val treeImpactSound = soundRegister.register("tree_impact") { createFixedRangeEvent(FallingTrees.resourceLocation("tree_impact"), 16) }
 
-private fun createFixedRangeEvent(resourceLocation: ResourceLocation, range: Int): SoundEvent {
-	return SoundEvent.createFixedRangeEvent(resourceLocation, range.toFloat())
+private fun createFixedRangeEvent(identifier: ResourceLocation, range: Int): SoundEvent {
+	return SoundEvent.createFixedRangeEvent(identifier, range.toFloat())
 }
 
 
