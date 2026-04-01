@@ -4,12 +4,12 @@ import com.google.auto.service.AutoService
 import dev.pandasystems.fallingtrees.compat.ModCompatibilities
 import dev.pandasystems.fallingtrees.compat.TreeChopCompat
 import dev.pandasystems.fallingtrees.compat.TreeChopCompat.Companion.tryMakeTreeFall
-import ht.treechop.api.FellData
+import ht.treechop.api.ChopData
 import ht.treechop.api.TreeChopEvents
 import ht.treechop.common.chop.ChopUtil
 import ht.treechop.common.registry.FabricModBlocks
 import net.minecraft.core.BlockPos
-import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 
@@ -30,16 +30,17 @@ class TreeChopCompatImpl : TreeChopCompat {
 
     companion object {
         init {
-            TreeChopEvents.BEFORE_FELL.register(::beforeFellEvent)
+            TreeChopEvents.BEFORE_CHOP.register(::beforeFellEvent)
         }
 
         private fun beforeFellEvent(
             level: Level,
-            serverPlayer: ServerPlayer,
+            player: Player,
             blockPos: BlockPos,
-            fellData: FellData
+            blockState: BlockState,
+            chopData: ChopData
         ): Boolean {
-            return tryMakeTreeFall(blockPos, level, serverPlayer)
+            return tryMakeTreeFall(blockPos, level, player)
         }
     }
 }
