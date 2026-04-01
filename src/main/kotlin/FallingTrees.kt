@@ -28,7 +28,5 @@ object FallingTrees {
 		TreeHandler.init()
 	}
 
-	fun resourceLocation(path: String): ResourceLocation {
-		return ResourceLocation(MODID, path)
-	}
+	fun resourceLocation(path: String): ResourceLocation = ResourceLocation(MODID, path)
 }
