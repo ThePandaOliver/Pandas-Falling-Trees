@@ -13,7 +13,7 @@ package dev.pandasystems.fallingtrees
 
 import dev.pandasystems.fallingtrees.api.TreeHandler
 import dev.pandasystems.fallingtrees.config.initConfigs
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 
 object FallingTrees {
 	const val MODID: String = "fallingtrees"
@@ -28,7 +28,7 @@ object FallingTrees {
 		TreeHandler.init()
 	}
 
-	fun resourceLocation(path: String): ResourceLocation {
-		return ResourceLocation.fromNamespaceAndPath(MODID, path)
-	}
+	@Deprecated("ResourceLocation renamed to Identifier", ReplaceWith("identifier(path)"))
+	fun resourceLocation(path: String): Identifier = Identifier.fromNamespaceAndPath(MODID, path)
+	fun identifier(path: String): Identifier = Identifier.fromNamespaceAndPath(MODID, path)
 }
