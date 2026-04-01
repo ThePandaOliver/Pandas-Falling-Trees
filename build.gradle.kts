@@ -7,15 +7,15 @@ import org.jetbrains.gradle.ext.packagePrefix
 import org.jetbrains.gradle.ext.settings
 
 plugins {
-	kotlin("jvm") version "2.3.0"
-	id("architectury-plugin") version "3.4-SNAPSHOT"
-	id("dev.architectury.loom") version "1.13-SNAPSHOT"
-	id("com.gradleup.shadow") version "9.0.2" apply false
-	id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.10"
+    kotlin("jvm") version "2.3.0"
+    id("architectury-plugin") version "3.4-SNAPSHOT"
+    id("dev.architectury.loom") version "1.13-SNAPSHOT"
+    id("com.gradleup.shadow") version "9.0.2" apply false
+    id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.10"
 
-	id("me.modmuss50.mod-publish-plugin") version "1.1.0"
-	id("com.google.devtools.ksp") version "2.3.0"
-	`maven-publish`
+    id("me.modmuss50.mod-publish-plugin") version "1.1.0"
+    id("com.google.devtools.ksp") version "2.3.0"
+    `maven-publish`
 }
 
 val javaVersion: String by project
@@ -40,237 +40,274 @@ val parchmentMappingsVersion: String by project
 val fabricApiVersion: String by project
 val pandalibVersion: String by project
 
+val forgeConfigApiVersion: String by project
+val httreechopNeoforgeVersion: String by project
+val httreechopFabricVersion: String by project
+val httreechopRuntimeEnabled: Boolean = false
+
 allprojects {
-	val loomPlatform = project.findProperty("loom.platform") as? String
-	val loaderEnv = loomPlatform ?: "common"
+    val loomPlatform = project.findProperty("loom.platform") as? String
+    val loaderEnv = loomPlatform ?: "common"
 
-	apply(plugin = "org.jetbrains.kotlin.jvm")
-	apply(plugin = "architectury-plugin")
-	apply(plugin = "dev.architectury.loom")
-	apply(plugin = "org.jetbrains.gradle.plugin.idea-ext")
-	if (loomPlatform != null)
-		apply(plugin = "com.gradleup.shadow")
-	apply(plugin = "com.google.devtools.ksp")
-	apply(plugin = "maven-publish")
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "architectury-plugin")
+    apply(plugin = "dev.architectury.loom")
+    apply(plugin = "org.jetbrains.gradle.plugin.idea-ext")
+    if (loomPlatform != null)
+        apply(plugin = "com.gradleup.shadow")
+    apply(plugin = "com.google.devtools.ksp")
+    apply(plugin = "maven-publish")
 
-	version = modVersion
-	group = modGroup
-	base { archivesName = "$modId-$loaderEnv-$mcVersion" }
+    version = modVersion
+    group = modGroup
+    base { archivesName = "$modId-$loaderEnv-$mcVersion" }
 
-	architectury {
-		when (loomPlatform) {
-			"fabric" -> {
-				fabric()
-				platformSetupLoomIde()
-			}
+    architectury {
+        when (loomPlatform) {
+            "fabric" -> {
+                fabric()
+                platformSetupLoomIde()
+            }
 
-			"neoforge" -> {
-				neoForge()
-				platformSetupLoomIde()
-			}
+            "neoforge" -> {
+                neoForge()
+                platformSetupLoomIde()
+            }
 
-			else -> {
-				common(buildFor.split(",").map { it.trim() })
-			}
-		}
-	}
+            else -> {
+                common(buildFor.split(",").map { it.trim() })
+            }
+        }
+    }
 
-	loom {
-		silentMojangMappingsLicense()
-		log4jConfigs.from(rootProject.file("log4j2.xml"))
-		accessWidenerPath = rootProject.file("src/main/resources/$modId.accesswidener")
+    loom {
+        silentMojangMappingsLicense()
+        log4jConfigs.from(rootProject.file("log4j2.xml"))
+        accessWidenerPath = rootProject.file("src/main/resources/$modId.accesswidener")
 
-		decompilers {
-			get("vineflower").apply { // Adds names to lambdas - useful for mixins
-				options.put("mark-corresponding-synthetics", "1")
-			}
-		}
+        decompilers {
+            get("vineflower").apply { // Adds names to lambdas - useful for mixins
+                options.put("mark-corresponding-synthetics", "1")
+            }
+        }
 
-		if (loomPlatform != null) {
-			runs {
-				val path = project.projectDir.toPath().relativize(rootProject.file(".runs").toPath())
+        if (loomPlatform != null) {
+            runs {
+                val path = project.projectDir.toPath().relativize(rootProject.file(".runs").toPath())
 
-				named("client") {
-					client()
-					configName = "Client"
-					runDir("$path/client")
-					programArg("--username=Dev")
-				}
-				named("server") {
-					server()
-					configName = "Server"
-					runDir("$path/server")
-				}
-			}
-		}
+                named("client") {
+                    client()
+                    configName = "Client"
+                    runDir("$path/client")
+                    programArg("--username=Dev")
+                }
+                named("server") {
+                    server()
+                    configName = "Server"
+                    runDir("$path/server")
+                }
+            }
+        }
 
-		runs.configureEach { ideConfigGenerated(false) }
-	}
+        runs.configureEach { ideConfigGenerated(false) }
+    }
 
-	val common: Configuration by configurations.creating {
-		isCanBeResolved = true
-		isCanBeConsumed = false
-	}
-	configurations.compileClasspath.get().extendsFrom(common)
-	configurations.runtimeClasspath.get().extendsFrom(common)
+    val common: Configuration by configurations.creating {
+        isCanBeResolved = true
+        isCanBeConsumed = false
+    }
+    configurations.compileClasspath.get().extendsFrom(common)
+    configurations.runtimeClasspath.get().extendsFrom(common)
 
-	val shadowBundle: Configuration by configurations.creating {
-		isCanBeResolved = true
-		isCanBeConsumed = false
-	}
+    val shadowBundle: Configuration by configurations.creating {
+        isCanBeResolved = true
+        isCanBeConsumed = false
+    }
 
-	configurations {
-		when (loomPlatform) {
-			"fabric" -> {
-				getByName("developmentFabric").extendsFrom(common)
-			}
+    configurations {
+        when (loomPlatform) {
+            "fabric" -> {
+                getByName("developmentFabric").extendsFrom(common)
+            }
 
-			"neoforge" -> {
-				getByName("developmentNeoForge").extendsFrom(common)
-			}
-		}
-	}
+            "neoforge" -> {
+                getByName("developmentNeoForge").extendsFrom(common)
+            }
+        }
+    }
 
-	repositories {
-		mavenLocal()
-		mavenCentral()
-		maven("https://maven.architectury.dev/")
-		maven("https://maven.parchmentmc.org/")
-		maven("https://maven.fabricmc.net/")
-		maven("https://maven.neoforged.net/releases/")
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven("https://maven.architectury.dev/")
+        maven("https://maven.parchmentmc.org/")
+        maven("https://maven.fabricmc.net/")
+        maven("https://maven.neoforged.net/releases/")
 
-		maven("https://repo.pandasystems.dev/repository/maven-public/")
-	}
+        maven("https://repo.pandasystems.dev/repository/maven-public/")
 
-	dependencies {
-		fun dependNoneMod(dependencyNotation: Any?): Any? {
+        exclusiveContent {
+            forRepository {
+                maven {
+                    name = "Modrinth"
+                    url = uri("https://api.modrinth.com/maven")
+                }
+            }
+            filter {
+                includeGroup("maven.modrinth")
+            }
+        }
+
+        maven("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/")
+    }
+
+    dependencies {
+        fun dependNoneMod(dependencyNotation: Any?): Any? {
 			if (dependencyNotation == null) return null
-			implementation(dependencyNotation)
-			if (loomPlatform == "neoforge") "forgeRuntimeLibrary"(dependencyNotation)
+            implementation(dependencyNotation)
+            if (loomPlatform == "neoforge") "forgeRuntimeLibrary"(dependencyNotation)
 			return dependencyNotation
 		}
 
 		fun nestNoneMod(dependencyNotation: Any?): Any? {
 			if (dependencyNotation == null) return null
-			if (loomPlatform != null) include(dependencyNotation)
+            if (loomPlatform != null) include(dependencyNotation)
 			return dependencyNotation
-		}
+        }
 
-		dependNoneMod(kotlin("stdlib"))
-		dependNoneMod(kotlin("stdlib-jdk8"))
-		dependNoneMod(kotlin("stdlib-jdk7"))
-		dependNoneMod(kotlin("reflect"))
-		dependNoneMod("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-		dependNoneMod("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.10.2")
-		dependNoneMod("org.jetbrains.kotlinx:kotlinx-serialization-core:1.9.0")
-		dependNoneMod("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
-		dependNoneMod("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.9.0")
-		dependNoneMod("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
-		dependNoneMod("org.jetbrains.kotlinx:kotlinx-io-core:0.8.2")
-		dependNoneMod("org.jetbrains.kotlinx:kotlinx-io-bytestring:0.8.2")
+        dependNoneMod(kotlin("stdlib"))
+        dependNoneMod(kotlin("stdlib-jdk8"))
+        dependNoneMod(kotlin("stdlib-jdk7"))
+        dependNoneMod(kotlin("reflect"))
+        dependNoneMod("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+        dependNoneMod("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.10.2")
+        dependNoneMod("org.jetbrains.kotlinx:kotlinx-serialization-core:1.9.0")
+        dependNoneMod("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+        dependNoneMod("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.9.0")
+        dependNoneMod("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
+        dependNoneMod("org.jetbrains.kotlinx:kotlinx-io-core:0.8.2")
+        dependNoneMod("org.jetbrains.kotlinx:kotlinx-io-bytestring:0.8.2")
 
-		dependNoneMod("dev.pandasystems:universal-serializer:0.1.0-SNAPSHOT")
+        dependNoneMod("dev.pandasystems:universal-serializer:0.1.0-SNAPSHOT")
 
-		runtimeOnly("com.google.auto.service:auto-service-annotations:1.1.1")
-		compileOnly("com.google.auto.service:auto-service-annotations:1.1.1")
-		ksp("dev.zacsweers.autoservice:auto-service-ksp:1.2.0")
+        runtimeOnly("com.google.auto.service:auto-service-annotations:1.1.1")
+        compileOnly("com.google.auto.service:auto-service-annotations:1.1.1")
+        ksp("dev.zacsweers.autoservice:auto-service-ksp:1.2.0")
 
-		minecraft("com.mojang:minecraft:$mcVersion")
-		@Suppress("UnstableApiUsage")
-		mappings(loom.layered {
-			officialMojangMappings()
-			parchment("org.parchmentmc.data:parchment-$parchmentMinecraftVersion:$parchmentMappingsVersion@zip")
-		})
+        minecraft("com.mojang:minecraft:$mcVersion")
+        @Suppress("UnstableApiUsage")
+        mappings(loom.layered {
+            officialMojangMappings()
+            parchment("org.parchmentmc.data:parchment-$parchmentMinecraftVersion:$parchmentMappingsVersion@zip")
+        })
 
-		when (loomPlatform) {
-			"fabric" -> {
-				modImplementation("net.fabricmc:fabric-loader:$fabricLoaderVersion")
-				modImplementation("net.fabricmc.fabric-api:fabric-api:$fabricApiVersion")
+        when (loomPlatform) {
+            "fabric" -> {
+                modImplementation("net.fabricmc:fabric-loader:$fabricLoaderVersion")
+                modImplementation("net.fabricmc.fabric-api:fabric-api:$fabricApiVersion")
 
-				common(project(":", configuration = "namedElements")) { isTransitive = false }
-				shadowBundle(project(":", configuration = "transformProductionFabric"))
-			}
+                common(project(":", configuration = "namedElements")) { isTransitive = false }
+                shadowBundle(project(":", configuration = "transformProductionFabric"))
 
-			"neoforge" -> {
-				"neoForge"("net.neoforged:neoforge:$neoforgeLoaderVersion")
+                modCompileOnly("maven.modrinth:treechop:${httreechopFabricVersion}-fabric,${mcVersion}")
+                if (httreechopRuntimeEnabled) {
+                    modLocalRuntime("maven.modrinth:treechop:${httreechopFabricVersion}-fabric,${mcVersion}")
+                    modLocalRuntime("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${forgeConfigApiVersion}")
+                }
+            }
 
-				common(project(":", configuration = "namedElements")) { isTransitive = false }
-				shadowBundle(project(":", configuration = "transformProductionNeoForge"))
-			}
+            "neoforge" -> {
+                "neoForge"("net.neoforged:neoforge:$neoforgeLoaderVersion")
 
-			else -> {
-				// We depend on fabric loader here to use the fabric @Environment annotations and get the mixin dependencies
-				// Do NOT use other classes from fabric loader
-				modImplementation("net.fabricmc:fabric-loader:$fabricLoaderVersion")
-			}
-		}
+                common(project(":", configuration = "namedElements")) { isTransitive = false }
+                shadowBundle(project(":", configuration = "transformProductionNeoForge"))
 
-		modImplementation("dev.pandasystems:pandalib-$loaderEnv-$mcVersion:$pandalibVersion:slim") { isTransitive = false }
-	}
+                modCompileOnly("maven.modrinth:treechop:${httreechopNeoforgeVersion}-neoforge,${mcVersion}")
+                if (httreechopRuntimeEnabled) {
+                    modLocalRuntime("maven.modrinth:treechop:${httreechopNeoforgeVersion}-neoforge,${mcVersion}")
+//                    modLocalRuntime("fuzs.forgeconfigapiport:forgeconfigapiport-neoforge:${forgeConfigApiVersion}")
+                }
+            }
 
-	java {
-		sourceCompatibility = JavaVersion.toVersion(javaVersion)
+            else -> {
+                // We depend on fabric loader here to use the fabric @Environment annotations and get the mixin dependencies
+                // Do NOT use other classes from fabric loader
+                modImplementation("net.fabricmc:fabric-loader:$fabricLoaderVersion")
+            }
+        }
+
+        modImplementation("dev.pandasystems:pandalib-$loaderEnv-$mcVersion:$pandalibVersion:slim") {
+            isTransitive = false
+        }
+    }
+
+    java {
+        sourceCompatibility = JavaVersion.toVersion(javaVersion)
 		targetCompatibility = JavaVersion.toVersion(javaVersion)
-		withSourcesJar()
-	}
+        withSourcesJar()
+    }
 
-	kotlin {
-		jvmToolchain(javaVersion.toInt())
-	}
+    kotlin {
+        jvmToolchain(javaVersion.toInt())
+    }
 
-	tasks {
-		processResources {
-			val props = mutableMapOf(
-				"java_version" to javaVersion,
-				"minecraft_version" to mcVersion,
+    tasks {
+        processResources {
+            val props = mutableMapOf(
+                "java_version" to javaVersion,
+                "minecraft_version" to mcVersion,
 
-				"mod_version" to modVersion,
-				"mod_group" to modGroup,
-				"mod_id" to modId,
+                "mod_version" to modVersion,
+                "mod_group" to modGroup,
+                "mod_id" to modId,
 
-				"mod_name" to modName,
-				"mod_description" to modDescription,
-				"mod_license" to modLicense,
-				"mod_authors_fabric" to modAuthors.split(",").joinToString(", ") { "\"$it\"" },
-				"mod_authors_forge" to modAuthors,
+                "mod_name" to modName,
+                "mod_description" to modDescription,
+                "mod_license" to modLicense,
+                "mod_authors_fabric" to modAuthors.split(",").joinToString(", ") { "\"$it\"" },
+                "mod_authors_forge" to modAuthors,
 
-				"pandalib_version" to pandalibVersion
-			)
+                "pandalib_version" to pandalibVersion
+            )
 
-			fabricLoaderVersion?.let { props["fabric_loader_version"] = it }
-			neoforgeLoaderVersion?.let { props["neoforge_loader_version"] = it }
+            fabricLoaderVersion?.let { props["fabric_loader_version"] = it }
+            neoforgeLoaderVersion?.let { props["neoforge_loader_version"] = it }
 
-			inputs.properties(props)
-			filesMatching(
-				listOf(
-					"META-INF/mods.toml",
-					"META-INF/neoforge.mods.toml",
-					"fabric.mod.json",
-					"**.mixins.json",
-					"pack.mcmeta"
-				)
+            inputs.properties(props)
+            filesMatching(
+                listOf(
+                    "META-INF/mods.toml",
+                    "META-INF/neoforge.mods.toml",
+                    "fabric.mod.json",
+                    "**.mixins.json",
+                    "pack.mcmeta"
+
+            )
 			) {
-				expand(props)
-			}
-		}
+                expand(props)
+            }
+        }
 
-		if (loomPlatform != null) {
-			getByName<ShadowJar>("shadowJar") {
-				configurations = listOf(shadowBundle)
-				archiveClassifier.set("dev-shadow")
+        if (loomPlatform != null) {
+            getByName<ShadowJar>("shadowJar") {
+                configurations = listOf(shadowBundle)
+                archiveClassifier.set("dev-shadow")
 
-				exclude("architectury.common.json")
-			}
+                exclude("architectury.common.json")
+            }
 
-			remapJar {
-				injectAccessWidener.set(true)
-				inputFile = getByName<ShadowJar>("shadowJar").archiveFile
-				archiveClassifier.set("")
-				if (loomPlatform == "neoforge")
-			 		atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
-			}
+            remapJar {
+                injectAccessWidener.set(true)
+                inputFile = getByName<ShadowJar>("shadowJar").archiveFile
 
-			val remapSlimJar by registering(RemapJarTask::class) {
+                archiveClassifier.set("")
+                if (loomPlatform == "neoforge")
+                    atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
+            }
+
+
+
+            val remapSlimJar by registering(RemapJarTask::class) {
 				dependsOn(getByName<ShadowJar>("shadowJar"))
 				injectAccessWidener.set(true)
 				inputFile = getByName<ShadowJar>("shadowJar").archiveFile
@@ -279,48 +316,48 @@ allprojects {
 				if (loomPlatform == "neoforge")
 					atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
 			}
+            val copyBuildModFile by registering(Copy::class) {
+                from("build/libs/${base.archivesName.get()}-$version.jar")
+                into(rootDir.resolve("build/mod-build"))
+            }
 
-			val copyBuildModFile by registering(Copy::class) {
-				from("build/libs/${base.archivesName.get()}-$version.jar")
-				into(rootDir.resolve("build/mod-build"))
-			}
+            build {
+                dependsOn("remapSlimJar")
+                finalizedBy(copyBuildModFile)
+            }
 
-			build {
-				dependsOn("remapSlimJar")
-				finalizedBy(copyBuildModFile)
-			}
+            val copyLicense by register("copyLicense", Copy::class) {
+                from(rootDir.resolve("LICENSE.md"))
+                destinationDir = project.layout.buildDirectory.file("resources/main").get().asFile
+            }
 
-			val copyLicense by register("copyLicense",Copy::class) {
-				from(rootDir.resolve("LICENSE.md"))
-				destinationDir = project.layout.buildDirectory.file("resources/main").get().asFile
-			}
+            processResources {
+                dependsOn(copyLicense)
+            }
+        }
+    }
 
-			processResources {
-				dependsOn(copyLicense)
-			}
-		}
-	}
+    idea {
+        module {
+            settings {
+                val packagePrefixStr = "$modGroup.$modId".let {
+                    if (loomPlatform != null) "$it.$loomPlatform"
+                    else it
+                }
+                packagePrefix["src/main/kotlin"] = packagePrefixStr
+                packagePrefix["src/main/java"] = packagePrefixStr
+            }
+        }
+    }
 
-	idea {
-		module {
-			settings {
-				val packagePrefixStr = "$modGroup.$modId".let {
-					if (loomPlatform != null) "$it.$loomPlatform"
-					else it
-				}
-				packagePrefix["src/main/kotlin"] = packagePrefixStr
-				packagePrefix["src/main/java"] = packagePrefixStr
-			}
-		}
-	}
+    publishing {
+        publications {
+            create<MavenPublication>("maven") {
+                from(components["java"])
+                artifactId = base.archivesName.get()
 
-	publishing {
-		publications {
-			create<MavenPublication>("maven") {
-				from(components["java"])
-				artifactId = base.archivesName.get()
 
-				if (loomPlatform != null) {
+        if (loomPlatform != null) {
 					artifact(tasks.named("remapSlimJar")) {
 						classifier = "slim"
 					}
@@ -332,74 +369,74 @@ allprojects {
 			}
 		}
 
-		repositories {
-			maven(
-				if (version.toString().endsWith("-SNAPSHOT"))
-					"https://repo.pandasystems.dev/repository/maven-snapshots/"
-				else
-					"https://repo.pandasystems.dev/repository/maven-releases/"
-			) {
-				name = "pandasystems"
-				credentials {
-					username = System.getenv("NEXUS_USERNAME")
-					password = System.getenv("NEXUS_PASSWORD")
-				}
-			}
-		}
-	}
+        repositories {
+            maven(
+                if (version.toString().endsWith("-SNAPSHOT"))
+                    "https://repo.pandasystems.dev/repository/maven-snapshots/"
+                else
+                    "https://repo.pandasystems.dev/repository/maven-releases/"
+            ) {
+                name = "pandasystems"
+                credentials {
+                    username = System.getenv("NEXUS_USERNAME")
+                    password = System.getenv("NEXUS_PASSWORD")
+                }
+            }
+        }
+    }
 }
 
 publishMods {
-	type = ReleaseType.BETA
-	changelog = file("CHANGELOG.md").readText()
+    type = ReleaseType.BETA
+    changelog = file("CHANGELOG.md").readText()
 
-	val cfOptions = curseforgeOptions {
-		accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
-		projectId = "880630"
-		minecraftVersions.add(mcVersion)
-	}
+    val cfOptions = curseforgeOptions {
+        accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+        projectId = "880630"
+        minecraftVersions.add(mcVersion)
+    }
 
-	val mrOptions = modrinthOptions {
-		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
-		projectId = "i2kUe4lq"
-		minecraftVersions.add(mcVersion)
-	}
+    val mrOptions = modrinthOptions {
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        projectId = "i2kUe4lq"
+        minecraftVersions.add(mcVersion)
+    }
 
-	curseforge("curseforgeFabric") {
-		displayName = "[$mcVersion Fabric] ${project.version}"
-		from(cfOptions)
-		file = project(":fabric").tasks.remapJar.get().archiveFile
-		modLoaders.add("fabric")
-		requires(
-			"fabric-api",
-			"pandalib"
-		)
-	}
+    curseforge("curseforgeFabric") {
+        displayName = "[$mcVersion Fabric] ${project.version}"
+        from(cfOptions)
+        file = project(":fabric").tasks.remapJar.get().archiveFile
+        modLoaders.add("fabric")
+        requires(
+            "fabric-api",
+            "pandalib"
+        )
+    }
 
-	curseforge("curseforgeNeoForge") {
-		displayName = "[$mcVersion NeoForge] ${project.version}"
-		from(cfOptions)
-		file = project(":neoforge").tasks.remapJar.get().archiveFile
-		modLoaders.add("neoforge")
-		requires("pandalib")
-	}
+    curseforge("curseforgeNeoForge") {
+        displayName = "[$mcVersion NeoForge] ${project.version}"
+        from(cfOptions)
+        file = project(":neoforge").tasks.remapJar.get().archiveFile
+        modLoaders.add("neoforge")
+        requires("pandalib")
+    }
 
-	modrinth("modrinthFabric") {
-		displayName = "[$mcVersion Fabric] ${project.version}"
-		from(mrOptions)
-		file = project(":fabric").tasks.remapJar.get().archiveFile
-		modLoaders.add("fabric")
-		requires(
-			"fabric-api",
-			"pandalib"
-		)
-	}
+    modrinth("modrinthFabric") {
+        displayName = "[$mcVersion Fabric] ${project.version}"
+        from(mrOptions)
+        file = project(":fabric").tasks.remapJar.get().archiveFile
+        modLoaders.add("fabric")
+        requires(
+            "fabric-api",
+            "pandalib"
+        )
+    }
 
-	modrinth("modrinthNeoForge") {
-		displayName = "[$mcVersion NeoForge] ${project.version}"
-		from(mrOptions)
-		file = project(":neoforge").tasks.remapJar.get().archiveFile
-		modLoaders.add("neoforge")
-		requires("pandalib")
-	}
+    modrinth("modrinthNeoForge") {
+        displayName = "[$mcVersion NeoForge] ${project.version}"
+        from(mrOptions)
+        file = project(":neoforge").tasks.remapJar.get().archiveFile
+        modLoaders.add("neoforge")
+        requires("pandalib")
+    }
 }
