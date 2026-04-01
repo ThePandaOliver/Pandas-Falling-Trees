@@ -9,6 +9,8 @@
 - Updated to Fabric Loader 0.18.4
 - Updated to NeoForge 21.10.64
 
+- Readded HTs TreeChop support
+
 ## Bug Fixes
 
 - Fixed crash on server startup due to config options not being properly synchronized between server and client.\

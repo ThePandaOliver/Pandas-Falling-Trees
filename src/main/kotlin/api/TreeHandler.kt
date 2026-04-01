@@ -13,6 +13,8 @@
 package dev.pandasystems.fallingtrees.api
 
 import com.mojang.logging.LogUtils
+import dev.pandasystems.fallingtrees.compat.ModCompatibilities
+import dev.pandasystems.fallingtrees.compat.TreeChopCompat
 import dev.pandasystems.fallingtrees.config.ClientConfig
 import dev.pandasystems.fallingtrees.config.MiningOptionEnum
 import dev.pandasystems.fallingtrees.config.fallingTreesClientConfig
@@ -50,6 +52,9 @@ object TreeHandler {
 	}
 
 	private fun onBlockBreak(level: Level, pos: BlockPos, state: BlockState, player: ServerPlayer): Boolean {
+		if (TreeChopCompat.isChoppable(level, pos))
+			return true
+
 		if (!canPlayerChopTree(player))
 			return true
 
