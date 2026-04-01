@@ -73,7 +73,7 @@ data class TreeData(
 			return this
 		}
 
-		fun <T> addAwardedStats(stats: MutableCollection<Stat<T>>): Builder {
+		fun <T: Any> addAwardedStats(stats: MutableCollection<Stat<T>>): Builder {
 			stats.forEach { stat: Stat<T> -> this.addAwardedStat(stat) }
 			return this
 		}
