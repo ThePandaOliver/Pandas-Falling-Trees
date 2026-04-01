@@ -15,8 +15,8 @@ import dev.pandasystems.fallingtrees.FallingTrees
 import dev.pandasystems.pandalib.config.ConfigRegistry
 import dev.pandasystems.pandalib.config.syncOption
 
-val fallingTreesClientConfig = ConfigRegistry.create(FallingTrees.identifier("client"), ClientConfig)
-val fallingTreesCommonConfig = ConfigRegistry.create(FallingTrees.identifier("common"), CommonConfig)
+val fallingTreesClientConfig = ConfigRegistry.create(FallingTrees.resourceLocation("client"), ClientConfig)
+val fallingTreesCommonConfig = ConfigRegistry.create(FallingTrees.resourceLocation("common"), CommonConfig)
 
 internal fun initConfigs() {
 	fallingTreesClientConfig.load()
