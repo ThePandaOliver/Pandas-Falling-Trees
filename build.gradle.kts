@@ -43,7 +43,7 @@ val pandalibVersion: String by project
 val forgeConfigApiVersion: String by project
 val httreechopNeoforgeVersion: String by project
 val httreechopFabricVersion: String by project
-val httreechopRuntimeEnabled: Boolean = true
+val httreechopRuntimeEnabled: Boolean = false
 
 allprojects {
     val loomPlatform = project.findProperty("loom.platform") as? String
@@ -221,12 +221,6 @@ allprojects {
 
                 common(project(":", configuration = "namedElements")) { isTransitive = false }
                 shadowBundle(project(":", configuration = "transformProductionNeoForge"))
-
-                modCompileOnly("maven.modrinth:treechop:${httreechopNeoforgeVersion}-neoforge,${mcVersion}")
-                if (httreechopRuntimeEnabled) {
-                    modLocalRuntime("maven.modrinth:treechop:${httreechopNeoforgeVersion}-neoforge,${mcVersion}")
-//                    modLocalRuntime("fuzs.forgeconfigapiport:forgeconfigapiport-neoforge:${forgeConfigApiVersion}")
-                }
             }
 
             else -> {

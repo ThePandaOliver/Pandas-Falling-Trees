@@ -12,8 +12,6 @@
 package dev.pandasystems.fallingtrees.neoforge
 
 import dev.pandasystems.fallingtrees.FallingTrees
-import dev.pandasystems.fallingtrees.compat.ModCompatibilities
-import dev.pandasystems.fallingtrees.neoforge.compat.TreeChopCompatImpl
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.fml.common.Mod
 
@@ -21,8 +19,5 @@ import net.neoforged.fml.common.Mod
 class FallingTreesNeoForge(eventBus: IEventBus) {
 	init {
 		FallingTrees
-
-		if (ModCompatibilities.isTreeChopLoaded)
-			TreeChopCompatImpl.init(eventBus)
 	}
 }

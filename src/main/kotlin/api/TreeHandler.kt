@@ -52,7 +52,7 @@ object TreeHandler {
 	}
 
 	private fun onBlockBreak(level: Level, pos: BlockPos, state: BlockState, player: ServerPlayer): Boolean {
-		if (TreeChopCompat.isChoppable(level, pos))
+		if (ModCompatibilities.isTreeChopLoaded && TreeChopCompat.isChoppable(level, pos))
 			return true
 
 		if (!canPlayerChopTree(player))
