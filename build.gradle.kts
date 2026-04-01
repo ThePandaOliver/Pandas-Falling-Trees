@@ -350,7 +350,7 @@ allprojects {
 }
 
 publishMods {
-	type = ReleaseType.ALPHA
+	type = ReleaseType.BETA
 	changelog = file("CHANGELOG.md").readText()
 
 	val cfOptions = curseforgeOptions {
