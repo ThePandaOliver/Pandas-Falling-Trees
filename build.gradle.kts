@@ -14,7 +14,7 @@ plugins {
     id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.10"
 
     id("me.modmuss50.mod-publish-plugin") version "1.1.0"
-	id("com.google.devtools.ksp") version "2.3.0"
+    id("com.google.devtools.ksp") version "2.3.0"
     `maven-publish`
 }
 
@@ -208,6 +208,11 @@ allprojects {
 
                 common(project(":", configuration = "namedElements")) { isTransitive = false }
                 shadowBundle(project(":", configuration = "transformProductionFabric"))
+            modCompileOnly("maven.modrinth:treechop:${httreechopFabricVersion}-fabric,${mcVersion}")
+                if (httreechopRuntimeEnabled) {
+                    modLocalRuntime("maven.modrinth:treechop:${httreechopFabricVersion}-fabric,${mcVersion}")
+                    modLocalRuntime("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${forgeConfigApiVersion}")
+                }
             }
 
             "neoforge" -> {
@@ -215,6 +220,11 @@ allprojects {
 
                 common(project(":", configuration = "namedElements")) { isTransitive = false }
                 shadowBundle(project(":", configuration = "transformProductionNeoForge"))
+            modCompileOnly("maven.modrinth:treechop:${httreechopNeoforgeVersion}-neoforge,${mcVersion}")
+                if (httreechopRuntimeEnabled) {
+                    modLocalRuntime("maven.modrinth:treechop:${httreechopNeoforgeVersion}-neoforge,${mcVersion}")
+//                    modLocalRuntime("fuzs.forgeconfigapiport:forgeconfigapiport-neoforge:${forgeConfigApiVersion}")
+                }
             }
 
             else -> {
