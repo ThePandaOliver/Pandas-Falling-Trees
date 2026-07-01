@@ -61,7 +61,7 @@ Development is targeted 1.21.10
 ```kotlin
 repositories {
 	mavenCentral()
-	maven("https://repo.pandasystems.dev/repository/maven-public/")
+	maven("https://repo.pandasystems.dev/maven/maven/")
 }
 
 dependencies {

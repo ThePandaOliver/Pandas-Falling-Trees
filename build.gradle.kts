@@ -139,7 +139,7 @@ allprojects {
 		maven("https://maven.fabricmc.net/")
 		maven("https://maven.neoforged.net/releases/")
 
-		maven("https://repo.pandasystems.dev/repository/maven-public/")
+		maven("https://repo.pandasystems.dev/maven/maven/")
 	}
 
 	dependencies {
@@ -333,16 +333,13 @@ allprojects {
 		}
 
 		repositories {
-			maven(
-				if (version.toString().endsWith("-SNAPSHOT"))
-					"https://repo.pandasystems.dev/repository/maven-snapshots/"
-				else
-					"https://repo.pandasystems.dev/repository/maven-releases/"
-			) {
-				name = "pandasystems"
-				credentials {
-					username = System.getenv("NEXUS_USERNAME")
-					password = System.getenv("NEXUS_PASSWORD")
+			repositories {
+				maven("https://repo.pandasystems.dev/maven/maven/") {
+					name = "artifact-keeper"
+					credentials {
+						username = providers.gradleProperty("REPO_USERNAME").get()
+						password = providers.gradleProperty("REPO_PASSWORD").get()
+					}
 				}
 			}
 		}
