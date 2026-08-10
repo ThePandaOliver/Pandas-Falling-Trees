@@ -1,0 +1,41 @@
+[versions]
+kotlin = "2.3.0"
+kotlinx-coroutines = "1.10.2"
+kotlinx-serialization = "1.9.0"
+kotlinx-io = "0.8.2"
+kotlinx-datetime = "0.7.1"
+
+autoService-ksp = "1.2.0"
+autoService-annotations = "1.1.1"
+
+minecraft = "1.21.11"
+
+[libraries]
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+kotlinx-serialization-cbor = { module = "org.jetbrains.kotlinx:kotlinx-serialization-cbor", version.ref = "kotlinx-serialization" }
+kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx-io" }
+kotlinx-io-bytestring = { module = "org.jetbrains.kotlinx:kotlinx-io-bytestring", version.ref = "kotlinx-io" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+
+autoService-ksp = { module = "dev.zacsweers.autoservice:auto-service-ksp", version.ref = "autoService-ksp" }
+autoService-annotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "autoService-annotations" }
+
+minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
+
+fabric-loader = { module = "net.fabricmc:fabric-loader", version = "0.18.4" }
+fabric-api = { module = "net.fabricmc.fabric-api:fabric-api", version = "0.140.2+1.21.11" }
+
+neoforge = { module = "net.neoforged:neoforge", version = "21.11.20-beta" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+architectury-loom = { id = "dev.architectury.loom", version = "1.13-SNAPSHOT" }
+shadow = { id = "com.gradleup.shadow", version = "9.0.2" }
+publish-mod = { id = "me.modmuss50.mod-publish-plugin", version = "1.1.0" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin" }
+easymodding = { id = "dev.pandasystems.easymodding", version = "1.0-SNAPSHOT" }

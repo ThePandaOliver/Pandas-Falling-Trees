@@ -16,10 +16,10 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"dev.pandasystems.fallingtrees.fabric.FallingTreesFabric"
+          "PFallingTreesFabric"
 		],
 		"client": [
-			"dev.pandasystems.fallingtrees.fabric.client.FallingTreesClientFabric"
+			"FabricClientInit"
 		]
 	},
 	"mixins": [

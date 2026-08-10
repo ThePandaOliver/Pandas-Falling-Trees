@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "metadata": {
+    "id": "falling-trees",
+    "version": "1.0",
+    "name": "Panda's Falling Trees",
+    "license": "GNU GPLv3",
+    "authors": [
+      "The Panda Oliver"
+    ]
+  }
+}

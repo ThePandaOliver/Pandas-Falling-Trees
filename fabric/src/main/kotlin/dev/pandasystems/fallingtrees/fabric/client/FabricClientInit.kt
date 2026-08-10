@@ -11,11 +11,10 @@
  */
 package dev.pandasystems.fallingtrees.fabric.client
 
-import dev.pandasystems.fallingtrees.client.FallingTreesClient
 import net.fabricmc.api.ClientModInitializer
 
-class FallingTreesClientFabric : ClientModInitializer {
+internal class FabricClientInit : ClientModInitializer {
 	override fun onInitializeClient() {
-		FallingTreesClient
+
 	}
 }

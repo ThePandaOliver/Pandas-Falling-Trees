@@ -11,11 +11,11 @@
  */
 package dev.pandasystems.fallingtrees.fabric
 
-import dev.pandasystems.fallingtrees.FallingTrees
+import dev.pandasystems.fallingtrees.core.FallingTreesMain
 import net.fabricmc.api.ModInitializer
 
-class FallingTreesFabric : ModInitializer {
+internal class FabricInit : ModInitializer {
 	override fun onInitialize() {
-		FallingTrees
+		FallingTreesMain()
 	}
 }
