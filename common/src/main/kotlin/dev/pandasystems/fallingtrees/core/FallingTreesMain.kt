@@ -1,9 +1,18 @@
 package dev.pandasystems.fallingtrees.core
 
+import dev.pandasystems.fallingtrees.config.CommonConfig
+import dev.pandasystems.pandalib.config.ConfigManager
+import dev.pandasystems.pandalib.config.store.InMemoryConfigStore
 
-class FallingTreesMain() {
+
+class FallingTreesMain {
 	init {
 		install(this)
+
+		CommonConfig.HANDLE = ConfigManager.load(
+			InMemoryConfigStore(),
+			{ CommonConfig() }
+		)
 	}
 
 	companion object {
