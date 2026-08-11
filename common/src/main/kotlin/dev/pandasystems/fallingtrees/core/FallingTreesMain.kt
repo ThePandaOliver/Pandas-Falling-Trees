@@ -1,9 +1,6 @@
 package dev.pandasystems.fallingtrees.core
 
-import dev.pandasystems.fallingtrees.config.CommonConfig
 import dev.pandasystems.fallingtrees.config.initConfigs
-import dev.pandasystems.pandalib.config.ConfigManager
-import dev.pandasystems.pandalib.config.store.InMemoryConfigStore
 
 
 class FallingTreesMain {
