@@ -1,4 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.gradle.kotlin.dsl.named
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
 	alias(libs.plugins.kotlin.jvm)
@@ -9,6 +11,8 @@ plugins {
 	`maven-publish`
 }
 
+evaluationDependsOn(":common")
+
 base {
 	archivesName.set("fallingtrees-fabric")
 }
@@ -18,7 +22,16 @@ repositories {
 	mavenCentral()
 }
 
-val common = configurations.create("common") {
+loom {
+	splitEnvironmentSourceSets()
+}
+
+val commonMain = configurations.create("commonMain") {
+	isCanBeResolved = true
+	isCanBeConsumed = false
+}
+
+val commonClient = configurations.create("commonClient") {
 	isCanBeResolved = true
 	isCanBeConsumed = false
 }
@@ -28,19 +41,35 @@ val shadowCommon = configurations.create("shadowCommon") {
 	isCanBeConsumed = false
 }
 
-configurations.compileClasspath.get().extendsFrom(common)
-configurations.runtimeClasspath.get().extendsFrom(common)
+configurations.compileClasspath.get().extendsFrom(commonMain)
+configurations.runtimeClasspath.get().extendsFrom(commonMain)
+configurations.named("clientCompileClasspath").get().extendsFrom(commonClient)
+configurations.named("clientRuntimeClasspath").get().extendsFrom(commonClient)
+
+val commonSourceSets = project(":common").extensions.getByType<SourceSetContainer>()
 
 dependencies {
 	minecraft("com.mojang:minecraft:${project.property("minecraft_version")}")
 	implementation("net.fabricmc:fabric-loader:${project.property("fabric_loader_version")}")
 	implementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_api_version")}")
 
-	common(project(":common")) { isTransitive = false }
+	api(libs.kotlin.reflect)
+	api(libs.kotlinx.coroutines)
+	api(libs.kotlinx.serialization)
+	api(libs.kotlinx.serialization.json)
+	api(libs.kotlinx.serialization.cbor)
+	api(libs.kotlinx.io)
+	api(libs.kotlinx.io.bytestring)
+	api(libs.kotlinx.datetime)
+
+	commonMain(commonSourceSets["main"].output)
+	commonClient(commonSourceSets["client"].output)
 	shadowCommon(project(":common")) { isTransitive = false }
 
 	implementation(libs.autoService.annotations)
+	"clientImplementation"(libs.autoService.annotations)
 	ksp(libs.autoService.ksp)
+	"kspClient"(libs.autoService.ksp)
 
 	api(libs.pandalib.fabric)
 }
@@ -53,6 +82,20 @@ java {
 
 kotlin {
 	jvmToolchain(25)
+	target {
+		val mainCompilation = compilations.getByName("main")
+		val clientCompilation = compilations.getByName("client")
+
+		clientCompilation.associateWith(mainCompilation)
+	}
+}
+
+tasks.named<KotlinCompile>("compileClientKotlin") {
+	friendPaths.setFrom(
+		sourceSets["main"].output.classesDirs,
+		commonSourceSets["main"].output.classesDirs,
+		commonSourceSets["client"].output.classesDirs
+	)
 }
 
 loom {
@@ -60,12 +103,14 @@ loom {
 		named("client") {
 			client()
 			configName = "Fabric Client"
+			ideConfigFolder = "Fabric"
 			ideConfigGenerated(true)
 			runDir("../.runs/client")
 		}
 		named("server") {
 			server()
 			configName = "Fabric Server"
+			ideConfigFolder = "Fabric"
 			ideConfigGenerated(true)
 			runDir("../.runs/server")
 		}
@@ -91,8 +136,10 @@ tasks.processResources {
 }
 
 tasks.named<ShadowJar>("shadowJar") {
+	from(sourceSets["client"].output)
 	configurations = listOf(shadowCommon)
 	archiveClassifier.set("")
+	mergeServiceFiles()
 }
 
 tasks.named<Jar>("jar") {

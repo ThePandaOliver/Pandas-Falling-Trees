@@ -5,23 +5,13 @@ import dev.pandasystems.fallingtrees.config.initConfigs
 
 class FallingTreesMain {
 	init {
-		install(this)
+		instance = this
 		initConfigs()
+		FallingTreesRegistries.register()
 	}
 
 	companion object {
 		lateinit var instance: FallingTreesMain
 			private set
-
-		private fun install(main: FallingTreesMain) {
-			if (!::instance.isInitialized) {
-				instance = main
-			} else {
-				logger.warn("""
-					FallingTreesMain instance already initialized.
-					This is only intended for testing purposes.
-				""".trimIndent())
-			}
-		}
 	}
 }

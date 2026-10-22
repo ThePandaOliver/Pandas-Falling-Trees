@@ -1,3 +1,6 @@
+import org.gradle.kotlin.dsl.named
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
@@ -13,6 +16,10 @@ base {
 repositories {
     mavenLocal()
     mavenCentral()
+}
+
+loom {
+    splitEnvironmentSourceSets()
 }
 
 dependencies {
@@ -41,6 +48,18 @@ java {
 
 kotlin {
     jvmToolchain(25)
+    target {
+        val mainCompilation = compilations.getByName("main")
+        val clientCompilation = compilations.getByName("client")
+
+        clientCompilation.associateWith(mainCompilation)
+    }
+}
+
+// Replace the default jar friendPath added by associateWith (which causes a task cycle with Loom's splitEnvironmentSourceSets)
+// with the compiled classes directories directly.
+tasks.named<KotlinCompile>("compileClientKotlin") {
+    friendPaths.setFrom(sourceSets["main"].output.classesDirs)
 }
 
 tasks.processResources {
