@@ -22,16 +22,7 @@ repositories {
 	mavenCentral()
 }
 
-loom {
-	splitEnvironmentSourceSets()
-}
-
-val commonMain = configurations.create("commonMain") {
-	isCanBeResolved = true
-	isCanBeConsumed = false
-}
-
-val commonClient = configurations.create("commonClient") {
+val common = configurations.create("common") {
 	isCanBeResolved = true
 	isCanBeConsumed = false
 }
@@ -41,12 +32,8 @@ val shadowCommon = configurations.create("shadowCommon") {
 	isCanBeConsumed = false
 }
 
-configurations.compileClasspath.get().extendsFrom(commonMain)
-configurations.runtimeClasspath.get().extendsFrom(commonMain)
-configurations.named("clientCompileClasspath").get().extendsFrom(commonClient)
-configurations.named("clientRuntimeClasspath").get().extendsFrom(commonClient)
-
-val commonSourceSets = project(":common").extensions.getByType<SourceSetContainer>()
+configurations.compileClasspath.get().extendsFrom(common)
+configurations.runtimeClasspath.get().extendsFrom(common)
 
 dependencies {
 	minecraft("com.mojang:minecraft:${project.property("minecraft_version")}")
@@ -62,14 +49,11 @@ dependencies {
 	api(libs.kotlinx.io.bytestring)
 	api(libs.kotlinx.datetime)
 
-	commonMain(commonSourceSets["main"].output)
-	commonClient(commonSourceSets["client"].output)
+	common(project(":common")) { isTransitive = false }
 	shadowCommon(project(":common")) { isTransitive = false }
 
 	implementation(libs.autoService.annotations)
-	"clientImplementation"(libs.autoService.annotations)
 	ksp(libs.autoService.ksp)
-	"kspClient"(libs.autoService.ksp)
 
 	api(libs.pandalib.fabric)
 }
@@ -82,20 +66,6 @@ java {
 
 kotlin {
 	jvmToolchain(25)
-	target {
-		val mainCompilation = compilations.getByName("main")
-		val clientCompilation = compilations.getByName("client")
-
-		clientCompilation.associateWith(mainCompilation)
-	}
-}
-
-tasks.named<KotlinCompile>("compileClientKotlin") {
-	friendPaths.setFrom(
-		sourceSets["main"].output.classesDirs,
-		commonSourceSets["main"].output.classesDirs,
-		commonSourceSets["client"].output.classesDirs
-	)
 }
 
 loom {
@@ -136,14 +106,9 @@ tasks.processResources {
 }
 
 tasks.named<ShadowJar>("shadowJar") {
-	from(sourceSets["client"].output)
 	configurations = listOf(shadowCommon)
 	archiveClassifier.set("")
 	mergeServiceFiles()
-}
-
-tasks.named<Jar>("jar") {
-	archiveClassifier.set("slim")
 }
 
 tasks.named("assemble") {

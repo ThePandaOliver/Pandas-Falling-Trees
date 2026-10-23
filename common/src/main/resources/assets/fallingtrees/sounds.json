@@ -1,0 +1,16 @@
+{
+	"tree_fall": {
+		"category": "block",
+		"subtitle": "subtitles.fallingtrees.tree_fall",
+		"sounds": [
+			"fallingtrees:tree_fall"
+		]
+	},
+	"tree_impact": {
+		"category": "block",
+		"subtitle": "subtitles.fallingtrees.tree_impact",
+		"sounds": [
+			"fallingtrees:tree_impact"
+		]
+	}
+}

@@ -18,10 +18,6 @@ repositories {
     mavenCentral()
 }
 
-loom {
-    splitEnvironmentSourceSets()
-}
-
 dependencies {
     minecraft("com.mojang:minecraft:${project.property("minecraft_version")}")
     compileOnly("net.fabricmc:fabric-loader:${project.property("fabric_loader_version")}")
@@ -48,21 +44,11 @@ java {
 
 kotlin {
     jvmToolchain(25)
-    target {
-        val mainCompilation = compilations.getByName("main")
-        val clientCompilation = compilations.getByName("client")
-
-        clientCompilation.associateWith(mainCompilation)
-    }
-}
-
-// Replace the default jar friendPath added by associateWith (which causes a task cycle with Loom's splitEnvironmentSourceSets)
-// with the compiled classes directories directly.
-tasks.named<KotlinCompile>("compileClientKotlin") {
-    friendPaths.setFrom(sourceSets["main"].output.classesDirs)
 }
 
 tasks.processResources {
+    exclude("**/*.aup3") // Exclude all audacity files
+
     val replaceProperties = mapOf(
         "mod_id" to project.property("mod_id"),
         "mod_name" to project.property("mod_name"),

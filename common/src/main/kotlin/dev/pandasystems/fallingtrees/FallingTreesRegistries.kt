@@ -1,7 +1,6 @@
-package dev.pandasystems.fallingtrees.core
+package dev.pandasystems.fallingtrees
 
-import dev.pandasystems.fallingtrees.core.entity.TreeEntity
-import dev.pandasystems.pandalib.core.handles.Identifier
+import dev.pandasystems.fallingtrees.entity.TreeEntity
 import dev.pandasystems.pandalib.core.handles.id
 import dev.pandasystems.pandalib.registry.DeferredRegistry
 import net.minecraft.core.registries.Registries
@@ -17,11 +16,8 @@ object FallingTreesRegistries {
 
 	// Sound
 
-	val treeFallSound = soundRegister.register(id(modId, "tree_fall")) { createFixedRangeEvent(it.identifier()) }
-	val treeImpactSound = soundRegister.register(id(modId, "tree_impact")) { createFixedRangeEvent(it.identifier()) }
-
-	private fun createFixedRangeEvent(identifier: Identifier, range: Float = 16f) =
-		SoundEvent.createFixedRangeEvent(identifier, range)
+	val treeFallSound = soundRegister.register(id(modId, "tree_fall")) { SoundEvent.createVariableRangeEvent(it.identifier()) }
+	val treeImpactSound = soundRegister.register(id(modId, "tree_impact")) { SoundEvent.createVariableRangeEvent(it.identifier()) }
 
 	// Entity
 

@@ -19,7 +19,7 @@
 			"dev.pandasystems.fallingtrees.fabric.FabricInit"
 		],
 		"client": [
-			"dev.pandasystems.fallingtrees.fabric.client.FabricClientInit"
+          "dev.pandasystems.fallingtrees.fabric.client.FabricClientInit"
 		]
 	},
 	"mixins": [
