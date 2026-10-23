@@ -31,6 +31,12 @@ data class CommonConfig(
 	var miningSpeedExponent: Float = 0.85f,
 	var maxMiningTimeMultiplier: Float = 12.0f,
 
+	// Falling Tree Entity Damage
+	var enableFallingTreeDamage: Boolean = true,
+	var baseFallingTreeDamage: Float = 2.0f,
+	var damagePerTrunkBlock: Float = 0.5f,
+	var maxFallingTreeDamage: Float = 20.0f,
+
 	// Built-in Special Flora Support
 	var enableCactus: Boolean = true,
 	var enableBamboo: Boolean = true,

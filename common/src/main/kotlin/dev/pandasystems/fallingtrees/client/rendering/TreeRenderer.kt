@@ -28,8 +28,7 @@ class TreeRenderer(context: EntityRendererProvider.Context) : EntityRenderer<Tre
 	override fun extractRenderState(entity: TreeEntity, state: TreeRenderState, partialTick: Float) {
 		super.extractRenderState(entity, state, partialTick)
 		state.fallDirection = entity.fallDirection
-		val totalTicks = entity.maxFallTicks.coerceAtLeast(1).toFloat()
-		state.fallProgress = ((entity.currentFallTicks + partialTick) / totalTicks).coerceIn(0f, 1f)
+		state.fallAngle = entity.getInterpolatedFallAngle(partialTick)
 
 		val clientLevel = entity.level() as? ClientLevel
 		val originPos = entity.blockPosition()
@@ -68,14 +67,17 @@ class TreeRenderer(context: EntityRendererProvider.Context) : EntityRenderer<Tre
 
 		poseStack.pushPose()
 
-		// Animate falling tilt (90 degrees around rotation axis perpendicular to fallDirection)
-		val fallAngle = state.fallProgress * 90.0f
 		val dir = state.fallDirection
 		// Perpendicular axis: rotAxis = (dir.z, 0, -dir.x)
 		val rotAxisX = dir.z.toFloat()
 		val rotAxisZ = (-dir.x).toFloat()
 
-		poseStack.mulPose(Axis.of(Vector3f(rotAxisX, 0.0f, rotAxisZ)).rotationDegrees(fallAngle))
+		// Pivot around the bottom edge of the origin block in the direction of the fall
+		val edgeX = dir.x * 0.5
+		val edgeZ = dir.z * 0.5
+		poseStack.translate(edgeX, 0.0, edgeZ)
+		poseStack.mulPose(Axis.of(Vector3f(rotAxisX, 0.0f, rotAxisZ)).rotationDegrees(state.fallAngle))
+		poseStack.translate(-edgeX, 0.0, -edgeZ)
 
 		// Render each block in the tree at its relative offset
 		for (entry in state.blockRenderStates) {

@@ -13,5 +13,5 @@ class TreeRenderState : EntityRenderState() {
 
 	var blockRenderStates: List<SingleBlockState> = emptyList()
 	var fallDirection: Vec3 = Vec3(1.0, 0.0, 0.0)
-	var fallProgress: Float = 0f
+	var fallAngle: Float = 0f
 }
