@@ -6,29 +6,13 @@ import net.minecraft.core.BlockPos
 
 data class TreeDefinition(
 	val id: Identifier,
-	val priority: Int = 0,
-	val detector: TreeDetector = StandardTreeDetector,
-	val enabledPredicate: (CommonConfig) -> Boolean = { true },
-	val trunkMatcher: BlockMatcher,
-	val leafMatcher: BlockMatcher = BlockMatcher.NONE,
-	val decorationMatcher: BlockMatcher = BlockMatcher.NONE,
-	val groundMatcher: BlockMatcher = DefaultGroundMatchers.STANDARD_GROUND,
-	val minLeaves: Int? = null,
-	val requireNaturalLeaves: Boolean = true,
-	val maxTrunkBlocks: Int? = null,
-	val maxLeafBlocks: Int? = null,
-	val maxLeafDistance: Int? = null,
-	val allowDiagonalTrunks: Boolean = true
+	val detector: Identifier = TreeDetectors.BRANCHING_ID,
+	val logs: BlockMatcher,
+	val leaves: BlockMatcher = BlockMatcher.NONE,
+	val decorations: BlockMatcher = BlockMatcher.NONE
 ) {
-	fun isEnabled(config: CommonConfig): Boolean = enabledPredicate(config)
-
-	fun resolveMinLeaves(config: CommonConfig): Int = minLeaves ?: config.minLeavesRequired
-
-	fun resolveMaxTrunkBlocks(config: CommonConfig): Int = maxTrunkBlocks ?: config.maxTrunkBlocks
-
-	fun resolveMaxLeafBlocks(config: CommonConfig): Int = maxLeafBlocks ?: config.maxLeafBlocks
-
-	fun resolveMaxLeafDistance(config: CommonConfig): Int = maxLeafDistance ?: config.maxLeafDistance
+	val hasLeaves: Boolean
+		get() = leaves !== BlockMatcher.NONE
 }
 
 data class ScannedTree(

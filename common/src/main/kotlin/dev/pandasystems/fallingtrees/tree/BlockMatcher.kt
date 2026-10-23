@@ -11,23 +11,28 @@ import net.minecraft.world.level.block.state.BlockState
 fun interface BlockMatcher {
 	fun matches(state: BlockState): Boolean
 
-	infix fun or(other: BlockMatcher): BlockMatcher = BlockMatcher { state ->
-		this.matches(state) || other.matches(state)
+	infix fun or(other: BlockMatcher): BlockMatcher {
+		if (this === NONE) return other
+		if (other === NONE) return this
+		return BlockMatcher { state -> this.matches(state) || other.matches(state) }
 	}
 
-	infix fun and(other: BlockMatcher): BlockMatcher = BlockMatcher { state ->
-		this.matches(state) && other.matches(state)
+	infix fun and(other: BlockMatcher): BlockMatcher {
+		if (this === NONE || other === NONE) return NONE
+		return BlockMatcher { state -> this.matches(state) && other.matches(state) }
 	}
 
 	companion object {
 		val NONE = BlockMatcher { false }
 
 		fun ofBlocks(vararg blocks: Block): BlockMatcher {
+			if (blocks.isEmpty()) return NONE
 			val set = blocks.toSet()
 			return BlockMatcher { it.block in set }
 		}
 
 		fun ofTags(vararg tags: TagKey<Block>): BlockMatcher {
+			if (tags.isEmpty()) return NONE
 			val list = tags.toList()
 			return BlockMatcher { state -> list.any { state.`is`(it) } }
 		}
@@ -48,6 +53,8 @@ fun interface BlockMatcher {
 					blockIds.add(id)
 				}
 			}
+
+			if (blockIds.isEmpty() && tagKeys.isEmpty()) return NONE
 
 			return BlockMatcher { state ->
 				val blockKey = BuiltInRegistries.BLOCK.getKey(state.block)

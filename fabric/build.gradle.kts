@@ -1,6 +1,4 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.gradle.kotlin.dsl.named
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
 	alias(libs.plugins.kotlin.jvm)
@@ -88,6 +86,7 @@ loom {
 }
 
 tasks.processResources {
+	from(project(":common").tasks.processResources)
 	val replaceProperties = mapOf(
 		"mod_id" to project.property("mod_id"),
 		"mod_name" to project.property("mod_name"),
