@@ -12,24 +12,94 @@ import net.minecraft.sounds.SoundSource
 import net.minecraft.tags.ItemTags
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.Vec3
+import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.pow
 
 object TreeFeller {
 	private val isFellingTree: ThreadLocal<Boolean> = ThreadLocal.withInitial { false }
+
+	private data class SessionKey(
+		val playerUuid: UUID,
+		val isClientSide: Boolean
+	)
+
+	private data class MiningSession(
+		val pos: BlockPos,
+		var lastTick: Int,
+		val initialItem: Item,
+		val startedCrouching: Boolean
+	)
+
+	private val miningSessions = ConcurrentHashMap<SessionKey, MiningSession>()
+	private const val MAX_TICK_GAP = 10
 
 	fun init() {
 		TreeRegistry.registerDefaults()
 		ServerPlayerEvents.playerBlockBreakBefore.subscribe(::onBeforeBlockBreak)
 	}
 
-	fun canPlayerTriggerFell(player: Player, config: CommonConfig): Boolean {
-		if (config.disableCrouchMining && player.isShiftKeyDown) return false
-		if (config.reverseCrouchMining && !player.isShiftKeyDown) return false
+	fun isPlayerCrouching(player: Player): Boolean {
+		return player.isShiftKeyDown || player.isCrouching
+	}
+
+	private fun getOrStartMiningSession(player: Player, pos: BlockPos, isClientSide: Boolean): MiningSession {
+		val key = SessionKey(player.uuid, isClientSide)
+		val currentTick = player.tickCount
+		val currentItem = player.mainHandItem.item
+		val existing = miningSessions[key]
+
+		if (existing != null &&
+			existing.pos == pos &&
+			existing.initialItem == currentItem &&
+			(currentTick - existing.lastTick) in 0..MAX_TICK_GAP
+		) {
+			existing.lastTick = currentTick
+			return existing
+		}
+
+		val isCrouching = isPlayerCrouching(player)
+		val newSession = MiningSession(
+			pos = pos.immutable(),
+			lastTick = currentTick,
+			initialItem = currentItem,
+			startedCrouching = isCrouching
+		)
+		miningSessions[key] = newSession
+
+		if (miningSessions.size > 64) {
+			miningSessions.entries.removeIf { (_, s) ->
+				val gap = currentTick - s.lastTick
+				gap > MAX_TICK_GAP || gap < 0
+			}
+		}
+
+		return newSession
+	}
+
+	fun canPlayerTriggerFell(
+		player: Player,
+		config: CommonConfig,
+		pos: BlockPos? = null
+	): Boolean {
+		val isCrouching = if (pos != null) {
+			val session = getOrStartMiningSession(player, pos, player.level().isClientSide)
+			session.startedCrouching
+		} else {
+			isPlayerCrouching(player)
+		}
+
+		if (!config.disableCrouchMining) {
+			if (isCrouching != config.reverseCrouchMining) {
+				return false
+			}
+		}
 
 		val mainHandItem = player.mainHandItem
 		if (config.requireAxe) {
@@ -59,9 +129,11 @@ object TreeFeller {
 		if (baseProgress <= 0f) return baseProgress
 
 		val config = fallingTreesCommonConfig.value
-		if (!config.scaleMiningSpeedWithSize) return baseProgress
-		if (!canPlayerTriggerFell(player, config)) return baseProgress
 		if (TreeRegistry.findMatchingDefinitions(state, config).isEmpty()) return baseProgress
+
+		val canFell = canPlayerTriggerFell(player, config, pos)
+		if (!config.scaleMiningSpeedWithSize) return baseProgress
+		if (!canFell) return baseProgress
 
 		val scanned = TreeScanCache.getOrScan(level, pos, config) ?: return baseProgress
 		if (!scanned.shouldFall(config)) return baseProgress
@@ -86,7 +158,10 @@ object TreeFeller {
 
 		TreeScanCache.invalidate(serverLevel, origin)
 
-		if (!canPlayerTriggerFell(player, config)) return
+		val canFell = canPlayerTriggerFell(player, config, origin)
+		miningSessions.remove(SessionKey(player.uuid, false))
+
+		if (!canFell) return
 
 		val scanned = TreeRegistry.scanTree(serverLevel, origin, config) ?: return
 		if (!scanned.shouldFall(config)) return
