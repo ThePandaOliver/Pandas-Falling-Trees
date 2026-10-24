@@ -17,7 +17,7 @@ data class CommonConfig(
 	var exhaustionPerBlock: Float = 0.005f,
 
 	// Rules
-	var requireFullGroundSeparation: Boolean = true,
+	var requireFullGroundSeparation: Boolean = false,
 	var scanBelowOrigin: Boolean = false,
 	var maxTrunkBlocks: Int = 256,
 	var maxLeafBlocks: Int = 512,

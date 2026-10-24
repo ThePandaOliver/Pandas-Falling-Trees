@@ -14,4 +14,7 @@ class TreeRenderState : EntityRenderState() {
 	var blockRenderStates: List<SingleBlockState> = emptyList()
 	var fallDirection: Vec3 = Vec3(1.0, 0.0, 0.0)
 	var fallAngle: Float = 0f
+	var pivotOffset: Vec3 = Vec3.ZERO
+	var colliderOffsets: List<Vec3> = emptyList()
+	var showDebugColliders: Boolean = false
 }

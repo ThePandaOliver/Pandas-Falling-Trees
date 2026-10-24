@@ -227,14 +227,14 @@ object TreeDetectors {
 			}
 		}
 
-		// Phase 3: Multi-Source Voronoi filter against rival trunks
+		// Multi-Source Voronoi filter against rival trunks
 		val survivingLeaves = if (rivalTrunks.isEmpty() || candidateLeaves.isEmpty()) {
 			LinkedHashSet(candidateLeaves.keys)
 		} else {
 			filterRivalLeaves(candidateLeaves, visitedTrunks, rivalTrunks)
 		}
 
-		// Phase 4: Collect attached & hanging decorations around trunks and surviving leaves
+		// Collect attached & hanging decorations around trunks and surviving leaves
 		val decorations = scanDecorations(context, visitedTrunks, survivingLeaves)
 
 		return survivingLeaves.toList() to decorations
@@ -281,7 +281,7 @@ object TreeDetectors {
 			if (theirStepDist == null || ourStepDist < theirStepDist) {
 				ownedLeaves.add(leafPos)
 			} else if (ourStepDist == theirStepDist) {
-				// Tie-breaker: compare 3D Euclidean squared distance to nearest trunk block
+				// Compare 3D Euclidean squared distance to nearest trunk block
 				val ourMinSq = minDistSq(leafPos, ourTrunks)
 				val theirMinSq = minDistSq(leafPos, rivalTrunks)
 				if (ourMinSq <= theirMinSq) {

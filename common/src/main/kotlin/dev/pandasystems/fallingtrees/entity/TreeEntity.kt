@@ -2,6 +2,7 @@ package dev.pandasystems.fallingtrees.entity
 
 import dev.pandasystems.fallingtrees.FallingTreesRegistries
 import dev.pandasystems.fallingtrees.config.fallingTreesCommonConfig
+import dev.pandasystems.fallingtrees.tree.TreeRegistry
 import net.minecraft.core.BlockPos
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
@@ -16,6 +17,7 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
@@ -50,7 +52,12 @@ class TreeEntity(type: EntityType<*>, level: Level) : Entity(type, level) {
 
 	val treeBlocks: MutableMap<BlockPos, BlockState> = LinkedHashMap()
 
-	private var colliderOffsets: List<Vec3> = emptyList()
+	var colliderOffsets: List<Vec3> = emptyList()
+		private set
+
+	var pivotOffset: Vec3 = Vec3.ZERO
+		private set
+
 	private var trunkBlockCount: Int = 1
 	private val damagedEntities: MutableSet<UUID> = HashSet()
 
@@ -94,18 +101,16 @@ class TreeEntity(type: EntityType<*>, level: Level) : Entity(type, level) {
 		prevFallAngle + (fallAngle - prevFallAngle) * partialTick
 
 	fun transformOffsetAroundEdgePivot(relOffset: Vec3, quat: Quaternionf, out: Vector3f): Vector3f {
-		val dir = fallDirection
-		val edgeX = (dir.x * 0.5).toFloat()
-		val edgeZ = (dir.z * 0.5).toFloat()
+		val p = pivotOffset
 
-		// Shift relative to the bottom edge pivot, rotate, then shift back
+		// Shift relative to the outermost base edge pivot, rotate, then shift back
 		out.set(
-			relOffset.x.toFloat() - edgeX,
-			relOffset.y.toFloat(),
-			relOffset.z.toFloat() - edgeZ
+			(relOffset.x - p.x).toFloat(),
+			(relOffset.y - p.y).toFloat(),
+			(relOffset.z - p.z).toFloat()
 		)
 		quat.transform(out)
-		out.add(edgeX, 0f, edgeZ)
+		out.add(p.x.toFloat(), p.y.toFloat(), p.z.toFloat())
 		return out
 	}
 
@@ -123,11 +128,11 @@ class TreeEntity(type: EntityType<*>, level: Level) : Entity(type, level) {
 			treeBlocks[rel] = state
 		}
 
+		fallDirection = fallDir
 		rebuildGeometryBounds()
 
 		pendingDrops.clear()
 		pendingDrops.addAll(drops)
-		fallDirection = fallDir
 
 		entityData.set(DATA_BLOCKS_STRING, encodeBlocksToString(treeBlocks))
 	}
@@ -144,7 +149,34 @@ class TreeEntity(type: EntityType<*>, level: Level) : Entity(type, level) {
 			treeBlocks.clear()
 			treeBlocks.putAll(decodeBlocksFromString(encoded))
 			rebuildGeometryBounds()
+		} else if (accessor == DATA_FALL_DIRECTION) {
+			rebuildGeometryBounds()
 		}
+	}
+
+	private fun isSolidStructuralBlock(state: BlockState): Boolean {
+		if (state.isAir) return false
+
+		// Ignore all leaf & wart canopy foliage
+		if (state.`is`(BlockTags.LEAVES) || state.`is`(BlockTags.WART_BLOCKS)) return false
+		if (state.`is`(Blocks.MANGROVE_LEAVES) || state.`is`(Blocks.CHORUS_FLOWER)) return false
+
+		// Ignore standard tree decorations (vines, moss carpets, cocoa, shroomlights, nests, etc.)
+		if (TreeRegistry.STANDARD_DECORATIONS.matches(state)) return false
+
+		// Ignore specific plant attachments and hanging foliage
+		if (state.`is`(Blocks.CACTUS_FLOWER) ||
+			state.`is`(Blocks.MANGROVE_PROPAGULE) ||
+			state.`is`(Blocks.WEEPING_VINES) ||
+			state.`is`(Blocks.WEEPING_VINES_PLANT) ||
+			state.`is`(Blocks.TWISTING_VINES) ||
+			state.`is`(Blocks.TWISTING_VINES_PLANT) ||
+			state.`is`(Blocks.VINE)
+		) {
+			return false
+		}
+
+		return true
 	}
 
 	private fun rebuildGeometryBounds() {
@@ -160,7 +192,7 @@ class TreeEntity(type: EntityType<*>, level: Level) : Entity(type, level) {
 			// Center of this block relative to (origin.x + 0.5, origin.y, origin.z + 0.5)
 			val offset = Vec3(rel.x.toDouble(), rel.y + 0.5, rel.z.toDouble())
 			allSample.add(offset)
-			if (!state.`is`(BlockTags.LEAVES) && !state.`is`(BlockTags.WART_BLOCKS)) {
+			if (isSolidStructuralBlock(state)) {
 				trunkSample.add(offset)
 			}
 		}
@@ -171,18 +203,27 @@ class TreeEntity(type: EntityType<*>, level: Level) : Entity(type, level) {
 		val totalBlocks = max(1, treeBlocks.size).toFloat()
 
 		// Compute rotational inertia scale from height, trunk volume, and canopy weight
-		// Normal trees (~22 effectiveMass) keep ~0.85 massScale, while giant trees gently taper down to 0.55
 		val effectiveMass = height * 1.5f + sqrt(trunkCount) * 3.0f + sqrt(totalBlocks) * 0.8f
 		massScale = 0.85f * (22.0f / effectiveMass.coerceAtLeast(10.0f)).pow(0.32f).coerceIn(0.65f, 1.25f)
 		maxSpeedForSize = (MAX_FALL_SPEED * massScale.pow(0.25f)).coerceIn(3.2f, 4.8f)
 
-		// Prefer solid trunk blocks for collision checks so outer leaves can compress slightly before solid impact
-		val sourceOffsets = trunkSample.ifEmpty { allSample }
-		colliderOffsets = if (sourceOffsets.size <= 64) {
-			sourceOffsets
+		// Every single solid trunk and branch block is retained for collisions so no part clips the terrain
+		colliderOffsets = trunkSample.ifEmpty { allSample }
+
+		// Calculate dynamic outermost base edge pivot in the fall direction
+		val dir = fallDirection
+		val baseTrunks = treeBlocks.filter { (pos, state) ->
+			pos.y == minY && isSolidStructuralBlock(state)
+		}
+
+		pivotOffset = if (baseTrunks.isNotEmpty()) {
+			// Find the base trunk block with the largest projection along fallDirection
+			val outermostBase = baseTrunks.keys.maxByOrNull { pos ->
+				pos.x * dir.x + pos.z * dir.z
+			} ?: BlockPos.ZERO
+			Vec3(outermostBase.x + dir.x * 0.5, minY.toDouble(), outermostBase.z + dir.z * 0.5)
 		} else {
-			// Prioritize blocks higher up the tree
-			sourceOffsets.sortedByDescending { it.lengthSqr() }.take(64)
+			Vec3(dir.x * 0.5, minY.toDouble(), dir.z * 0.5)
 		}
 
 		val expand = (maxY - minY + 3).toDouble()
@@ -223,10 +264,10 @@ class TreeEntity(type: EntityType<*>, level: Level) : Entity(type, level) {
 
 		// Check if sweeping to targetAngle collides with the environment
 		if (fallAngle > 5.0f && angularVelocity > 0f && checkCollisionAtAngle(currentLevel, targetAngle)) {
-			// Binary search for exact contact angle between fallAngle and targetAngle
+			// Binary search for exact contact angle between fallAngle and targetAngle (6 iterations for high precision)
 			var low = fallAngle
 			var high = targetAngle
-			for (i in 0 until 4) {
+			for (i in 0 until 6) {
 				val mid = (low + high) * 0.5f
 				if (checkCollisionAtAngle(currentLevel, mid)) {
 					high = mid
@@ -308,12 +349,14 @@ class TreeEntity(type: EntityType<*>, level: Level) : Entity(type, level) {
 		val finalDamage = rawDamage.coerceIn(1.0f, config.maxFallingTreeDamage)
 		val damageSource = damageSources().fallingBlock(this)
 
+		val p = pivotOffset
+
 		for (entity in candidates) {
 			val entityBox = entity.boundingBox
 			var hit = false
 			for (offset in colliderOffsets) {
-				// Ignore the bottom pivot log block so the player chopping at the base isn't immediately hit
-				if (offset.y < 1.0 && offset.x == 0.0 && offset.z == 0.0) continue
+				// Ignore blocks near the base pivot height so players chopping at the base aren't immediately hit
+				if (offset.y < p.y + 1.0) continue
 
 				// Check both the block center and the leading face of the block in the fall direction
 				val leadOffset = Vec3(offset.x + leadX, offset.y, offset.z + leadZ)
@@ -356,22 +399,36 @@ class TreeEntity(type: EntityType<*>, level: Level) : Entity(type, level) {
 		val pivotZ = z
 		val originBlock = blockPosition()
 
-		// Offset from the block's center to its leading side face (and top edge) in the direction of the fall
-		val sideX = dir.x * 0.48
-		val sideZ = dir.z * 0.48
+		// Primary fall direction vector and lateral perpendicular vector
+		val leadX = dir.x * 0.48
+		val leadZ = dir.z * 0.48
+		val latX = -dir.z * 0.45
+		val latZ = dir.x * 0.45
+
+		// Probe offsets spanning leading face, bottom face, bottom corners, and lateral branch sides
+		val probeDeltas = arrayOf(
+			Vec3(leadX, -0.45, leadZ),                   // Bottom leading edge center
+			Vec3(leadX + latX, -0.45, leadZ + latZ),      // Bottom leading right corner
+			Vec3(leadX - latX, -0.45, leadZ - latZ),      // Bottom leading left corner
+			Vec3(leadX, 0.45, leadZ),                     // Top leading edge center (cliffs/walls)
+			Vec3(0.0, -0.48, 0.0),                        // Bottom face center
+			Vec3(latX, -0.45, latZ),                      // Lateral right branch bottom
+			Vec3(-latX, -0.45, -latZ)                     // Lateral left branch bottom
+		)
 
 		val tempVec = Vector3f()
 		val checkPos = BlockPos.MutableBlockPos()
 
-		for (offset in colliderOffsets) {
-			// Skip the bottom pivot block itself so it doesn't immediately collide with the ground it sits on
-			if (offset.y < 1.0 && offset.x == 0.0 && offset.z == 0.0) continue
+		val p = pivotOffset
 
-			// Check the leading side face of the falling block (which becomes the bottom face at 90 degrees)
-			// plus a point near its top leading edge so tall blocks don't clip at the tip
-			for (yShift in floatArrayOf(0.0f, 0.42f)) {
-				val sidePoint = Vec3(offset.x + sideX, offset.y + yShift, offset.z + sideZ)
-				transformOffsetAroundEdgePivot(sidePoint, quat, tempVec)
+		for (offset in colliderOffsets) {
+			// Ignore base-level blocks right at the pivot level (minY) - these are the stumps/roots resting on the ground!
+			// Testing them immediately collides with the ground block or adjacent stump they rested upon.
+			if (offset.y < p.y + 1.0) continue
+
+			for (delta in probeDeltas) {
+				val probePoint = Vec3(offset.x + delta.x, offset.y + delta.y, offset.z + delta.z)
+				transformOffsetAroundEdgePivot(probePoint, quat, tempVec)
 
 				val wx = pivotX + tempVec.x
 				val wy = pivotY + tempVec.y
@@ -387,8 +444,8 @@ class TreeEntity(type: EntityType<*>, level: Level) : Entity(type, level) {
 				if (!shape.isEmpty) {
 					val worldBounds = shape.bounds().move(checkPos)
 					if (worldBounds.intersects(
-							wx - 0.04, wy - 0.04, wz - 0.04,
-							wx + 0.04, wy + 0.04, wz + 0.04
+							wx - 0.06, wy - 0.06, wz - 0.06,
+							wx + 0.06, wy + 0.06, wz + 0.06
 						)
 					) {
 						return true
