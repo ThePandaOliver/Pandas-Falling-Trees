@@ -13,7 +13,6 @@ import net.minecraft.world.level.block.LeavesBlock
 import net.minecraft.world.level.block.state.BlockState
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.abs
-import kotlin.math.max
 
 class TreeScanContext(
 	val level: BlockGetter,

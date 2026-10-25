@@ -76,7 +76,7 @@ object TreeFeller {
 		if (miningSessions.size > 64) {
 			miningSessions.entries.removeIf { (_, s) ->
 				val gap = currentTick - s.lastTick
-				gap > MAX_TICK_GAP || gap < 0
+				gap !in 0..MAX_TICK_GAP
 			}
 		}
 
@@ -186,7 +186,8 @@ object TreeFeller {
 				leaves = leavesToFell,
 				decorations = decorationsToFell,
 				tool = tool,
-				config = config
+				config = config,
+				definition = scanned.definition
 			)
 		} finally {
 			isFellingTree.set(false)
@@ -215,7 +216,8 @@ object TreeFeller {
 		leaves: List<BlockPos>,
 		decorations: List<BlockPos>,
 		tool: ItemStack,
-		config: CommonConfig
+		config: CommonConfig,
+		definition: TreeDefinition
 	) {
 		val capturedBlocks = LinkedHashMap<BlockPos, BlockState>()
 		val collectedDrops = mutableListOf<Pair<BlockPos, ItemStack>>()
@@ -229,15 +231,12 @@ object TreeFeller {
 		val canDropItems = !player.isCreative
 		val toolSnapshot = tool.copy()
 
-		// Capture block states and loot drops before removing blocks
 		for (pos in allPositions) {
 			val state = serverLevel.getBlockState(pos)
 			if (state.isAir) continue
 			capturedBlocks[pos] = state
 
-			// The origin block itself will be broken by vanilla's destroyBlock flow,
-			// so we only collect drops for the additional blocks above/around origin.
-			if (pos != origin && canDropItems) {
+			if (canDropItems) {
 				val blockEntity = serverLevel.getBlockEntity(pos)
 				val drops = Block.getDrops(state, serverLevel, pos, blockEntity, player, toolSnapshot)
 				for (drop in drops) {
@@ -253,12 +252,12 @@ object TreeFeller {
 			val state = serverLevel.getBlockState(pos)
 			if (!state.isAir) {
 				val replacement = state.fluidState.createLegacyBlock()
-				// Update limit is 0, so no neighbor updates are triggered.
+				// Update limit is 0, so no neighbor updates are triggered during block removal.
 				serverLevel.setBlock(pos, replacement, removalFlags, 0)
 			}
 		}
 
-		// Notify neighbors around the cleared volume once removal is complete
+		// Notify neighbors around the cleared blocks once removal is complete
 		val updateNeighborFlags = removalFlags or -34
 		for (pos in allPositions) {
 			val oldState = capturedBlocks[pos]
@@ -268,7 +267,6 @@ object TreeFeller {
 			newState.updateIndirectNeighbourShapes(serverLevel, pos, updateNeighborFlags, 511)
 		}
 
-		// Apply extra durability and exhaustion costs for additional trunk blocks
 		val extraTrunksBroken = (trunks.size - 1).coerceAtLeast(0)
 		if (!player.isCreative && extraTrunksBroken > 0) {
 			if (!config.disableExtraToolDamage && tool.isDamageableItem) {
@@ -279,14 +277,14 @@ object TreeFeller {
 			}
 		}
 
-		// Spawn the TreeEntity to animate the fall and drop items on impact
 		val treeEntity = TreeEntity(FallingTreesRegistries.treeEntity.get(), serverLevel)
-		val fallDir = player.lookAngle
+		val fallDirection = player.lookAngle
 		treeEntity.initializeTree(
 			origin = origin,
 			blocks = capturedBlocks,
 			drops = collectedDrops,
-			fallDir = Vec3(fallDir.x, 0.0, fallDir.z)
+			fallDirection = Vec3(fallDirection.x, 0.0, fallDirection.z),
+			definition = definition
 		)
 		serverLevel.addFreshEntity(treeEntity)
 
