@@ -1,12 +1,5 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 plugins {
-	alias(libs.plugins.kotlin.jvm)
-	alias(libs.plugins.kotlin.serialization)
-	alias(libs.plugins.ksp)
-	alias(libs.plugins.fabric.loom)
-	alias(libs.plugins.shadow)
-	`maven-publish`
+	id("fallingtrees.fabric")
 }
 
 evaluationDependsOn(":common")
@@ -15,55 +8,11 @@ base {
 	archivesName.set("fallingtrees-fabric")
 }
 
-repositories {
-	mavenLocal()
-	mavenCentral()
-}
-
-val common = configurations.create("common") {
-	isCanBeResolved = true
-	isCanBeConsumed = false
-}
-
-val shadowCommon = configurations.create("shadowCommon") {
-	isCanBeResolved = true
-	isCanBeConsumed = false
-}
-
-configurations.compileClasspath.get().extendsFrom(common)
-configurations.runtimeClasspath.get().extendsFrom(common)
-
 dependencies {
-	minecraft("com.mojang:minecraft:${project.property("minecraft_version")}")
-	implementation("net.fabricmc:fabric-loader:${project.property("fabric_loader_version")}")
-	implementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_api_version")}")
-
-	api(libs.kotlin.reflect)
-	api(libs.kotlinx.coroutines)
-	api(libs.kotlinx.serialization)
-	api(libs.kotlinx.serialization.json)
-	api(libs.kotlinx.serialization.cbor)
-	api(libs.kotlinx.io)
-	api(libs.kotlinx.io.bytestring)
-	api(libs.kotlinx.datetime)
-
-	common(project(":common")) { isTransitive = false }
-	shadowCommon(project(":common")) { isTransitive = false }
-
-	implementation(libs.autoService.annotations)
-	ksp(libs.autoService.ksp)
+	"common"(project(":common")) { isTransitive = false }
+	"shadowCommon"(project(":common")) { isTransitive = false }
 
 	api(libs.pandalib.fabric)
-}
-
-java {
-	toolchain {
-		languageVersion.set(JavaLanguageVersion.of(25))
-	}
-}
-
-kotlin {
-	jvmToolchain(25)
 }
 
 loom {
@@ -104,28 +53,4 @@ tasks.processResources {
 	}
 }
 
-tasks.named<ShadowJar>("shadowJar") {
-	configurations = listOf(shadowCommon)
-	archiveClassifier.set("")
-	mergeServiceFiles()
-}
-
-tasks.named("assemble") {
-	dependsOn(tasks.named("shadowJar"))
-}
-
-publishing {
-	publications {
-		create<MavenPublication>("maven") {
-			from(components["java"])
-			artifactId = "fallingtrees-fabric"
-		}
-	}
-
-	repositories {
-		maven {
-			name = "LocalRepo"
-			url = uri(providers.gradleProperty("LocalRepo").getOrElse("${rootProject.layout.buildDirectory.get()}/repo"))
-		}
-	}
-}
+configureFallingTreesPublishing("fallingtrees-fabric")

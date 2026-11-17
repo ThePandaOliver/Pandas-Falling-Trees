@@ -2,7 +2,7 @@ package dev.pandasystems.fallingtrees.client
 
 import dev.pandasystems.fallingtrees.client.rendering.TreeRenderer
 import dev.pandasystems.fallingtrees.FallingTreesRegistries
-import dev.pandasystems.pandalib.client.rendering.RendererRegistry
+import dev.pandasystems.pandalib.core.rendering.RendererRegistry
 
 
 class FallingTreesClientMain {

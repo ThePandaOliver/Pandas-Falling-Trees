@@ -1,9 +1,11 @@
 [versions]
-kotlin = "2.3.0"
-kotlinx-coroutines = "1.10.2"
-kotlinx-serialization = "1.9.0"
-kotlinx-io = "0.8.2"
-kotlinx-datetime = "0.7.1"
+kotlin = "2.4.21"
+kotlinx-coroutines = "1.11.0"
+kotlinx-serialization = "1.13.0"
+kotlinx-io = "0.9.3"
+kotlinx-datetime = "0.8.0"
+
+ksp = "2.3.14"
 
 autoService-ksp = "1.2.0"
 autoService-annotations = "1.1.1"
@@ -31,8 +33,8 @@ pandalib-neoforge = { module = "dev.pandasystems:pandalib-neoforge", version.ref
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-shadow = { id = "com.gradleup.shadow", version = "9.0.2" }
-publish-mod = { id = "me.modmuss50.mod-publish-plugin", version = "1.1.0" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin" }
+shadow = { id = "com.gradleup.shadow", version = "9.6.1" }
+publish-mod = { id = "me.modmuss50.mod-publish-plugin", version = "2.2.1" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 fabric-loom = { id = "net.fabricmc.fabric-loom", version = "1.15-SNAPSHOT" }
 neoforge-moddev = { id = "net.neoforged.moddev", version = "2.0.146" }

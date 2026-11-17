@@ -1,9 +1,11 @@
-pluginManagement.repositories {
-	mavenLocal()
-	maven("https://maven.architectury.dev/") { name = "Architectury" }
-	maven("https://maven.fabricmc.net/") { name = "Fabric" }
-	maven("https://maven.neoforged.net/releases/") { name = "NeoForge" }
-	gradlePluginPortal()
+pluginManagement {
+	repositories {
+		mavenLocal()
+		maven("https://maven.architectury.dev/") { name = "Architectury" }
+		maven("https://maven.fabricmc.net/") { name = "Fabric" }
+		maven("https://maven.neoforged.net/releases/") { name = "NeoForge" }
+		gradlePluginPortal()
+	}
 }
 
 plugins {
@@ -15,3 +17,4 @@ rootProject.name = "FallingTrees"
 
 include("common")
 include("fabric")
+include("neoforge")

@@ -2,7 +2,7 @@ package dev.pandasystems.fallingtrees
 
 import dev.pandasystems.fallingtrees.entity.TreeEntity
 import dev.pandasystems.pandalib.core.handles.id
-import dev.pandasystems.pandalib.registry.DeferredRegistry
+import dev.pandasystems.pandalib.core.registry.DeferredRegistry
 import net.minecraft.core.registries.Registries
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.entity.EntityType

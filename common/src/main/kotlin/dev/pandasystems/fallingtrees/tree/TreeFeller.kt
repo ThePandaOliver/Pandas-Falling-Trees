@@ -4,8 +4,8 @@ import dev.pandasystems.fallingtrees.config.CommonConfig
 import dev.pandasystems.fallingtrees.config.fallingTreesCommonConfig
 import dev.pandasystems.fallingtrees.FallingTreesRegistries
 import dev.pandasystems.fallingtrees.entity.TreeEntity
-import dev.pandasystems.pandalib.event.events.server.ServerPlayerBlockBreakEventContext
-import dev.pandasystems.pandalib.event.events.server.ServerPlayerEvents
+import dev.pandasystems.pandalib.core.event.ServerPlayerBlockBreakEventContext
+import dev.pandasystems.pandalib.core.event.ServerPlayerEvents
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundSource
